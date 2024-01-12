@@ -21,7 +21,7 @@ import { MergeMap, MergeSet } from './utils';
 
 export function validateNonNullObject(obj: unknown): object {
   if ('object' !== typeof obj || null === obj) {
-    throw new Error();
+    throw new Error('Expected non-null object');
   }
   return obj;
 }
@@ -29,7 +29,7 @@ export function validateNonNullObject(obj: unknown): object {
 export function validateUint8Array(array: unknown): Uint8Array {
   const obj: object = validateNonNullObject(array);
   if (obj.constructor !== Uint8Array) {
-    throw new Error();
+    throw new Error('Expected Uint8Array');
   }
   return array as Uint8Array;
 }
@@ -37,14 +37,14 @@ export function validateUint8Array(array: unknown): Uint8Array {
 export function validateURL(url: unknown): URL {
   const obj: object = validateNonNullObject(url);
   if (obj.constructor !== URL) {
-    throw new Error();
+    throw new Error('Expected URL');
   }
   return url as URL;
 }
 
 export function validateCalendarUrl(url: unknown): string {
   if ('string' !== typeof url) {
-    throw new Error();
+    throw new Error('Expected string');
   }
   if (!/^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/.test(url)) {
     throw new Error('Invalid URL');
@@ -54,37 +54,37 @@ export function validateCalendarUrl(url: unknown): string {
 
 export function validateNonNegativeInteger(num: unknown): number {
   if ('number' !== typeof num) {
-    throw new Error();
+    throw new Error('Expected number');
   }
   if (!Number.isSafeInteger(num)) {
-    throw new Error();
+    throw new Error('Expected safe-integer');
   }
   if (num < 0) {
-    throw new Error();
+    throw new Error('Expected positive integer');
   }
   return num;
 }
 
 export function validateOneOfStrings(value: string, options: string[]): string {
   if (!options.includes(value)) {
-    throw new Error();
+    throw new Error(`Expected one of ${options.join(', ')}`);
   }
   return value;
 }
 
 export function validateObjectHasTypeKey(obj: object): { type: string } {
   if (!('type' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .type');
   }
   if ('string' !== typeof obj.type) {
-    throw new Error();
+    throw new Error('Expected string');
   }
   return obj as { type: string };
 }
 
 export function validateObjectHasHeightKey(obj: object): { height: number } {
   if (!('height' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .height');
   }
   validateNonNegativeInteger(obj.height);
   return obj as { height: number };
@@ -92,7 +92,7 @@ export function validateObjectHasHeightKey(obj: object): { height: number } {
 
 export function validateObjectHasUrlKey(obj: object): { url: URL } {
   if (!('url' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .url');
   }
   validateURL(obj.url);
   return obj as { url: URL };
@@ -100,7 +100,7 @@ export function validateObjectHasUrlKey(obj: object): { url: URL } {
 
 export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } {
   if (!('header' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .header');
   }
   validateUint8Array(obj.header);
   return obj as { header: Uint8Array };
@@ -108,7 +108,7 @@ export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } 
 
 export function validateObjectHasPayloadKey(obj: object): { payload: Uint8Array } {
   if (!('payload' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .payload');
   }
   validateUint8Array(obj.payload);
   return obj as { payload: Uint8Array };
@@ -116,7 +116,7 @@ export function validateObjectHasPayloadKey(obj: object): { payload: Uint8Array 
 
 export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array } {
   if (!('operand' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .operand');
   }
   validateUint8Array(obj.operand);
   return obj as { operand: Uint8Array };
@@ -124,11 +124,11 @@ export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array 
 
 export function validateObjectHasLeavesKey(obj: object): { leaves: MergeSet<Leaf> } {
   if (!('leaves' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .leaves');
   }
   const leaves: object = validateNonNullObject(obj.leaves);
   if (leaves.constructor !== MergeSet) {
-    throw new Error();
+    throw new Error('Expected MergeSet');
   }
   (leaves as MergeSet<unknown>).values().forEach(validateLeaf);
 
@@ -137,11 +137,11 @@ export function validateObjectHasLeavesKey(obj: object): { leaves: MergeSet<Leaf
 
 export function validateObjectHasEdgesKey(obj: object): { edges: MergeMap<Op, Tree> } {
   if (!('edges' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .edges');
   }
   const edges: object = validateNonNullObject(obj.edges);
   if (edges.constructor !== MergeMap) {
-    throw new Error();
+    throw new Error('Expected MergeMap');
   }
   (edges as MergeMap<unknown, unknown>).keys().forEach(validateOp);
   (edges as MergeMap<unknown, unknown>).values().forEach(validateTree);
@@ -151,10 +151,10 @@ export function validateObjectHasEdgesKey(obj: object): { edges: MergeMap<Op, Tr
 
 export function validateObjectHashAlgorithmKey(obj: object): { algorithm: string } {
   if (!('algorithm' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .algorithm');
   }
   if ('string' !== typeof obj.algorithm) {
-    throw new Error();
+    throw new Error('Expected string');
   }
   validateOneOfStrings(obj.algorithm, ['sha1', 'ripemd160', 'sha256', 'keccak256']);
 
@@ -163,7 +163,7 @@ export function validateObjectHashAlgorithmKey(obj: object): { algorithm: string
 
 export function validateObjectHashValueKey(obj: object): { value: Uint8Array } {
   if (!('value' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .value');
   }
   validateUint8Array(obj.value);
 
@@ -271,7 +271,7 @@ export function validateFileHash(fileHash: unknown): FileHash {
 export function validateVersion(version: unknown): number {
   validateNonNegativeInteger(version);
   if (1 !== version) {
-    throw new Error();
+    throw new Error('Expected .version to be 1');
   }
 
   return version;
@@ -281,13 +281,13 @@ export function validateTimestamp(timestamp: unknown): Timestamp {
   const obj: object = validateNonNullObject(timestamp);
 
   if (!('version' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .version');
   }
   if (!('fileHash' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .fileHash');
   }
   if (!('tree' in obj)) {
-    throw new Error();
+    throw new Error('Expected key .tree');
   }
 
   validateVersion(obj.version);
