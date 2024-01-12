@@ -1,0 +1,41 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "includeVersion": true,
+  "plugin": [
+    "typedoc-plugin-keywords",
+    "typedoc-plugin-katex",
+    "typedoc-plugin-remove-references",
+    "typedoc-plugin-mermaid"
+  ],
+  "keywords": ["NOSOpenTimestampsTR", "library"],
+  "markedOptions": {
+    "gfm": true
+  },
+  "json": "../dist/docs/internal.json",
+  "pretty": true,
+  "sourceLinkExternal": true,
+  "hideParameterTypesInTitle": false,
+  "cleanOutputDir": true,
+  "out": "../dist/docs/internal",
+  "entryPoints": ["../src/**/*.ts", "../test/helpers.ts"],
+  "hideGenerator": true,
+  "searchInComments": true,
+  "navigationLinks": {
+    "La Crypta": "https://lacrypta.ar"
+  },
+  "visibilityFilters": {
+    "protected": true,
+    "private": true,
+    "inherited": false,
+    "external": true
+  },
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "treatWarningsAsErrors": true,
+  "treatValidationWarningsAsErrors": true,
+  "logLevel": "Verbose",
+  "disableSources": false
+}
