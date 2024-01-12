@@ -264,8 +264,8 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
 
 export function validateFileHash(fileHash: unknown): FileHash {
   const obj: object = validateNonNullObject(fileHash);
-
-  return validateFileHashValue(validateObjectHashAlgorithmKey(obj).algorithm, validateObjectHashValueKey(obj).value);
+  validateFileHashValue(validateObjectHashAlgorithmKey(obj).algorithm, validateObjectHashValueKey(obj).value);
+  return fileHash as FileHash;
 }
 
 export function validateVersion(version: unknown): number {
