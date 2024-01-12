@@ -156,7 +156,7 @@ export class MergeMap<K, V> {
   }
 }
 
-export async function safeFetchBody(input: string | URL | Request, init?: RequestInit): Promise<Uint8Array | Error> {
+export async function safeFetchBody(input: URL, init?: RequestInit): Promise<Uint8Array | Error> {
   try {
     const response: Response = await fetch(input, {
       headers: {
