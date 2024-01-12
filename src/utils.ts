@@ -134,6 +134,7 @@ export class MergeMap<K, V> {
   public remove(value: K): this {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete this.mapping[this.toKey(value)];
+    this.keySet.delete(value);
     return this;
   }
 
