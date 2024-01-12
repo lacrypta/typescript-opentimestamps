@@ -152,13 +152,6 @@ export class MergeMap<K, V> {
   }
 }
 
-export async function asyncReturn<T>(value: T): Promise<T> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new Promise<T>((resolve: (value: T | PromiseLike<T>) => void, _reject: (reason?: any) => void) => {
-    resolve(value);
-  });
-}
-
 export async function safeFetchBody(input: string | URL | Request, init?: RequestInit): Promise<Uint8Array | Error> {
   try {
     const response: Response = await fetch(input, {
@@ -169,15 +162,15 @@ export async function safeFetchBody(input: string | URL | Request, init?: Reques
       ...init,
     });
     if (!response.ok || null === response.body) {
-      return asyncReturn(new Error('Error retrieving response body'));
+      return new Error('Error retrieving response body');
     }
     // ref: https://stackoverflow.com/a/72718732
     return new Uint8Array(await new Response(response.body).arrayBuffer());
   } catch (e: unknown) {
     if (e instanceof Error) {
-      return asyncReturn(e);
+      return e;
     } else {
-      return asyncReturn(new Error('Unknown fetch() error'));
+      return new Error('Unknown fetch() error');
     }
   }
 }
