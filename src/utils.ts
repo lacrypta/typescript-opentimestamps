@@ -16,27 +16,20 @@
 
 'use strict';
 
-export function uint8ArrayFromHex(hex: string): Uint8Array {
-  if (hex.length % 2) {
-    throw new Error('Hex value should be of even length');
-  }
-  return Uint8Array.from((hex.match(/../g) ?? []).map((pair: string) => Number.parseInt(pair, 16)));
-}
-
-export function uint8ArrayFromBase64(base64: string): Uint8Array {
-  return Uint8Array.from(atob(base64), (c: string) => c.charCodeAt(0));
-}
-
 export function uint8ArrayToHex(data: Uint8Array): string {
   return data.reduce((result: string, value: number) => result + value.toString(16).padStart(2, '0'), '').toLowerCase();
 }
 
-export function uint8ArrayToBase64(data: Uint8Array): string {
-  let sData: string = '';
-  data.forEach((value: number) => {
-    sData += String.fromCharCode(value);
-  });
-  return btoa(sData);
+export function uint8ArrayFromHex(hex: string): Uint8Array {
+  if (hex.length % 2) {
+    throw new Error('Hex value should be of even length');
+  }
+  return Uint8Array.from((hex.match(/../g) ?? []).map((pair: string) => {
+    if (!pair.match(/^[0-9a-f]{2}$/i)) {
+      throw new Error('Malformed hex string');
+    }
+    return Number.parseInt(pair, 16);
+  }));
 }
 
 export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
@@ -55,7 +48,7 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
 // ref: https://stackoverflow.com/a/49129872
 export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
   const result = new Uint8Array(
-    arrays.map((item: Uint8Array): number => item.length).reduce((prev: number, curr: number): number => prev + curr),
+    arrays.map((item: Uint8Array): number => item.length).reduce((prev: number, curr: number): number => prev + curr, 0),
   );
   let offset = 0;
   arrays.forEach((item: Uint8Array): void => {
