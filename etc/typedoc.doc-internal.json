@@ -17,7 +17,7 @@
   "hideParameterTypesInTitle": false,
   "cleanOutputDir": true,
   "out": "../dist/docs/internal",
-  "entryPoints": ["../src/**/*.ts", "../test/helpers.ts"],
+  "entryPoints": ["../src/**/*.ts"],
   "hideGenerator": true,
   "searchInComments": true,
   "navigationLinks": {
