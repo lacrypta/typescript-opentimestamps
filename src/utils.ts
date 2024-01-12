@@ -24,12 +24,14 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
   if (hex.length % 2) {
     throw new Error('Hex value should be of even length');
   }
-  return Uint8Array.from((hex.match(/../g) ?? []).map((pair: string) => {
-    if (!pair.match(/^[0-9a-f]{2}$/i)) {
-      throw new Error('Malformed hex string');
-    }
-    return Number.parseInt(pair, 16);
-  }));
+  return Uint8Array.from(
+    (hex.match(/../g) ?? []).map((pair: string) => {
+      if (!pair.match(/^[0-9a-f]{2}$/i)) {
+        throw new Error('Malformed hex string');
+      }
+      return Number.parseInt(pair, 16);
+    }),
+  );
 }
 
 export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
@@ -48,7 +50,9 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
 // ref: https://stackoverflow.com/a/49129872
 export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
   const result = new Uint8Array(
-    arrays.map((item: Uint8Array): number => item.length).reduce((prev: number, curr: number): number => prev + curr, 0),
+    arrays
+      .map((item: Uint8Array): number => item.length)
+      .reduce((prev: number, curr: number): number => prev + curr, 0),
   );
   let offset = 0;
   arrays.forEach((item: Uint8Array): void => {
