@@ -67,7 +67,7 @@ export function validateNonNegativeInteger(num: unknown): number {
 
 export function validateOneOfStrings(value: string, options: string[]): string {
   if (!options.includes(value)) {
-    throw new Error(`Expected one of ${options.join(', ')}`);
+    throw new Error(`Expected one of [${options.join(', ')}]`);
   }
   return value;
 }
