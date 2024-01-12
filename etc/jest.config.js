@@ -20,4 +20,5 @@ module.exports = {
     '\\.ts$': 'ts-jest',
   },
   verbose: true,
+  maxWorkers: 1,
 };
