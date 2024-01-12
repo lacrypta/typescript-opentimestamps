@@ -243,7 +243,7 @@ export function validateTree(tree: unknown): Tree {
 }
 
 export function validateFileHashValue(algorithm: string, value: Uint8Array): FileHash {
-  switch (algorithm) {
+  switch (validateOneOfStrings(algorithm, ['sha1', 'ripemd160', 'sha256', 'keccak256'])) {
     case 'sha1':
     case 'ripemd160':
       if (20 !== value.length) {
@@ -256,10 +256,8 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
         throw new Error('Expected 32 byte hash');
       }
       break;
-    default:
-      throw new Error('Unknown hash algorithm');
   }
-  return { algorithm, value };
+  return { algorithm, value } as FileHash;
 }
 
 export function validateFileHash(fileHash: unknown): FileHash {
