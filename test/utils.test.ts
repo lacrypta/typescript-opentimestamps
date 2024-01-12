@@ -752,14 +752,13 @@ describe('Utils', () => {
       }) => {
         jest
           .spyOn(globalThis, 'fetch')
-          .mockImplementation(
-            async (_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
-              if (null !== responseError) {
-                throw responseError;
-              }
-              return new Response(response, { status: responseCode });
-            },
-          );
+          .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
+            if (null !== responseError) {
+              // eslint-disable-next-line @typescript-eslint/no-throw-literal
+              throw responseError;
+            }
+            return Promise.resolve(new Response(response, { status: responseCode }));
+          });
         expect(await safeFetchBody(new URL('http://www.example.com'))).toStrictEqual(expected);
       },
     );
@@ -769,11 +768,9 @@ describe('Utils', () => {
     test('should use GET method', () => {
       jest
         .spyOn(globalThis, 'fetch')
-        .mockImplementation(
-          async (_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
-            return new Response(`method:${init?.method}`);
-          },
-        );
+        .mockImplementation((_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
+          return Promise.resolve(new Response(`method:${init?.method}`));
+        });
       expect(retrieveGetBody(new URL('http://www.example.com'))).toStrictEqual(
         Promise.resolve(new TextEncoder().encode('method:GET')),
       );
