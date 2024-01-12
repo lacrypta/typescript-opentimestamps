@@ -184,7 +184,7 @@ export function validateLeaf(leaf: unknown): Leaf {
       validateObjectHasHeightKey(obj);
       return leaf as { type: 'ethereum'; height: number };
     case 'pending':
-      validateObjectHasHeightKey(obj);
+      validateObjectHasUrlKey(obj);
       return leaf as { type: 'pending'; url: URL };
     case 'unknown':
       validateObjectHasHeaderKey(obj);
