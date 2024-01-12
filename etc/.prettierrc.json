@@ -27,6 +27,15 @@
       }
     },
     {
+      "files": "*.jsonc",
+      "options": {
+        "parser": "jsonc",
+        "singleQuote": false,
+        "tabWidth": 2,
+        "trailingComma": "none"
+      }
+    },
+    {
       "files": "*.{yml,yaml}",
       "options": {
         "parser": "yaml"
