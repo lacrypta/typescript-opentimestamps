@@ -192,6 +192,7 @@ export function validateLeaf(leaf: unknown): Leaf {
       return leaf as { type: 'unknown'; header: Uint8Array; payload: Uint8Array };
   }
 
+  /* istanbul ignore next */
   return undefined as never;
 }
 
@@ -230,6 +231,7 @@ export function validateOp(op: unknown): Op {
       return op as { type: 'prepend'; operand: Uint8Array };
   }
 
+  /* istanbul ignore next */
   return undefined as never;
 }
 
