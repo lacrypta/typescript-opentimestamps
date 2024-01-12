@@ -1,0 +1,15 @@
+dist/
+node_modules/
+
+.*
+!.github/
+!.husky/
+!.editorconfig
+!.eslintrc.json
+!.gitattributes
+!.gitconfig
+!.gitignore
+!.gitkeep
+!.markdownlint.jsonc
+!.npmrc
+!.prettierrc.json

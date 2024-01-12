@@ -1,0 +1,79 @@
+[core]
+    filemode = true
+    hideDotFiles = true
+    ignoreCase = true
+    precomposeUnicode = true
+    protectHFS = true
+    protectNTFS = true
+    fsmonitorHookVersion = 2
+    trustctime = false
+    checkStat = minimal
+    eol = lf
+    symlinks = false
+    bare = false
+    repositoryformatversion = 1
+    compression = 9
+    looseCompression = 9
+    fsyncObjectFiles = true
+    abbrev = auto
+    whitespace = space-before-tab,-indent-with-non-tab,tab-in-indent,trailing-space,-cr-at-eol
+
+[blame]
+    markUnblamables = true
+    markIgnoredLines = true
+
+[diff]
+    dirstat = changes,noncumulative
+    mnemonicPrefix = true
+    renames = copies
+    renameLimit = 0
+    algorithm = histogram
+    wsErrorHighlight = none,new
+    colorMoved = true
+
+[diff "cfg"]
+    xfuncname = "^(\\[.*)$"
+
+[diff "attr"]
+    xfuncname = "^(#.*)$"
+
+[gc]
+    autoDetach = false
+
+[grep]
+    patternType = perl
+
+[hooks]
+    allownonascii = false
+
+[index]
+    threads = true
+
+[merge]
+    conflictStyle = diff3
+    renormalize = true
+
+[notes]
+    rewriteMode = cat_sort_uniq
+    rewriteRef = refs/notes/commits
+
+[protocol]
+    version = 2
+
+[rebase]
+    stat = true
+    missingCommitsCheck = warn
+
+[receive]
+    denyCurrentBranch = true
+    fsckObjects = true
+
+[rerere]
+    enabled = true
+
+[status]
+    showStash = true
+    showUntrackedFiles = all
+
+[user]
+    useConfigOnly = true

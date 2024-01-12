@@ -1,0 +1,13 @@
+# Disable LF normalization for all files
+# Use LF as EOL for all files
+# Use UTF-8 encoding for all files
+# Enable IDENT support
+# Enable whitespace checks
+* -text eol=LF encoding=UTF-8 ident whitespace=space-before-tab,-indent-with-non-tab,tab-in-indent,trailing-space,-cr-at-eol
+
+# Enable diff drivers
+*.md diff=markdown
+*.py diff=python
+*.cfg diff=cfg
+.gitconfig diff=cfg
+.gitattributes diff=attr
