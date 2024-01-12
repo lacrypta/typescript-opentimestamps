@@ -23,6 +23,7 @@ import {
   uint8ArrayCompare,
   uint8ArrayConcat,
   MergeSet,
+  MergeMap,
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -397,6 +398,288 @@ describe('Utils', () => {
       ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: MergeSet<number> }) => {
         expect(mergeSet.clone()).toEqual(expected);
       });
+    });
+  });
+
+  describe('MergeMap<K, V>', () => {
+    const theToKey: (key: number) => number | string | symbol = (key: number) => key.toString();
+    const theCombine: (left: string, right: string) => string = (left: string, right: string) => `(${left}:${right})`;
+
+    const theEmptyMergeMap: MergeMap<number, string> = new MergeMap<number, string>(theToKey, theCombine);
+
+    describe('constructor', () => {
+      it.each([
+        {
+          toKey: theToKey,
+          combine: theCombine,
+          expected: theEmptyMergeMap,
+          name: 'should correctly construct',
+        },
+      ])(
+        '$name',
+        ({
+          toKey,
+          combine,
+          expected,
+        }: {
+          toKey: (key: number) => number | string | symbol;
+          combine: (left: string, right: string) => string;
+          expected: MergeMap<number, string>;
+        }) => {
+          expect(new MergeMap<number, string>(toKey, combine)).toEqual(expected);
+        },
+      );
+    });
+
+    describe('size()', () => {
+      it.each([
+        {
+          mergeMap: theEmptyMergeMap,
+          expected: 0,
+          name: 'should return 0 for empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          expected: 1,
+          name: 'should return 1 for singleton MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          expected: 1,
+          name: 'should return 1 for singleton MergeMap (again)',
+        },
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number }) => {
+        expect(mergeMap.size()).toEqual(expected);
+      });
+    });
+
+    describe('keys()', () => {
+      it.each([
+        {
+          mergeMap: theEmptyMergeMap,
+          expected: [],
+          name: 'should return empty for empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          expected: [1],
+          name: 'should return singleton for singleton MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          expected: [1],
+          name: 'should return singleton for singleton MergeMap (again)',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b').add(2, 'c'),
+          expected: [1, 2],
+          name: 'should return non-singleton for non-singleton MergeMap',
+        },
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number[] }) => {
+        expect(mergeMap.keys()).toEqual(expected);
+      });
+    });
+
+    describe('values()', () => {
+      it.each([
+        {
+          mergeMap: theEmptyMergeMap,
+          expected: [],
+          name: 'should return empty for empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          expected: ['a'],
+          name: 'should return singleton for singleton MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          expected: ['(a:b)'],
+          name: 'should return singleton for singleton MergeMap (again)',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b').add(2, 'c'),
+          expected: ['(a:b)', 'c'],
+          name: 'should return non-singleton for non-singleton MergeMap',
+        },
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: string[] }) => {
+        expect(mergeMap.values()).toEqual(expected);
+      });
+    });
+
+    describe('entries()', () => {
+      it.each([
+        {
+          mergeMap: theEmptyMergeMap,
+          expected: [] as [number, string][],
+          name: 'should return empty for empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          expected: [[1, 'a']] as [number, string][],
+          name: 'should return singleton for singleton MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          expected: [[1, '(a:b)']] as [number, string][],
+          name: 'should return singleton for singleton MergeMap (again)',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b').add(2, 'c'),
+          expected: [
+            [1, '(a:b)'],
+            [2, 'c'],
+          ] as [number, string][],
+          name: 'should return non-singleton for non-singleton MergeMap',
+        },
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: [number, string][] }) => {
+        expect(mergeMap.entries()).toEqual(expected);
+      });
+    });
+
+    describe('remove()', () => {
+      it.each([
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
+          item: 0,
+          expected: new MergeMap<number, string>(theToKey, theCombine),
+          name: 'should not alter empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          item: 1,
+          expected: new MergeMap<number, string>(theToKey, theCombine),
+          name: 'should return empty MergeMap when removing last element',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(2, 'b'),
+          item: 1,
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(2, 'b'),
+          name: 'should remove non-combined element',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(2, 'b').add(1, 'c'),
+          item: 1,
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(2, 'b'),
+          name: 'should remove combined element',
+        },
+      ])(
+        '$name',
+        ({
+          mergeMap,
+          item,
+          expected,
+        }: {
+          mergeMap: MergeMap<number, string>;
+          item: number;
+          expected: MergeMap<number, string>;
+        }) => {
+          expect(mergeMap.remove(item)).toEqual(expected);
+        },
+      );
+    });
+
+    describe('add()', () => {
+      it.each([
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
+          key: 1,
+          value: 'a',
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          name: 'should add single item',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          key: 1,
+          value: 'b',
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          name: 'should add item and combine it',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(2, 'b'),
+          key: 1,
+          value: 'c',
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(2, 'b').add(1, 'a').add(1, 'c'),
+          name: 'should add item and combine it regardless of order',
+        },
+      ])(
+        '$name',
+        ({
+          mergeMap,
+          key,
+          value,
+          expected,
+        }: {
+          mergeMap: MergeMap<number, string>;
+          key: number;
+          value: string;
+          expected: MergeMap<number, string>;
+        }) => {
+          expect(mergeMap.add(key, value)).toEqual(expected);
+        },
+      );
+    });
+
+    describe('incorporate()', () => {
+      it.each([
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
+          other: new MergeMap<number, string>(theToKey, theCombine),
+          expected: new MergeMap<number, string>(theToKey, theCombine),
+          name: 'should return empty MergeMap when combining empty MergeMaps',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
+          other: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          name: 'should ignore empty MergeMap left',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          other: new MergeMap<number, string>(theToKey, theCombine),
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          name: 'should ignore empty MergeMap right',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a'),
+          other: new MergeMap<number, string>(theToKey, theCombine).add(1, 'b'),
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'b'),
+          name: 'should return combined MergeMap when incorporating no new elements',
+        },
+      ])(
+        '$name',
+        ({
+          mergeMap,
+          other,
+          expected,
+        }: {
+          mergeMap: MergeMap<number, string>;
+          other: MergeMap<number, string>;
+          expected: MergeMap<number, string>;
+        }) => {
+          expect(mergeMap.incorporate(other)).toEqual(expected);
+        },
+      );
+    });
+
+    describe('clone()', () => {
+      it.each([
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
+          expected: new MergeMap<number, string>(theToKey, theCombine),
+          name: 'should return empty MergeMap when cloning empty MergeMap',
+        },
+        {
+          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(2, 'b').add(1, 'c'),
+          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'c').add(2, 'b'),
+          name: 'should return same MergeMap when cloning non-empty MergeMap',
+        },
+      ])(
+        '$name',
+        ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: MergeMap<number, string> }) => {
+          expect(mergeMap.clone()).toEqual(expected);
+        },
+      );
     });
   });
 });
