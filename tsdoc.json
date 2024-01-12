@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "tagDefinitions": [
+    {
+      "tagName": "@category",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@enum",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@event",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@group",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@hidden",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@ignore",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@interface",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@module",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@namespace",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@overload",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@private",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@prop",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@property",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@protected",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@satisfies",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@template",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@mermaid",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    }
+  ],
+  "supportForTags": {
+    "@alpha": true,
+    "@beta": true,
+    "@category": true,
+    "@defaultValue": true,
+    "@deprecated": true,
+    "@enum": true,
+    "@event": true,
+    "@eventProperty": true,
+    "@example": true,
+    "@experimental": true,
+    "@group": true,
+    "@hidden": true,
+    "@ignore": true,
+    "@inheritDoc": true,
+    "@interface": true,
+    "@internal": true,
+    "@label": true,
+    "@link": true,
+    "@module": true,
+    "@namespace": true,
+    "@overload": true,
+    "@override": true,
+    "@packageDocumentation": true,
+    "@param": true,
+    "@private": true,
+    "@privateRemarks": true,
+    "@prop": true,
+    "@property": true,
+    "@protected": true,
+    "@public": true,
+    "@readonly": true,
+    "@remarks": true,
+    "@returns": true,
+    "@satisfies": true,
+    "@sealed": true,
+    "@see": true,
+    "@template": true,
+    "@throws": true,
+    "@typeParam": true,
+    "@virtual": true,
+    "@mermaid": true
+  }
+}
