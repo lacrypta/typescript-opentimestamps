@@ -192,7 +192,7 @@ export function validateLeaf(leaf: unknown): Leaf {
       return leaf as { type: 'unknown'; header: Uint8Array; payload: Uint8Array };
   }
 
-  throw new Error();
+  return undefined as never;
 }
 
 export function validateOp(op: unknown): Op {
@@ -230,7 +230,7 @@ export function validateOp(op: unknown): Op {
       return op as { type: 'prepend'; operand: Uint8Array };
   }
 
-  throw new Error();
+  return undefined as never;
 }
 
 export function validateTree(tree: unknown): Tree {
