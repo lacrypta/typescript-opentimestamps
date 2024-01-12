@@ -24,6 +24,9 @@ import {
   uint8ArrayConcat,
   MergeSet,
   MergeMap,
+  safeFetchBody,
+  retrieveGetBody,
+  retrievePostBody,
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -679,6 +682,130 @@ describe('Utils', () => {
         ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: MergeMap<number, string> }) => {
           expect(mergeMap.clone()).toEqual(expected);
         },
+      );
+    });
+  });
+
+  describe('safeFetchBody()', () => {
+    it.each([
+      {
+        response: uint8ArrayFromHex('123abc'),
+        responseCode: 200,
+        responseError: null,
+        expected: uint8ArrayFromHex('123abc'),
+        name: 'should correctly return on 2xx and non-empty body',
+      },
+      {
+        response: uint8ArrayFromHex('123abc'),
+        responseCode: 300,
+        responseError: null,
+        expected: new Error('Error retrieving response body'),
+        name: 'should fail on 3xx status',
+      },
+      {
+        response: uint8ArrayFromHex('123abc'),
+        responseCode: 400,
+        responseError: null,
+        expected: new Error('Error retrieving response body'),
+        name: 'should fail on 4xx status',
+      },
+      {
+        response: uint8ArrayFromHex('123abc'),
+        responseCode: 500,
+        responseError: null,
+        expected: new Error('Error retrieving response body'),
+        name: 'should fail on 5xx status',
+      },
+      {
+        response: null,
+        responseCode: 200,
+        responseError: null,
+        expected: new Error('Error retrieving response body'),
+        name: 'should fail on 2xx status and null body',
+      },
+      {
+        response: uint8ArrayFromHex(''),
+        responseCode: 0,
+        responseError: new Error('Some fetch() error you may encounter'),
+        expected: new Error('Some fetch() error you may encounter'),
+        name: 'should fail on fetch() throwing an Error',
+      },
+      {
+        response: uint8ArrayFromHex(''),
+        responseCode: 0,
+        responseError: 'Something else entirely',
+        expected: new Error('Unknown fetch() error'),
+        name: 'should fail on fetch() throwing anything else',
+      },
+    ])(
+      '$name',
+      async ({
+        response,
+        responseCode,
+        responseError,
+        expected,
+      }: {
+        response: Uint8Array | null;
+        responseCode: number;
+        responseError: string | Error | null;
+        expected: Uint8Array | Error;
+      }) => {
+        jest
+          .spyOn(globalThis, 'fetch')
+          .mockImplementation(
+            async (_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
+              if (null !== responseError) {
+                throw responseError;
+              }
+              return new Response(response, { status: responseCode });
+            },
+          );
+        expect(await safeFetchBody(new URL('http://www.example.com'))).toStrictEqual(expected);
+      },
+    );
+  });
+
+  describe('retrieveGetBody()', () => {
+    test('should use GET method', () => {
+      jest
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(
+          async (_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
+            return new Response(`method:${init?.method}`);
+          },
+        );
+      expect(retrieveGetBody(new URL('http://www.example.com'))).toStrictEqual(
+        Promise.resolve(new TextEncoder().encode('method:GET')),
+      );
+    });
+  });
+
+  describe('retrievePostBody()', () => {
+    it.each([
+      {
+        body: Uint8Array.of(),
+        expected: 'method:POST:body:',
+        name: 'should post when empty body',
+      },
+      {
+        body: Uint8Array.of(1, 2, 3),
+        expected: 'method:POST:body:010203',
+        name: 'should post when non-empty body',
+      },
+    ])('$name', ({ body, expected }: { body: Uint8Array; expected: string }) => {
+      jest
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(
+          async (_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
+            return new Response(
+              `method:${init?.method};body:${uint8ArrayToHex(
+                new Uint8Array(await new Response(init?.body).arrayBuffer()),
+              )}`,
+            );
+          },
+        );
+      expect(retrievePostBody(new URL('http://www.example.com'), body)).toStrictEqual(
+        Promise.resolve(new TextEncoder().encode(expected)),
       );
     });
   });
