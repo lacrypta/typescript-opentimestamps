@@ -52,18 +52,23 @@ export async function submitTimestamp(
   const [stampedTree, stampingErrors]: [Tree, Error[]] = (
     await Promise.all(
       calendarUrls.map(async (url: URL): Promise<Tree | Error> => {
-        const body: Uint8Array | Error = await retrievePostBody(
-          new URL(`${url.toString().replace(/\/$/, '')}/digest`),
-          fudgedValue,
-        );
-        if (body instanceof Error) {
-          return body;
+        try {
+          const body: Uint8Array = await retrievePostBody(
+            new URL(`${url.toString().replace(/\/$/, '')}/digest`),
+            fudgedValue,
+          );
+          const [tree, end]: [Tree, number] = readTree(body, 0);
+          if (end !== body.length) {
+            return new Error(`Garbage at end of calendar (${url.toString()}) response}`);
+          }
+          return tree;
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            return e;
+          } else {
+            return new Error('Unknown error contacting calendar');
+          }
         }
-        const [tree, end]: [Tree, number] = readTree(body, 0);
-        if (end !== body.length) {
-          return new Error(`Garbage at end of calendar (${url.toString()}) response}`);
-        }
-        return tree;
       }),
     )
   ).reduce(

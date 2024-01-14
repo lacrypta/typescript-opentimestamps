@@ -86,5 +86,4 @@ export const magicHeader: Uint8Array = uint8ArrayFromHex(
 
 export const nonFinal: number = 0xff;
 
-export type LeafVerifier = (msg: Uint8Array, height: number) => boolean | Promise<boolean>;
-export type LeafVerifiers = { [leafType in 'bitcoin' | 'litecoin' | 'ethereum']?: Record<string, LeafVerifier> };
+export type Verifier = (msg: Uint8Array, leaf: Leaf) => Promise<number | undefined>;

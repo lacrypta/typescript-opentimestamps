@@ -156,33 +156,40 @@ export class MergeMap<K, V> {
   }
 }
 
-export async function safeFetchBody(input: URL, init?: RequestInit): Promise<Uint8Array | Error> {
+export async function fetchBody(input: URL, init?: RequestInit): Promise<Uint8Array> {
   try {
-    const response: Response = await fetch(input, {
-      headers: {
-        Accept: 'application/vnd.opentimestamps.v1',
-        'User-Agent': 'typescript-opentimestamps',
-      },
-      ...init,
-    });
+    const response: Response = await fetch(input, init);
     if (!response.ok || null === response.body) {
-      return new Error('Error retrieving response body');
+      throw new Error('Error retrieving response body');
     }
     // ref: https://stackoverflow.com/a/72718732
     return new Uint8Array(await new Response(response.body).arrayBuffer());
   } catch (e: unknown) {
     if (e instanceof Error) {
-      return e;
+      throw e;
     } else {
-      return new Error('Unknown fetch() error');
+      throw new Error('Unknown fetch() error');
     }
   }
 }
 
-export async function retrieveGetBody(url: URL): Promise<Uint8Array | Error> {
-  return await safeFetchBody(url, { method: 'GET' });
+export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
+  return await fetchBody(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/vnd.opentimestamps.v1',
+      'User-Agent': 'typescript-opentimestamps',
+    },
+  });
 }
 
-export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint8Array | Error> {
-  return await safeFetchBody(url, { method: 'POST', body });
+export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint8Array> {
+  return await fetchBody(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/vnd.opentimestamps.v1',
+      'User-Agent': 'typescript-opentimestamps',
+    },
+    body,
+  });
 }

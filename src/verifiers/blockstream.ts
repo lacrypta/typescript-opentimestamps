@@ -16,20 +16,25 @@
 
 'use strict';
 
-import type { LeafVerifier } from '../types';
+import type { Leaf, Verifier } from '../types';
 
-import { uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
+import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
 
-export const verify: LeafVerifier = async (msg: Uint8Array, height: number): Promise<boolean> => {
-  try {
-    const blockHash = await (await fetch(new URL(`https://blockstream.info/api/block-height/${height}`))).text();
-    try {
-      const block: unknown = await (await fetch(new URL(`https://blockstream.info/api/block/${blockHash}`))).json();
-      return uint8ArrayEquals(msg, uint8ArrayFromHex((block as { merkle_root: string }).merkle_root));
-    } catch {
-      return false;
-    }
-  } catch {
-    return false;
+export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
+  if ('bitcoin' !== leaf.type) {
+    return undefined;
   }
+  const blockHash: string = new TextDecoder().decode(
+    await fetchBody(new URL(`https://blockstream.info/api/block-height/${leaf.height}`)),
+  );
+  if (!/^[0-9a-f]{64}$/i.test(blockHash)) {
+    throw new Error('Malformed block hash');
+  }
+  const block: unknown = JSON.parse(
+    new TextDecoder().decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
+  );
+  if (!uint8ArrayEquals(msg, uint8ArrayFromHex((block as { merkle_root: string }).merkle_root))) {
+    throw new Error('Merkle root mismatch');
+  }
+  return (block as { timestamp: number }).timestamp;
 };

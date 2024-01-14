@@ -16,14 +16,14 @@
 
 'use strict';
 
-import type { Leaf, LeafVerifier, LeafVerifiers, Op, Timestamp, Tree } from './types';
+import type { Leaf, Op, Timestamp, Tree, Verifier } from './types';
 
 import { callOp } from './internals';
 
-export function getLeaves(msg: Uint8Array, tree: Tree): { leaf: Leaf; msg: Uint8Array }[] {
-  let result: { leaf: Leaf; msg: Uint8Array }[] = [];
+export function getLeaves(msg: Uint8Array, tree: Tree): { msg: Uint8Array; leaf: Leaf }[] {
+  let result: { msg: Uint8Array; leaf: Leaf }[] = [];
   tree.leaves.values().forEach((leaf: Leaf) => {
-    result.push({ leaf, msg });
+    result.push({ msg, leaf });
   });
   tree.edges.entries().forEach(([op, tree]: [Op, Tree]) => {
     result = result.concat(getLeaves(callOp(op, msg), tree));
@@ -31,25 +31,54 @@ export function getLeaves(msg: Uint8Array, tree: Tree): { leaf: Leaf; msg: Uint8
   return result;
 }
 
-export function getAllLeaves(timestamp: Timestamp): { leaf: Leaf; msg: Uint8Array }[] {
-  return getLeaves(timestamp.fileHash.value, timestamp.tree);
-}
+export async function verifyTimestamp(
+  timestamp: Timestamp,
+  verifiers: Record<string, Verifier>,
+): Promise<{ attestations: Record<number, string[]>; errors: Record<string, Error[]> }> {
+  const result: { attestations: Record<number, string[]>; errors: Record<string, Error[]> } = {
+    attestations: {},
+    errors: {},
+  };
 
-export async function verifyLeaf(
-  leaf: Leaf,
-  msg: Uint8Array,
-  verifiers: LeafVerifiers,
-): Promise<Record<string, boolean>> {
-  if (leaf.type !== 'bitcoin' && leaf.type !== 'litecoin' && leaf.type !== 'ethereum') {
-    return {};
-  }
-  return Object.fromEntries(
+  (
     await Promise.all(
-      Object.entries(verifiers[leaf.type] ?? {}).map(
-        async ([key, verifier]: [string, LeafVerifier]): Promise<[string, boolean]> => {
-          return [key, await verifier(msg, leaf.height)];
+      getLeaves(timestamp.fileHash.value, timestamp.tree).map(
+        async ({ msg, leaf }: { msg: Uint8Array; leaf: Leaf }): Promise<[string, number | Error | undefined][]> => {
+          return await Promise.all(
+            Object.entries(verifiers).map(
+              async ([name, verifier]: [string, Verifier]): Promise<[string, number | undefined | Error]> => {
+                try {
+                  return [name, await verifier(msg, leaf)];
+                } catch (e: unknown) {
+                  if (e instanceof Error) {
+                    return [name, e];
+                  } else {
+                    return [name, new Error('Unknown error in verifier')];
+                  }
+                }
+              },
+            ),
+          );
         },
       ),
-    ),
-  );
+    )
+  ).forEach((leafResults: [string, number | Error | undefined][]) => {
+    leafResults.forEach(([verifierName, leafResult]: [string, number | Error | undefined]) => {
+      if (undefined === leafResult) {
+        return;
+      } else if (leafResult instanceof Error) {
+        if (!(verifierName in result.errors)) {
+          result.errors[verifierName] = [];
+        }
+        result.errors[verifierName]!.push(leafResult);
+      } else {
+        if (!(leafResult in result.attestations)) {
+          result.attestations[leafResult] = [];
+        }
+        result.attestations[leafResult]!.push(verifierName);
+      }
+    });
+  });
+
+  return result;
 }

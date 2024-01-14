@@ -16,15 +16,19 @@
 
 'use strict';
 
-import type { LeafVerifier } from '../types';
+import type { Leaf, Verifier } from '../types';
 
-import { uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
+import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
 
-export const verify: LeafVerifier = async (msg: Uint8Array, height: number): Promise<boolean> => {
-  try {
-    const value: unknown = await (await fetch(new URL(`https://blockchain.info/rawblock/${height}`))).json();
-    return uint8ArrayEquals(msg, uint8ArrayFromHex((value as { mrkl_root: string }).mrkl_root));
-  } catch {
-    return false;
+export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
+  if ('bitcoin' !== leaf.type) {
+    return undefined;
   }
+  const block: unknown = JSON.parse(
+    new TextDecoder().decode(await fetchBody(new URL(`https://blockchain.info/rawblock/${leaf.height}`))),
+  );
+  if (!uint8ArrayEquals(msg, uint8ArrayFromHex((block as { mrkl_root: string }).mrkl_root))) {
+    throw new Error('Merkle root mismatch');
+  }
+  return (block as { time: number }).time;
 };

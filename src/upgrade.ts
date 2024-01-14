@@ -34,12 +34,9 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
               return [];
             }
             try {
-              const body: Uint8Array | Error = await retrieveGetBody(
+              const body: Uint8Array = await retrieveGetBody(
                 new URL(`${leaf.url.toString().replace(/\/$/, '')}/timestamp/${uint8ArrayToHex(msg)}`),
               );
-              if (body instanceof Error) {
-                return [body];
-              }
               const [upgradedTree, end]: [Tree, number] = readTree(body, 0);
               if (end !== body.length) {
                 return [new Error(`Garbage at end of calendar (${leaf.url.toString()}) response}`)];

@@ -25,8 +25,6 @@ export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
 export { normalizeTimestamp as normalize } from './internals';
 export { isTimestamp, validateTimestamp as validate } from './validation';
-
-// TODO: verify
-export { verifyLeaf, getAllLeaves } from './verify';
+export { verifyTimestamp as verify } from './verify';
 export * from './verifiers';
 // TODO: prune
