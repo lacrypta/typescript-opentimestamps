@@ -16,15 +16,16 @@
 
 'use strict';
 
+export type { Timestamp } from './types';
+
 export { readTimestamp as read } from './read';
 export { writeTimestamp as write } from './write';
 export { infoTimestamp as info } from './info';
 export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
 export { normalizeTimestamp as normalize } from './internals';
-
-// TODO: validate & is
 export { isTimestamp, validateTimestamp as validate } from './validation';
+
 // TODO: verify
 export { verifyLeaf, getAllLeaves } from './verify';
 export * from './verifiers';
