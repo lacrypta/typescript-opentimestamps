@@ -16,19 +16,8 @@
 
 'use strict';
 
-import {
-  Edge,
-  FileHash,
-  Leaf,
-  LeafHeader,
-  Op,
-  RLeafHeader,
-  Tag,
-  Timestamp,
-  Tree,
-  magicHeader,
-  nonFinal,
-} from './types';
+import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import { LeafHeader, RLeafHeader, Tag, magicHeader, nonFinal } from './types';
 import { uint8ArrayCompare, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 export function writeUint(value: number): Uint8Array {

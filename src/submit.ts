@@ -21,7 +21,7 @@ import { randomBytes } from '@noble/hashes/utils';
 
 import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalizeTimestamp } from './internals';
 import { readTree } from './read';
-import { FileHash, Timestamp, Tree } from './types';
+import type { FileHash, Timestamp, Tree } from './types';
 import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
 

@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { LeafVerifier } from '../types';
+import type { LeafVerifier } from '../types';
 import { uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
 
 export const verify: LeafVerifier = async (msg: Uint8Array, height: number): Promise<boolean> => {
