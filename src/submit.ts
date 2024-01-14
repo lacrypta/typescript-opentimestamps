@@ -39,13 +39,14 @@ export const defaultCalendarUrls: URL[] = [
 export async function submitTimestamp(
   algorithm: string,
   value: Uint8Array,
+  fudge: Uint8Array | undefined,
   calendarUrls: URL[] = defaultCalendarUrls,
 ): Promise<[Timestamp, Error[]]> {
   const fileHash: FileHash = validateFileHashValue(algorithm, value);
   calendarUrls.forEach((url: URL): void => void validateCalendarUrl(url.toString()));
 
-  const fudge: Uint8Array = randomBytes(16);
-  const fudgedValue: Uint8Array = sha256(Uint8Array.of(...value, ...fudge));
+  const fudgeValue: Uint8Array = undefined === fudge ? randomBytes(16) : fudge;
+  const fudgedValue: Uint8Array = sha256(Uint8Array.of(...value, ...fudgeValue));
 
   const [stampedTree, stampingErrors]: [Tree, Error[]] = (
     await Promise.all(
@@ -71,21 +72,22 @@ export async function submitTimestamp(
     [newTree(), [] as Error[]],
   );
 
+  const resultTree: Tree = {
+    leaves: newLeaves(),
+    edges: newEdges().add({ type: 'sha256' }, stampedTree),
+  };
+
+  const fudgedTree: Tree =
+    0 === fudgeValue.length
+      ? resultTree
+      : { leaves: newLeaves(), edges: newEdges().add({ type: 'append', operand: fudgeValue }, resultTree) };
+
   return [
-    {
+    normalizeTimestamp({
       version: 1,
       fileHash,
-      tree: normalizeTimestamp({
-        leaves: newLeaves(),
-        edges: newEdges().add(
-          { type: 'append', operand: fudge },
-          {
-            leaves: newLeaves(),
-            edges: newEdges().add({ type: 'sha256' }, stampedTree),
-          },
-        ),
-      })!,
-    },
+      tree: fudgedTree,
+    })!,
     stampingErrors,
   ];
 }

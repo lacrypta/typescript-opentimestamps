@@ -67,11 +67,11 @@ export async function upgradeStep(tree: Tree, msg: Uint8Array): Promise<[Tree, E
 export async function upgradeTimestamp(timestamp: Timestamp): Promise<[Timestamp, Error[]]> {
   const [tree, errors]: [Tree, Error[]] = await upgradeStep(timestamp.tree, timestamp.fileHash.value);
   return [
-    {
+    normalizeTimestamp({
       version: timestamp.version,
       fileHash: timestamp.fileHash,
-      tree: normalizeTimestamp(tree)!,
-    },
+      tree,
+    })!,
     errors,
   ];
 }

@@ -21,7 +21,7 @@ import { sha1 } from '@noble/hashes/sha1';
 import { sha256 } from '@noble/hashes/sha256';
 import { keccak_256 } from '@noble/hashes/sha3';
 
-import { Edge, Leaf, Op, Tree } from './types';
+import type { Edge, Leaf, Op, Timestamp, Tree } from './types';
 import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayToHex } from './utils';
 
 export function callOp(op: Op, msg: Uint8Array): Uint8Array {
@@ -97,98 +97,126 @@ export function newTree(): Tree {
   return { edges: newEdges(), leaves: newLeaves() };
 }
 
-export function normalizeTimestamp(tree: Tree): Tree | undefined {
-  tree.edges.entries().forEach(([op, subTree]: [Op, Tree]) => {
-    tree.edges.remove(op);
-    const nSubTree: Tree | undefined = normalizeTimestamp(subTree);
-    if (undefined === nSubTree) {
-      return;
-    }
-    if (0 === nSubTree.leaves.size() && 1 === nSubTree.edges.size()) {
-      const [subOp, nSubSubTree]: [Op, Tree] = nSubTree.edges.entries()[0]!;
-      switch (`${op.type}:${subOp.type}`) {
-        case 'reverse:reverse':
-          // reverse(reverse(x)) -> x
-          tree.leaves.incorporate(nSubSubTree.leaves);
-          tree.edges.incorporate(nSubSubTree.edges);
-          break;
-        case 'append:append':
-          // append(append(x, t), s) -> append(x, ts))
-          tree.edges.add(
-            {
-              type: 'append',
-              operand: uint8ArrayConcat([
-                (op as { operand: Uint8Array }).operand,
-                (subOp as { operand: Uint8Array }).operand,
-              ]),
-            },
-            nSubSubTree,
-          );
-          break;
-        case 'prepend:prepend':
-          // prepend(prepend(x, t), s) -> prepend(x, st)
-          tree.edges.add(
-            {
-              type: 'prepend',
-              operand: uint8ArrayConcat([
-                (subOp as { operand: Uint8Array }).operand,
-                (op as { operand: Uint8Array }).operand,
-              ]),
-            },
-            nSubSubTree,
-          );
-          break;
-        case 'reverse:append':
-          // append(reverse(x), s) -> reverse(prepend(x, reverse(s)))
-          tree.edges.add(
-            {
-              type: 'prepend',
-              operand: (subOp as { operand: Uint8Array }).operand.toReversed(),
-            },
-            {
-              leaves: newLeaves(),
-              edges: newEdges().add({ type: 'reverse' }, nSubSubTree),
-            },
-          );
-          break;
-        case 'reverse:prepend':
-          // prepend(reverse(x), s) -> reverse(append(x, reverse(s)))
-          tree.edges.add(
-            {
-              type: 'append',
-              operand: (subOp as { operand: Uint8Array }).operand.toReversed(),
-            },
-            {
-              leaves: newLeaves(),
-              edges: newEdges().add({ type: 'reverse' }, nSubSubTree),
-            },
-          );
-          break;
-        case 'prepend:append':
-          // append(prepend(x, t), s) -> prepend(append(x, s), t)
-          tree.edges.add(
-            {
-              type: 'append',
-              operand: (subOp as { operand: Uint8Array }).operand,
-            },
-            {
-              leaves: newLeaves(),
-              edges: newEdges().add(
-                {
-                  type: 'prepend',
-                  operand: (op as { operand: Uint8Array }).operand,
-                },
-                nSubSubTree,
-              ),
-            },
-          );
-          break;
-        default:
-          tree.edges.add(op, nSubTree);
+export function coalesceOperations(tree: Tree): Tree {
+  tree.edges.values().forEach(coalesceOperations);
+  if (0 !== tree.leaves.size()) {
+    return tree;
+  }
+  tree.edges.entries().forEach(([op, subTree]: [Op, Tree]): void => {
+    if (0 === subTree.leaves.size() && 1 === subTree.edges.size()) {
+      const [subOp, subSubTree]: [Op, Tree] = subTree.edges.entries()[0]!;
+      if ('prepend' === op.type && 'prepend' === subOp.type) {
+        tree.edges
+          .remove(op)
+          .add({ type: 'prepend', operand: uint8ArrayConcat([subOp.operand, op.operand]) }, subSubTree);
+      } else if ('append' === op.type && 'append' === subOp.type) {
+        tree.edges
+          .remove(op)
+          .add({ type: 'append', operand: uint8ArrayConcat([op.operand, subOp.operand]) }, subSubTree);
       }
-    } else {
-      tree.edges.add(op, nSubTree);
     }
   });
-  return 0 !== tree.leaves.size() + tree.edges.size() ? tree : undefined;
+  return tree;
+}
+
+export function leafPathToTree(leafPath: { operations: Op[]; leaf: Leaf }): Tree {
+  let tree: Tree = { leaves: newLeaves().add(leafPath.leaf), edges: newEdges() };
+  for (let i = leafPath.operations.length; 0 < i; i--) {
+    const thisOp: Op = leafPath.operations[i - 1]!;
+    tree = { leaves: newLeaves(), edges: newEdges().add(thisOp, tree) };
+  }
+  return tree;
+}
+
+export function atomizePrependOp(prefix: Uint8Array): Op[] {
+  const ops: Op[] = [];
+  prefix.toReversed().forEach((value: number): void => {
+    ops.push({ type: 'prepend', operand: Uint8Array.of(value) });
+  });
+  return ops;
+}
+
+export function atomizeAppendOp(suffix: Uint8Array): Op[] {
+  const ops: Op[] = [];
+  suffix.forEach((value: number): void => {
+    ops.push({ type: 'append', operand: Uint8Array.of(value) });
+  });
+  return ops;
+}
+
+export function normalizeOps(operations: Op[]): Op[] {
+  let prefix: Uint8Array = Uint8Array.of();
+  let suffix: Uint8Array = Uint8Array.of();
+  let reverse: boolean = false;
+  let ops: Op[] = [];
+  for (let i: number = 0; i < operations.length; i++) {
+    const thisOp: Op = operations[i]!;
+    switch (thisOp.type) {
+      case 'reverse':
+        [prefix, reverse, suffix] = [suffix.toReversed(), !reverse, prefix.toReversed()];
+        break;
+      case 'append':
+        suffix = uint8ArrayConcat([suffix, thisOp.operand]);
+        break;
+      case 'prepend':
+        prefix = uint8ArrayConcat([thisOp.operand, prefix]);
+        break;
+      default:
+        if (0 !== prefix.length) {
+          ops = ops.concat(atomizePrependOp(prefix));
+          prefix = Uint8Array.of();
+        }
+        if (0 !== suffix.length) {
+          ops = ops.concat(atomizeAppendOp(suffix));
+          suffix = Uint8Array.of();
+        }
+        if (reverse) {
+          ops.push({ type: 'reverse' });
+          reverse = false;
+        }
+        ops.push(thisOp);
+    }
+  }
+  if (0 !== prefix.length) {
+    ops = ops.concat(atomizePrependOp(prefix));
+  }
+  if (0 !== suffix.length) {
+    ops = ops.concat(atomizeAppendOp(suffix));
+  }
+  if (reverse) {
+    ops.push({ type: 'reverse' });
+  }
+  return ops;
+}
+
+export function leafPathsFromTree(tree: Tree, path: Op[]): { operations: Op[]; leaf: Leaf }[] {
+  const result: { operations: Op[]; leaf: Leaf }[] = [];
+  tree.leaves.values().forEach((leaf: Leaf): void => {
+    result.push({ operations: path, leaf });
+  });
+  tree.edges.entries().forEach(([op, subTree]: [Op, Tree]): void => {
+    leafPathsFromTree(subTree, path.concat([op])).forEach((leafPath: { operations: Op[]; leaf: Leaf }): void => {
+      result.push(leafPath);
+    });
+  });
+  return result;
+}
+
+export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined {
+  const tree: Tree = coalesceOperations(
+    leafPathsFromTree(timestamp.tree, [])
+      .map((leafPath: { operations: Op[]; leaf: Leaf }) => {
+        return { operations: normalizeOps(leafPath.operations), leaf: leafPath.leaf };
+      })
+      .map(leafPathToTree)
+      .reduce(incorporateTreeToTree, newTree()),
+  );
+
+  return 0 === tree.leaves.size() + tree.edges.size()
+    ? undefined
+    : {
+        fileHash: timestamp.fileHash,
+        version: timestamp.version,
+        tree,
+      };
 }
