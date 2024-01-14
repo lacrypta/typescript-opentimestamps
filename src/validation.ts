@@ -17,6 +17,7 @@
 'use strict';
 
 import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
+
 import { MergeMap, MergeSet } from './utils';
 
 export function validateNonNullObject(obj: unknown): object {

@@ -16,9 +16,10 @@
 
 'use strict';
 
+import type { Leaf, Op, Timestamp, Tree } from './types';
+
 import { callOp, incorporateTreeToTree, normalizeTimestamp } from './internals';
 import { readTree } from './read';
-import type { Leaf, Op, Timestamp, Tree } from './types';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
 export async function upgradeStep(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {

@@ -16,8 +16,9 @@
 
 'use strict';
 
-import { callOp } from './internals';
 import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
+
+import { callOp } from './internals';
 import { uint8ArrayToHex } from './utils';
 
 export function indent(text: string): string {

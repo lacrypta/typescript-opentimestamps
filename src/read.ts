@@ -16,8 +16,9 @@
 
 'use strict';
 
-import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
 import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
+
+import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
 import { RLeafHeader, Tag, magicHeader, nonFinal } from './types';
 import { uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';

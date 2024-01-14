@@ -22,6 +22,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { keccak_256 } from '@noble/hashes/sha3';
 
 import type { Edge, Leaf, Op, Timestamp, Tree } from './types';
+
 import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayToHex } from './utils';
 
 export function callOp(op: Op, msg: Uint8Array): Uint8Array {

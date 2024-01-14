@@ -19,9 +19,10 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { randomBytes } from '@noble/hashes/utils';
 
+import type { FileHash, Timestamp, Tree } from './types';
+
 import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalizeTimestamp } from './internals';
 import { readTree } from './read';
-import type { FileHash, Timestamp, Tree } from './types';
 import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
 

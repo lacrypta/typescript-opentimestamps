@@ -16,8 +16,9 @@
 
 'use strict';
 
-import { callOp } from './internals';
 import type { Leaf, LeafVerifier, LeafVerifiers, Op, Timestamp, Tree } from './types';
+
+import { callOp } from './internals';
 
 export function getLeaves(msg: Uint8Array, tree: Tree): { leaf: Leaf; msg: Uint8Array }[] {
   let result: { leaf: Leaf; msg: Uint8Array }[] = [];
