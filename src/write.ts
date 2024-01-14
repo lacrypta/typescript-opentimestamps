@@ -59,10 +59,6 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
   );
   if (0 === headerCompare) {
     switch (left.type) {
-      case 'bitcoin':
-      case 'litecoin':
-      case 'ethereum':
-        return left.height - (right as { height: number }).height;
       case 'pending':
         return uint8ArrayCompare(
           new TextEncoder().encode(left.url.toString()),
@@ -70,6 +66,8 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
         );
       case 'unknown':
         return uint8ArrayCompare(left.payload, (right as { payload: Uint8Array }).payload);
+      default:
+        return left.height - (right as { height: number }).height;
     }
   }
   return headerCompare;
@@ -92,12 +90,6 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
   const resultParts: Uint8Array[] = [];
   resultParts.push(Uint8Array.of(Tag.attestation));
   switch (leaf.type) {
-    case 'bitcoin':
-    case 'litecoin':
-    case 'ethereum':
-      resultParts.push(uint8ArrayFromHex(LeafHeader[leaf.type]));
-      resultParts.push(writeBytes(writeUint(leaf.height)));
-      break;
     case 'pending':
       resultParts.push(uint8ArrayFromHex(LeafHeader[leaf.type]));
       resultParts.push(writeBytes(writeBytes(new TextEncoder().encode(leaf.url.toString()))));
@@ -106,6 +98,9 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
       resultParts.push(leaf.header);
       resultParts.push(writeBytes(leaf.payload));
       break;
+    default:
+      resultParts.push(uint8ArrayFromHex(LeafHeader[leaf.type]));
+      resultParts.push(writeBytes(writeUint(leaf.height)));
   }
   return uint8ArrayConcat(resultParts);
 }

@@ -29,18 +29,12 @@ export function infoEdge(op: Op, tree: Tree, msg: Uint8Array, verbose: boolean):
   const resultParts: string[] = [];
   const newMsg: Uint8Array = callOp(op, msg);
   switch (op.type) {
-    case 'sha1':
-    case 'ripemd160':
-    case 'sha256':
-    case 'keccak256':
-    case 'reverse':
-    case 'hexlify':
-      resultParts.push(`msg = ${op.type}(msg)`);
-      break;
     case 'append':
     case 'prepend':
       resultParts.push(`msg = ${op.type}(msg, ${uint8ArrayToHex(op.operand)})`);
       break;
+    default:
+      resultParts.push(`msg = ${op.type}(msg)`);
   }
   if (verbose) {
     resultParts.push(`    = ${uint8ArrayToHex(newMsg)}`);
@@ -51,14 +45,12 @@ export function infoEdge(op: Op, tree: Tree, msg: Uint8Array, verbose: boolean):
 
 export function infoLeaf(leaf: Leaf): string {
   switch (leaf.type) {
-    case 'bitcoin':
-    case 'litecoin':
-    case 'ethereum':
-      return `verify(msg, ${leaf.type}, ${leaf.height})`;
     case 'pending':
       return `pending(msg, ${leaf.url.toString()})`;
     case 'unknown':
       return `unknown<${uint8ArrayToHex(leaf.header)}>(msg, ${uint8ArrayToHex(leaf.payload)})`;
+    default:
+      return `verify(msg, ${leaf.type}, ${leaf.height})`;
   }
 }
 

@@ -64,16 +64,11 @@ export function newEdges(): MergeMap<Op, Tree> {
   return new MergeMap<Op, Tree>(
     (op: Op): string => {
       switch (op.type) {
-        case 'sha1':
-        case 'ripemd160':
-        case 'sha256':
-        case 'keccak256':
-        case 'hexlify':
-        case 'reverse':
-          return op.type;
         case 'append':
         case 'prepend':
           return `${op.type}:${uint8ArrayToHex(op.operand)}`;
+        default:
+          return op.type;
       }
     },
     (left: Tree, right: Tree): Tree => incorporateTreeToTree(left, right),
@@ -84,14 +79,12 @@ export function newLeaves(): MergeSet<Leaf> {
   return new MergeSet<Leaf>(
     (leaf: Leaf): string => {
       switch (leaf.type) {
-        case 'bitcoin':
-        case 'litecoin':
-        case 'ethereum':
-          return `${leaf.type}:${leaf.height}`;
         case 'pending':
           return `${leaf.type}:${leaf.url.toString()}`;
         case 'unknown':
           return `${leaf.type}:${uint8ArrayToHex(leaf.header)}:${uint8ArrayToHex(leaf.payload)}`;
+        default:
+          return `${leaf.type}:${leaf.height}`;
       }
     },
     (left: Leaf, _right: Leaf): Leaf => {
