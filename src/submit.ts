@@ -42,7 +42,7 @@ export async function submitTimestamp(
   value: Uint8Array,
   fudge: Uint8Array | undefined,
   calendarUrls: URL[] = defaultCalendarUrls,
-): Promise<[Timestamp, Error[]]> {
+): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const fileHash: FileHash = validateFileHashValue(algorithm, value);
   calendarUrls.forEach((url: URL): void => void validateCalendarUrl(url.toString()));
 
@@ -83,12 +83,12 @@ export async function submitTimestamp(
       ? resultTree
       : { leaves: newLeaves(), edges: newEdges().add({ type: 'append', operand: fudgeValue }, resultTree) };
 
-  return [
-    normalizeTimestamp({
+  return {
+    timestamp: normalizeTimestamp({
       version: 1,
       fileHash,
       tree: fudgedTree,
     })!,
-    stampingErrors,
-  ];
+    errors: stampingErrors,
+  };
 }
