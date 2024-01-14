@@ -22,7 +22,7 @@ import { callOp, incorporateTreeToTree, normalizeTimestamp } from './internals';
 import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
-export async function upgradeStep(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
+export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
   return [
     tree,
     (
@@ -57,7 +57,7 @@ export async function upgradeStep(tree: Tree, msg: Uint8Array): Promise<[Tree, E
           })
           .concat(
             tree.edges.entries().map(async ([op, tree]: [Op, Tree]): Promise<Error[]> => {
-              return (await upgradeStep(tree, callOp(op, msg)))[1];
+              return (await upgradeTree(tree, callOp(op, msg)))[1];
             }),
           ),
       )
@@ -66,7 +66,7 @@ export async function upgradeStep(tree: Tree, msg: Uint8Array): Promise<[Tree, E
 }
 
 export async function upgradeTimestamp(timestamp: Timestamp): Promise<[Timestamp, Error[]]> {
-  const [tree, errors]: [Tree, Error[]] = await upgradeStep(timestamp.tree, timestamp.fileHash.value);
+  const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
   return [
     normalizeTimestamp({
       version: timestamp.version,
