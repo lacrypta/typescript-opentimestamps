@@ -18,7 +18,7 @@
 
 import type { Leaf, Op, Timestamp, Tree, Verifier } from './types';
 
-import { callOp } from './internals';
+import { callOp, leafPathToTree, leafPathsFromTree, normalizeTimestamp } from './internals';
 
 export function getLeaves(msg: Uint8Array, tree: Tree): { msg: Uint8Array; leaf: Leaf }[] {
   let result: { msg: Uint8Array; leaf: Leaf }[] = [];
@@ -81,4 +81,33 @@ export async function verifyTimestamp(
   });
 
   return result;
+}
+
+export function shrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
+  const shrunkenPath: { operations: Op[]; leaf: Leaf } | undefined = leafPathsFromTree(timestamp.tree, [])
+    .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
+    .reduce(
+      (
+        left: { operations: Op[]; leaf: Leaf } | undefined,
+        right: { operations: Op[]; leaf: Leaf },
+      ): { operations: Op[]; leaf: Leaf } => {
+        if (undefined === left) {
+          return right;
+        } else if ((left.leaf as { height: number }).height <= (right.leaf as { height: number }).height) {
+          return left;
+        } else {
+          return right;
+        }
+      },
+      undefined,
+    );
+  if (undefined === shrunkenPath) {
+    return timestamp;
+  } else {
+    return normalizeTimestamp({
+      fileHash: timestamp.fileHash,
+      version: timestamp.version,
+      tree: leafPathToTree(shrunkenPath),
+    })!;
+  }
 }
