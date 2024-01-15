@@ -16,60 +16,69 @@
 
 'use strict';
 
-import type { Edge, Leaf, Timestamp, Tree } from './types';
+import type { Path, Paths, Timestamp, Tree } from './types';
 
-import { callOp, incorporateTreeToTree, normalizeTimestamp } from './internals';
+import { callOps, normalizeTimestamp, pathsToTree, treeToPaths } from './internals';
 import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
-export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
-  return [
-    tree,
-    (
-      await Promise.all(
-        tree.leaves
-          .values()
-          .map(async (leaf: Leaf): Promise<Error[]> => {
-            if ('pending' !== leaf.type) {
-              return [];
-            }
-            try {
-              const body: Uint8Array = await retrieveGetBody(
-                new URL(`${leaf.url.toString().replace(/\/$/, '')}/timestamp/${uint8ArrayToHex(msg)}`),
-              );
-              const [upgradedTree, end]: [Tree, number] = readTree(body, 0);
-              if (end !== body.length) {
-                return [new Error(`Garbage at end of calendar (${leaf.url.toString()}) response}`)];
-              }
-              tree.leaves.remove(leaf);
-              incorporateTreeToTree(tree, upgradedTree);
-              return [];
-            } catch (e: unknown) {
-              if (e instanceof Error) {
-                return [e];
-              } else {
-                return [new Error('Unknown error')];
-              }
-            }
-          })
-          .concat(
-            tree.edges.entries().map(async ([op, tree]: Edge): Promise<Error[]> => {
-              return (await upgradeTree(tree, callOp(op, msg)))[1];
-            }),
-          ),
-      )
-    ).reduce<Error[]>((prev: Error[], curr: Error[]) => prev.concat(curr), []),
-  ];
+export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Promise<Tree> {
+  const body: Uint8Array = await retrieveGetBody(
+    new URL(`${calendarUrl.toString().replace(/\/$/, '')}/timestamp/${uint8ArrayToHex(msg)}`),
+  );
+  const [upgradedTree, end]: [Tree, number] = readTree(body, 0);
+  if (end !== body.length) {
+    throw new Error(`Garbage at end of calendar response}`);
+  }
+  return upgradedTree;
 }
 
-export async function upgradeTimestamp(timestamp: Timestamp): Promise<[Timestamp, Error[]]> {
+export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
+  const { paths, errors }: { paths: Paths; errors: Error[] } = (
+    await Promise.all(
+      treeToPaths(tree).map(async ({ operations, leaf }: Path): Promise<Paths | Error> => {
+        if ('pending' !== leaf.type) {
+          return Promise.resolve([{ operations, leaf }]);
+        } else {
+          try {
+            return upgradeFromCalendar(leaf.url, callOps(operations, msg)).then((upgradedTree: Tree): Paths => {
+              return treeToPaths(upgradedTree).map(
+                ({ operations: upgradedOperations, leaf: upgradedLeaf }: Path): Path => {
+                  return { operations: operations.concat(upgradedOperations), leaf: upgradedLeaf };
+                },
+              );
+            });
+          } catch (e: unknown) {
+            if (e instanceof Error) {
+              return Promise.resolve(e);
+            } else {
+              return Promise.resolve(new Error('Unknown error'));
+            }
+          }
+        }
+      }),
+    )
+  ).reduce(
+    (prev: { paths: Paths; errors: Error[] }, current: Error | Paths): { paths: Paths; errors: Error[] } => {
+      if (current instanceof Error) {
+        return { paths: prev.paths, errors: prev.errors.concat([current]) };
+      } else {
+        return { paths: prev.paths.concat(current), errors: prev.errors };
+      }
+    },
+    { paths: [], errors: [] },
+  );
+  return [pathsToTree(paths), errors];
+}
+
+export async function upgradeTimestamp(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
-  return [
-    normalizeTimestamp({
+  return {
+    timestamp: normalizeTimestamp({
       version: timestamp.version,
       fileHash: timestamp.fileHash,
       tree,
     })!,
     errors,
-  ];
+  };
 }
