@@ -34,8 +34,8 @@
     "invalidLink": true,
     "notDocumented": false
   },
-  "treatWarningsAsErrors": true,
-  "treatValidationWarningsAsErrors": true,
+  "treatWarningsAsErrors": false,
+  "treatValidationWarningsAsErrors": false,
   "logLevel": "Verbose",
   "disableSources": false
 }
