@@ -268,8 +268,8 @@ export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined 
   const tree: Tree = decoalesceOperations(
     coalesceOperations(
       pathsToTree(
-        treeToPaths(timestamp.tree).map((leafPath: Path) => {
-          return { operations: normalizeOps(leafPath.operations), leaf: leafPath.leaf };
+        treeToPaths(timestamp.tree).map((path: Path) => {
+          return { operations: normalizeOps(path.operations), leaf: path.leaf };
         }),
       ),
     ),
