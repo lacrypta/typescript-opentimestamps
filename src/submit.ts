@@ -27,14 +27,10 @@ import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
 
 export const defaultCalendarUrls: URL[] = [
-  // new URL('https://a.pool.opentimestamps.org'),
-  // new URL('https://b.pool.opentimestamps.org'),
-  // new URL('https://a.pool.eternitywall.com'),
   new URL('https://alice.btc.calendar.opentimestamps.org'),
   new URL('https://bob.btc.calendar.opentimestamps.org'),
-  // new URL('https://finney.calendar.eternitywall.com'),
-  // new URL('https://opentimestamps.org'),
-  // new URL('https://ots.btc.catallaxy.com'),
+  new URL('https://finney.calendar.eternitywall.com'),
+  new URL('https://btc.calendar.catallaxy.com'),
 ];
 
 export async function submitTimestamp(
