@@ -25,5 +25,6 @@ export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
 export { normalizeTimestamp as normalize } from './internals';
 export { isTimestamp, validateTimestamp as validate } from './validation';
-export { verifyTimestamp as verify, shrinkTimestamp as shrink } from './verify';
+export { verifyTimestamp as verify } from './verify';
+export { shrinkTimestamp as shrink } from './shrink';
 export * from './verifiers';

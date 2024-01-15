@@ -16,9 +16,9 @@
 
 'use strict';
 
-import type { Leaf, Path, Timestamp, Verifier } from './types';
+import type { Path, Timestamp, Verifier } from './types';
 
-import { treeToPaths, pathsToTree, normalizeTimestamp, callOps } from './internals';
+import { treeToPaths, callOps } from './internals';
 
 export async function verifyTimestamp(
   timestamp: Timestamp,
@@ -75,27 +75,4 @@ export async function verifyTimestamp(
   });
 
   return result;
-}
-
-export function shrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
-  const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
-    .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
-    .reduce((left: Path | undefined, right: Path): Path => {
-      if (undefined === left) {
-        return right;
-      } else if ((left.leaf as { height: number }).height <= (right.leaf as { height: number }).height) {
-        return left;
-      } else {
-        return right;
-      }
-    }, undefined);
-  if (undefined === shrunkenPath) {
-    return timestamp;
-  } else {
-    return normalizeTimestamp({
-      fileHash: timestamp.fileHash,
-      version: timestamp.version,
-      tree: pathsToTree([shrunkenPath]),
-    })!;
-  }
 }
