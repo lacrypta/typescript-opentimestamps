@@ -28,7 +28,7 @@ export function writeUint(value: number): Uint8Array {
   const resultParts: Uint8Array[] = [];
   while (0x7f < value) {
     resultParts.push(Uint8Array.of(0x80 | (value & 0x7f)));
-    value >>= 7;
+    value >>>= 7;
   }
   resultParts.push(Uint8Array.of(value));
   return uint8ArrayConcat(resultParts);
