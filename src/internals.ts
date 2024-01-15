@@ -102,7 +102,7 @@ export function newTree(): Tree {
   return { edges: newEdges(), leaves: newLeaves() };
 }
 
-function decoalesceOperations(tree: Tree): Tree {
+export function decoalesceOperations(tree: Tree): Tree {
   tree.edges.entries().forEach(([_op, subTree]: Edge) => decoalesceOperations(subTree));
   if (1 === tree.edges.size()) {
     const [op, subTree]: Edge = tree.edges.entries()[0]!;
