@@ -27,7 +27,7 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   const block: unknown = JSON.parse(
     new TextDecoder().decode(await fetchBody(new URL(`https://blockchain.info/rawblock/${leaf.height}`))),
   );
-  if (!uint8ArrayEquals(msg, uint8ArrayFromHex((block as { mrkl_root: string }).mrkl_root))) {
+  if (!uint8ArrayEquals(msg.toReversed(), uint8ArrayFromHex((block as { mrkl_root: string }).mrkl_root))) {
     throw new Error('Merkle root mismatch');
   }
   return (block as { time: number }).time;

@@ -33,7 +33,7 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   const block: unknown = JSON.parse(
     new TextDecoder().decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
   );
-  if (!uint8ArrayEquals(msg, uint8ArrayFromHex((block as { merkle_root: string }).merkle_root))) {
+  if (!uint8ArrayEquals(msg.toReversed(), uint8ArrayFromHex((block as { merkle_root: string }).merkle_root))) {
     throw new Error('Merkle root mismatch');
   }
   return (block as { timestamp: number }).timestamp;
