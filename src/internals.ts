@@ -103,7 +103,7 @@ export function newTree(): Tree {
 }
 
 export function decoalesceOperations(tree: Tree): Tree {
-  tree.edges.entries().forEach(([_op, subTree]: Edge) => decoalesceOperations(subTree));
+  tree.edges.values().forEach((subTree: Tree) => decoalesceOperations(subTree));
   if (1 === tree.edges.size()) {
     const [op, subTree]: Edge = tree.edges.entries()[0]!;
     if (0 === subTree.leaves.size() && 2 === subTree.edges.size()) {
@@ -112,13 +112,11 @@ export function decoalesceOperations(tree: Tree): Tree {
         1 === op.operand.length &&
         'prepend:prepend' ===
           subTree.edges
-            .entries()
-            .map(([subOp, _subSubTree]: [Op, Tree]) => subOp.type)
+            .keys()
+            .map((subOp: Op) => subOp.type)
             .join(':')
       ) {
-        const entries: Edge[] = subTree.edges.entries();
-        const [subOp1, subSubTree1]: Edge = entries[0]!;
-        const [subOp2, subSubTree2]: Edge = entries[1]!;
+        const [[subOp1, subSubTree1], [subOp2, subSubTree2]]: [Edge, Edge] = subTree.edges.entries() as [Edge, Edge];
         tree.edges
           .remove(op)
           .add(
@@ -134,13 +132,11 @@ export function decoalesceOperations(tree: Tree): Tree {
         1 === op.operand.length &&
         'append:append' ===
           subTree.edges
-            .entries()
-            .map(([subOp, _subSubTree]: [Op, Tree]) => subOp.type)
+            .keys()
+            .map((subOp: Op) => subOp.type)
             .join(':')
       ) {
-        const entries: Edge[] = subTree.edges.entries();
-        const [subOp1, subSubTree1]: Edge = entries[0]!;
-        const [subOp2, subSubTree2]: Edge = entries[1]!;
+        const [[subOp1, subSubTree1], [subOp2, subSubTree2]]: [Edge, Edge] = subTree.edges.entries() as [Edge, Edge];
         tree.edges
           .remove(op)
           .add(
