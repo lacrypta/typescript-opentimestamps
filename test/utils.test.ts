@@ -203,7 +203,7 @@ describe('Utils', () => {
   });
 
   describe('MergeSet<V>', () => {
-    const theToKey: (key: number) => number | string | symbol = (key: number) => key.toString();
+    const theToKey: (key: number) => string = (key: number) => key.toString();
     const theCombine: (left: number, right: number) => number = (left: number, right: number) =>
       (left % 100) * 100 + right;
 
@@ -224,7 +224,7 @@ describe('Utils', () => {
           combine,
           expected,
         }: {
-          toKey: (key: number) => number | string | symbol;
+          toKey: (key: number) => string;
           combine: (left: number, right: number) => number;
           expected: MergeSet<number>;
         }) => {
@@ -405,7 +405,7 @@ describe('Utils', () => {
   });
 
   describe('MergeMap<K, V>', () => {
-    const theToKey: (key: number) => number | string | symbol = (key: number) => key.toString();
+    const theToKey: (key: number) => string = (key: number) => key.toString();
     const theCombine: (left: string, right: string) => string = (left: string, right: string) => `(${left}:${right})`;
 
     const theEmptyMergeMap: MergeMap<number, string> = new MergeMap<number, string>(theToKey, theCombine);
@@ -425,7 +425,7 @@ describe('Utils', () => {
           combine,
           expected,
         }: {
-          toKey: (key: number) => number | string | symbol;
+          toKey: (key: number) => string;
           combine: (left: string, right: string) => string;
           expected: MergeMap<number, string>;
         }) => {

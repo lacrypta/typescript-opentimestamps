@@ -16,10 +16,24 @@
 
 'use strict';
 
+/**
+ * Serialize the given Uint8Array to a Hex string.
+ *
+ * @param data - Uint8Array to serialize as Hex.
+ * @returns The resulting Hex string.
+ */
 export function uint8ArrayToHex(data: Uint8Array): string {
   return data.reduce((result: string, value: number) => result + value.toString(16).padStart(2, '0'), '').toLowerCase();
 }
 
+/**
+ * Deserialize the given Hex string into a Uint8Array.
+ *
+ * @param hex - Hex string to deserialize into the resulting Uint8Array.
+ * @returns The deserialized Uint8Array,
+ * @throws Error if the given Hex string length is odd.
+ * @throws Error if the given Hex string contains non-hexadecimal characters.
+ */
 export function uint8ArrayFromHex(hex: string): Uint8Array {
   if (hex.length % 2) {
     throw new Error(`Hex value should be of even length, found ${hex.length}`);
@@ -63,14 +77,14 @@ export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
 }
 
 export class MergeSet<V> {
-  private mapping: Record<number | string | symbol, V> = {};
+  private mapping: Record<string, V> = {};
 
   constructor(
-    private readonly toKey: (key: V) => number | string | symbol,
+    private readonly toKey: (key: V) => string,
     private readonly combine: (left: V, right: V) => V,
   ) {}
 
-  protected doAdd(key: number | string | symbol, value: V): this {
+  protected doAdd(key: string, value: V): this {
     this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, value) : value;
     return this;
   }
@@ -94,7 +108,7 @@ export class MergeSet<V> {
   }
 
   public incorporate(other: typeof this): this {
-    Object.entries(other.mapping).forEach(([key, value]: [number | string | symbol, V]) => this.doAdd(key, value));
+    Object.entries(other.mapping).forEach(([key, value]: [string, V]) => this.doAdd(key, value));
     return this;
   }
 
@@ -104,27 +118,27 @@ export class MergeSet<V> {
 }
 
 export class MergeMap<K, V> {
-  private keySet: Set<K> = new Set<K>();
-  private mapping: Record<number | string | symbol, V> = {};
+  private keySet: Record<string, K> = {};
+  private mapping: Record<string, V> = {};
 
   constructor(
-    private readonly toKey: (key: K) => number | string | symbol,
+    private readonly toKey: (key: K) => string,
     private readonly combine: (left: V, right: V) => V,
   ) {}
 
   protected doAdd(key: K, value: V): this {
-    this.keySet.add(key);
-    const sKey: number | string | symbol = this.toKey(key);
+    const sKey: string = this.toKey(key);
+    this.keySet[sKey] = key;
     this.mapping[sKey] = sKey in this.mapping ? this.combine(this.mapping[sKey]!, value) : value;
     return this;
   }
 
   public size(): number {
-    return this.keySet.size;
+    return this.values().length;
   }
 
   public keys(): K[] {
-    return Array.from(this.keySet);
+    return Object.values(this.keySet);
   }
 
   public values(): V[] {
@@ -136,9 +150,11 @@ export class MergeMap<K, V> {
   }
 
   public remove(value: K): this {
+    const sKey: string = this.toKey(value);
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.mapping[this.toKey(value)];
-    this.keySet.delete(value);
+    delete this.mapping[sKey];
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete this.keySet[sKey];
     return this;
   }
 
