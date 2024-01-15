@@ -236,15 +236,17 @@ export function normalizeOps(operations: Ops): Ops {
   return ops;
 }
 
-export function pathsToTree(leafPaths: Paths): Tree {
-  return leafPaths
-    .map((leafPath: Path): Tree => {
-      let tree: Tree = { leaves: newLeaves().add(leafPath.leaf), edges: newEdges() };
-      for (let i = leafPath.operations.length; 0 < i; i--) {
-        const thisOp: Op = leafPath.operations[i - 1]!;
-        tree = { leaves: newLeaves(), edges: newEdges().add(thisOp, tree) };
-      }
-      return tree;
+export function pathsToTree(paths: Paths): Tree {
+  return paths
+    .map((path: Path): Tree => {
+      return path.operations.reduceRight(
+        (tree: Tree, op: Op): Tree => {
+          const result: Tree = newTree();
+          result.edges.add(op, tree);
+          return result;
+        },
+        { leaves: newLeaves().add(path.leaf), edges: newEdges() },
+      );
     })
     .reduce(incorporateTreeToTree, newTree());
 }
