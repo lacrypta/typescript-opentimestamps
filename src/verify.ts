@@ -16,20 +16,9 @@
 
 'use strict';
 
-import type { Edge, Leaf, Path, Timestamp, Tree, Verifier } from './types';
+import type { Leaf, Path, Timestamp, Verifier } from './types';
 
-import { callOp, treeToPaths, pathsToTree, normalizeTimestamp } from './internals';
-
-export function getLeaves(msg: Uint8Array, tree: Tree): { msg: Uint8Array; leaf: Leaf }[] {
-  let result: { msg: Uint8Array; leaf: Leaf }[] = [];
-  tree.leaves.values().forEach((leaf: Leaf) => {
-    result.push({ msg, leaf });
-  });
-  tree.edges.entries().forEach(([op, tree]: Edge) => {
-    result = result.concat(getLeaves(callOp(op, msg), tree));
-  });
-  return result;
-}
+import { treeToPaths, pathsToTree, normalizeTimestamp, callOps } from './internals';
 
 export async function verifyTimestamp(
   timestamp: Timestamp,
@@ -42,42 +31,47 @@ export async function verifyTimestamp(
 
   (
     await Promise.all(
-      getLeaves(timestamp.fileHash.value, timestamp.tree).map(
-        async ({ msg, leaf }: { msg: Uint8Array; leaf: Leaf }): Promise<[string, number | Error | undefined][]> => {
-          return await Promise.all(
-            Object.entries(verifiers).map(
-              async ([name, verifier]: [string, Verifier]): Promise<[string, number | undefined | Error]> => {
-                try {
-                  return [name, await verifier(msg, leaf)];
-                } catch (e: unknown) {
-                  if (e instanceof Error) {
-                    return [name, e];
-                  } else {
-                    return [name, new Error('Unknown error in verifier')];
-                  }
+      treeToPaths(timestamp.tree)
+        .map(({ operations, leaf }: Path): Promise<[string, number | Error | undefined]>[] => {
+          const msg: Uint8Array = callOps(operations, timestamp.fileHash.value);
+          return Object.entries(verifiers).map(
+            async ([name, verifier]: [string, Verifier]): Promise<[string, number | undefined | Error]> => {
+              try {
+                return [name, await verifier(msg, leaf)];
+              } catch (e: unknown) {
+                if (e instanceof Error) {
+                  return [name, e];
+                } else {
+                  return [name, new Error('Unknown error in verifier')];
                 }
-              },
-            ),
+              }
+            },
           );
-        },
-      ),
+        })
+        .reduce(
+          (
+            prev: Promise<[string, number | Error | undefined]>[],
+            curr: Promise<[string, number | Error | undefined]>[],
+          ): Promise<[string, number | Error | undefined]>[] => {
+            return prev.concat(curr);
+          },
+          [],
+        ),
     )
-  ).forEach((leafResults: [string, number | Error | undefined][]) => {
-    leafResults.forEach(([verifierName, leafResult]: [string, number | Error | undefined]) => {
-      if (undefined === leafResult) {
-        return;
-      } else if (leafResult instanceof Error) {
-        if (!(verifierName in result.errors)) {
-          result.errors[verifierName] = [];
-        }
-        result.errors[verifierName]!.push(leafResult);
-      } else {
-        if (!(leafResult in result.attestations)) {
-          result.attestations[leafResult] = [];
-        }
-        result.attestations[leafResult]!.push(verifierName);
+  ).forEach(([verifierName, leafResult]: [string, number | undefined | Error]) => {
+    if (undefined === leafResult) {
+      return;
+    } else if (leafResult instanceof Error) {
+      if (!(verifierName in result.errors)) {
+        result.errors[verifierName] = [];
       }
-    });
+      result.errors[verifierName]!.push(leafResult);
+    } else {
+      if (!(leafResult in result.attestations)) {
+        result.attestations[leafResult] = [];
+      }
+      result.attestations[leafResult]!.push(verifierName);
+    }
   });
 
   return result;
