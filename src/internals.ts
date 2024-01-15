@@ -102,6 +102,61 @@ export function newTree(): Tree {
   return { edges: newEdges(), leaves: newLeaves() };
 }
 
+function decoalesceOperations(tree: Tree): Tree {
+  tree.edges.entries().forEach(([_op, subTree]: Edge) => decoalesceOperations(subTree));
+  if (1 === tree.edges.size()) {
+    const [op, subTree]: Edge = tree.edges.entries()[0]!;
+    if (0 === subTree.leaves.size() && 2 === subTree.edges.size()) {
+      if (
+        'prepend' === op.type &&
+        1 === op.operand.length &&
+        'prepend:prepend' ===
+          subTree.edges
+            .entries()
+            .map(([subOp, _subSubTree]: [Op, Tree]) => subOp.type)
+            .join(':')
+      ) {
+        const entries: Edge[] = subTree.edges.entries();
+        const [subOp1, subSubTree1]: Edge = entries[0]!;
+        const [subOp2, subSubTree2]: Edge = entries[1]!;
+        tree.edges
+          .remove(op)
+          .add(
+            { type: 'prepend', operand: uint8ArrayConcat([(subOp1 as { operand: Uint8Array }).operand, op.operand]) },
+            subSubTree1,
+          )
+          .add(
+            { type: 'prepend', operand: uint8ArrayConcat([(subOp2 as { operand: Uint8Array }).operand, op.operand]) },
+            subSubTree2,
+          );
+      } else if (
+        'append' === op.type &&
+        1 === op.operand.length &&
+        'append:append' ===
+          subTree.edges
+            .entries()
+            .map(([subOp, _subSubTree]: [Op, Tree]) => subOp.type)
+            .join(':')
+      ) {
+        const entries: Edge[] = subTree.edges.entries();
+        const [subOp1, subSubTree1]: Edge = entries[0]!;
+        const [subOp2, subSubTree2]: Edge = entries[1]!;
+        tree.edges
+          .remove(op)
+          .add(
+            { type: 'append', operand: uint8ArrayConcat([op.operand, (subOp1 as { operand: Uint8Array }).operand]) },
+            subSubTree1,
+          )
+          .add(
+            { type: 'append', operand: uint8ArrayConcat([op.operand, (subOp2 as { operand: Uint8Array }).operand]) },
+            subSubTree2,
+          );
+      }
+    }
+  }
+  return tree;
+}
+
 export function coalesceOperations(tree: Tree): Tree {
   tree.edges.values().forEach(coalesceOperations);
   if (0 !== tree.leaves.size()) {
@@ -212,11 +267,13 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
 }
 
 export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined {
-  const tree: Tree = coalesceOperations(
-    pathsToTree(
-      treeToPaths(timestamp.tree).map((leafPath: Path) => {
-        return { operations: normalizeOps(leafPath.operations), leaf: leafPath.leaf };
-      }),
+  const tree: Tree = decoalesceOperations(
+    coalesceOperations(
+      pathsToTree(
+        treeToPaths(timestamp.tree).map((leafPath: Path) => {
+          return { operations: normalizeOps(leafPath.operations), leaf: leafPath.leaf };
+        }),
+      ),
     ),
   );
 
