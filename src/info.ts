@@ -51,7 +51,7 @@ export function infoLeaf(leaf: Leaf): string {
     case 'unknown':
       return `unknown<${uint8ArrayToHex(leaf.header)}>(msg, ${uint8ArrayToHex(leaf.payload)})`;
     default:
-      return `verify(msg, ${leaf.type}, ${leaf.height})`;
+      return `${leaf.type}Verify(msg, ${leaf.height})`;
   }
 }
 
