@@ -61,10 +61,10 @@ export function infoTree(tree: Tree, msg: Uint8Array, verbose: boolean): string 
 
   const doIndent: (x: string) => string = 1 < leavesSize + edgesSize ? indent : (x: string) => x;
 
-  const resultParts: string[] = ([] as string[]).concat(
-    tree.leaves.values().map((leaf: Leaf): string => doIndent(infoLeaf(leaf))),
-    tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg, verbose))),
-  );
+  const resultParts: string[] = tree.leaves
+    .values()
+    .map((leaf: Leaf): string => doIndent(infoLeaf(leaf)))
+    .concat(tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg, verbose))));
   return resultParts.join('\n');
 }
 
