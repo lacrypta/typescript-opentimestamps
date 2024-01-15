@@ -22,7 +22,7 @@ export function uint8ArrayToHex(data: Uint8Array): string {
 
 export function uint8ArrayFromHex(hex: string): Uint8Array {
   if (hex.length % 2) {
-    throw new Error('Hex value should be of even length');
+    throw new Error(`Hex value should be of even length, found ${hex.length}`);
   }
   return Uint8Array.from(
     (hex.match(/../g) ?? []).map((pair: string) => {

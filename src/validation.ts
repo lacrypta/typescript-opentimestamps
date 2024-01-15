@@ -104,6 +104,9 @@ export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } 
     throw new Error('Expected key .header');
   }
   validateUint8Array(obj.header);
+  if (8 !== (obj.header as Uint8Array).length) {
+    throw new Error('Expected 8 byte header');
+  }
   return obj as { header: Uint8Array };
 }
 

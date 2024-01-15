@@ -58,13 +58,13 @@ describe('Utils', () => {
       {
         hex: '1',
         expected: null,
-        error: 'Hex value should be of even length',
+        error: 'Hex value should be of even length, found 1',
         name: 'should fail for odd length',
       },
       {
         hex: '12345',
         expected: null,
-        error: 'Hex value should be of even length',
+        error: 'Hex value should be of even length, found 5',
         name: 'should fail for odd length (again)',
       },
       {

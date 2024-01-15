@@ -18,7 +18,7 @@
 
 import type { Leaf, Verifier } from '../types';
 
-import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex } from '../utils';
+import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex, uint8ArrayToHex } from '../utils';
 
 export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
@@ -33,8 +33,10 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   const block: unknown = JSON.parse(
     new TextDecoder().decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
   );
-  if (!uint8ArrayEquals(msg.toReversed(), uint8ArrayFromHex((block as { merkle_root: string }).merkle_root))) {
-    throw new Error('Merkle root mismatch');
+  const expected: Uint8Array = msg.toReversed();
+  const found: Uint8Array = uint8ArrayFromHex((block as { merkle_root: string }).merkle_root);
+  if (!uint8ArrayEquals(expected, found)) {
+    throw new Error(`Merkle root mismatch (expected ${uint8ArrayToHex(expected)} but found ${uint8ArrayToHex(found)})`);
   }
   return (block as { timestamp: number }).timestamp;
 };

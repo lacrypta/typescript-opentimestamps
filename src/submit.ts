@@ -59,14 +59,14 @@ export async function submitTimestamp(
           );
           const [tree, end]: [Tree, number] = readTree(body, 0);
           if (end !== body.length) {
-            return new Error(`Garbage at end of calendar (${url.toString()}) response}`);
+            return new Error('Garbage at end of calendar response}');
           }
           return tree;
         } catch (e: unknown) {
           if (e instanceof Error) {
-            return e;
+            return new Error(`Error (${url.toString()}): ${e.message}`);
           } else {
-            return new Error('Unknown error contacting calendar');
+            return new Error(`Error (${url.toString()}): Unknown error contacting calendar`);
           }
         }
       }),

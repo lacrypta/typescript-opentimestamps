@@ -40,9 +40,9 @@ export async function verifyTimestamp(
                 return [name, await verifier(msg, leaf)];
               } catch (e: unknown) {
                 if (e instanceof Error) {
-                  return [name, e];
+                  return [name, new Error(`Error (${name}): ${e.message}`)];
                 } else {
-                  return [name, new Error('Unknown error in verifier')];
+                  return [name, new Error(`Error (${name}): unknown error in verifier`)];
                 }
               }
             },

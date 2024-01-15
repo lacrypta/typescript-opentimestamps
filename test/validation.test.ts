@@ -319,6 +319,16 @@ describe('Validation', () => {
       },
       {
         obj: { header: Uint8Array.of() },
+        error: new Error('Expected 8 byte header'),
+        name: 'should fail when .header key less than 8 bytes',
+      },
+      {
+        obj: { header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9) },
+        error: new Error('Expected 8 byte header'),
+        name: 'should fail when .header key more than 8 bytes',
+      },
+      {
+        obj: { header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8) },
         error: null,
         name: 'should pass when well-formed .header key',
       },
@@ -605,16 +615,21 @@ describe('Validation', () => {
       },
       {
         obj: { type: 'unknown', header: Uint8Array.of() },
-        error: new Error('Expected key .payload'),
-        name: 'should fail when "unknown" leaf has no .payload key',
+        error: new Error('Expected 8 byte header'),
+        name: 'should fail when "unknown" leaf has .header with less than 8 bytes',
       },
       {
-        obj: { type: 'unknown', header: Uint8Array.of(), payload: null },
+        obj: { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9) },
+        error: new Error('Expected 8 byte header'),
+        name: 'should fail when "unknown" leaf has .header with more than 8 bytes',
+      },
+      {
+        obj: { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: null },
         error: new Error('Expected non-null object'),
         name: 'should fail when "unknown" leaf has null .payload',
       },
       {
-        obj: { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() },
+        obj: { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
         error: null,
         name: 'should pass when "unknown" leaf is well-formed',
       },

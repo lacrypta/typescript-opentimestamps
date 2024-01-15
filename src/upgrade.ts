@@ -50,9 +50,9 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
             });
           } catch (e: unknown) {
             if (e instanceof Error) {
-              return Promise.resolve(e);
+              return new Error(`Error (${leaf.url.toString()}): ${e.message}`);
             } else {
-              return Promise.resolve(new Error('Unknown error'));
+              return new Error(`Error (${leaf.url.toString()}): Unknown error contacting calendar`);
             }
           }
         }

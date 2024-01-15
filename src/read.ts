@@ -26,7 +26,7 @@ import { validateCalendarUrl } from './validation';
 export function getBytes(length: number, data: Uint8Array, index: number): [Uint8Array, number] {
   const result: Uint8Array = data.slice(index, index + length);
   if (result.length !== length) {
-    throw new Error('Unexpected EOF');
+    throw new Error(`Unexpected EOF reading bytes at position ${index}`);
   }
   return [result, index + length];
 }
@@ -59,11 +59,13 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
 }
 
 export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array): [Uint8Array, number] {
-  const [header, idx]: [Uint8Array, number] = getBytes(literal.length, data, index);
-  if (!uint8ArrayEquals(header, literal)) {
-    throw new Error('Literal mismatch');
+  const [found, idx]: [Uint8Array, number] = getBytes(literal.length, data, index);
+  if (!uint8ArrayEquals(found, literal)) {
+    throw new Error(
+      `Literal mismatch (expected ${uint8ArrayToHex(literal)} but found ${uint8ArrayToHex(found)}) at position ${index}`,
+    );
   }
-  return [header, idx];
+  return [found, idx];
 }
 
 export function readDoneLeafPayload(payload: Uint8Array): number {
@@ -153,14 +155,14 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
       return [{ algorithm: Tag[tag] as 'sha256' | 'keccak256', value }, idx2];
     }
     default:
-      throw new Error('Unknown hashing algorithm');
+      throw new Error(`Unknown hashing algorithm ${uint8ArrayToHex(Uint8Array.of(tag))} at position ${index}`);
   }
 }
 
 export function readVersion(data: Uint8Array, index: number): [number, number] {
   const [version, idx]: [number, number] = readUint(data, index);
   if (1 !== version) {
-    throw new Error('Unrecognized version');
+    throw new Error(`Unrecognized version (expected 1 but found ${version}) at position ${index}`);
   }
   return [version, idx];
 }
