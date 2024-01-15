@@ -38,7 +38,7 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
     await Promise.all(
       treeToPaths(tree).map(async ({ operations, leaf }: Path): Promise<Paths | Error> => {
         if ('pending' !== leaf.type) {
-          return Promise.resolve([{ operations, leaf }]);
+          return [{ operations, leaf }];
         } else {
           try {
             return upgradeFromCalendar(leaf.url, callOps(operations, msg)).then((upgradedTree: Tree): Paths => {
