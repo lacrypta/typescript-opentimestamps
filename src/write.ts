@@ -96,7 +96,7 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
 }
 
 export function writeEdge(edge: Edge): Uint8Array {
-  const [op, tree]: [Op, Tree] = edge;
+  const [op, tree]: Edge = edge;
   const resultParts: Uint8Array[] = [];
   resultParts.push(Uint8Array.of(Tag[op.type]));
   if (op.type === 'append' || op.type === 'prepend') {

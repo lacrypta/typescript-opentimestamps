@@ -16,16 +16,16 @@
 
 'use strict';
 
-import type { Leaf, Op, Timestamp, Tree, Verifier } from './types';
+import type { Edge, Leaf, Path, Timestamp, Tree, Verifier } from './types';
 
-import { callOp, leafPathToTree, leafPathsFromTree, normalizeTimestamp } from './internals';
+import { callOp, treeToPaths, pathsToTree, normalizeTimestamp } from './internals';
 
 export function getLeaves(msg: Uint8Array, tree: Tree): { msg: Uint8Array; leaf: Leaf }[] {
   let result: { msg: Uint8Array; leaf: Leaf }[] = [];
   tree.leaves.values().forEach((leaf: Leaf) => {
     result.push({ msg, leaf });
   });
-  tree.edges.entries().forEach(([op, tree]: [Op, Tree]) => {
+  tree.edges.entries().forEach(([op, tree]: Edge) => {
     result = result.concat(getLeaves(callOp(op, msg), tree));
   });
   return result;
@@ -84,30 +84,24 @@ export async function verifyTimestamp(
 }
 
 export function shrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
-  const shrunkenPath: { operations: Op[]; leaf: Leaf } | undefined = leafPathsFromTree(timestamp.tree, [])
+  const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
     .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
-    .reduce(
-      (
-        left: { operations: Op[]; leaf: Leaf } | undefined,
-        right: { operations: Op[]; leaf: Leaf },
-      ): { operations: Op[]; leaf: Leaf } => {
-        if (undefined === left) {
-          return right;
-        } else if ((left.leaf as { height: number }).height <= (right.leaf as { height: number }).height) {
-          return left;
-        } else {
-          return right;
-        }
-      },
-      undefined,
-    );
+    .reduce((left: Path | undefined, right: Path): Path => {
+      if (undefined === left) {
+        return right;
+      } else if ((left.leaf as { height: number }).height <= (right.leaf as { height: number }).height) {
+        return left;
+      } else {
+        return right;
+      }
+    }, undefined);
   if (undefined === shrunkenPath) {
     return timestamp;
   } else {
     return normalizeTimestamp({
       fileHash: timestamp.fileHash,
       version: timestamp.version,
-      tree: leafPathToTree(shrunkenPath),
+      tree: pathsToTree([shrunkenPath]),
     })!;
   }
 }

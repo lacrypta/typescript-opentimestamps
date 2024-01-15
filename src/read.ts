@@ -16,7 +16,7 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
 
 import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
 import { RLeafHeader, Tag, magicHeader, nonFinal } from './types';
@@ -130,11 +130,11 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
   const result: Tree = newTree();
   let idx: number = index;
   while (nonFinal === data[idx]) {
-    const [edgeOrLeaf, idx2]: [[Op, Tree] | Leaf, number] = readEdgeOrLeaf(data, idx + 1);
+    const [edgeOrLeaf, idx2]: [Edge | Leaf, number] = readEdgeOrLeaf(data, idx + 1);
     incorporateToTree(result, edgeOrLeaf);
     idx = idx2;
   }
-  const [edgeOrLeaf, idx2]: [[Op, Tree] | Leaf, number] = readEdgeOrLeaf(data, idx);
+  const [edgeOrLeaf, idx2]: [Edge | Leaf, number] = readEdgeOrLeaf(data, idx);
   incorporateToTree(result, edgeOrLeaf);
   return [result, idx2];
 }

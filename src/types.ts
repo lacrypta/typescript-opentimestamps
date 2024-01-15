@@ -35,6 +35,11 @@ export type Op =
   | { type: 'append'; operand: Uint8Array }
   | { type: 'prepend'; operand: Uint8Array };
 
+export type Ops = Op[];
+
+export type Path = { operations: Ops; leaf: Leaf };
+export type Paths = Path[];
+
 export type Tree = {
   leaves: MergeSet<Leaf>;
   edges: MergeMap<Op, Tree>;

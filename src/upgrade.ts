@@ -16,7 +16,7 @@
 
 'use strict';
 
-import type { Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge, Leaf, Timestamp, Tree } from './types';
 
 import { callOp, incorporateTreeToTree, normalizeTimestamp } from './internals';
 import { readTree } from './read';
@@ -53,7 +53,7 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
             }
           })
           .concat(
-            tree.edges.entries().map(async ([op, tree]: [Op, Tree]): Promise<Error[]> => {
+            tree.edges.entries().map(async ([op, tree]: Edge): Promise<Error[]> => {
               return (await upgradeTree(tree, callOp(op, msg)))[1];
             }),
           ),

@@ -21,7 +21,7 @@ import { sha1 } from '@noble/hashes/sha1';
 import { sha256 } from '@noble/hashes/sha256';
 import { keccak_256 } from '@noble/hashes/sha3';
 
-import type { Edge, Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge, Leaf, Op, Ops, Path, Paths, Timestamp, Tree } from './types';
 
 import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayToHex } from './utils';
 
@@ -44,6 +44,10 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
     case 'hexlify':
       return new TextEncoder().encode(uint8ArrayToHex(msg));
   }
+}
+
+export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
+  return ops.reduce((prevMsg: Uint8Array, op: Op): Uint8Array => callOp(op, prevMsg), msg);
 }
 
 export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
@@ -103,9 +107,9 @@ export function coalesceOperations(tree: Tree): Tree {
   if (0 !== tree.leaves.size()) {
     return tree;
   }
-  tree.edges.entries().forEach(([op, subTree]: [Op, Tree]): void => {
+  tree.edges.entries().forEach(([op, subTree]: Edge): void => {
     if (0 === subTree.leaves.size() && 1 === subTree.edges.size()) {
-      const [subOp, subSubTree]: [Op, Tree] = subTree.edges.entries()[0]!;
+      const [subOp, subSubTree]: Edge = subTree.edges.entries()[0]!;
       if ('prepend' === op.type && 'prepend' === subOp.type) {
         tree.edges
           .remove(op)
@@ -120,36 +124,27 @@ export function coalesceOperations(tree: Tree): Tree {
   return tree;
 }
 
-export function leafPathToTree(leafPath: { operations: Op[]; leaf: Leaf }): Tree {
-  let tree: Tree = { leaves: newLeaves().add(leafPath.leaf), edges: newEdges() };
-  for (let i = leafPath.operations.length; 0 < i; i--) {
-    const thisOp: Op = leafPath.operations[i - 1]!;
-    tree = { leaves: newLeaves(), edges: newEdges().add(thisOp, tree) };
-  }
-  return tree;
-}
-
-export function atomizePrependOp(prefix: Uint8Array): Op[] {
-  const ops: Op[] = [];
+export function atomizePrependOp(prefix: Uint8Array): Ops {
+  const ops: Ops = [];
   prefix.toReversed().forEach((value: number): void => {
     ops.push({ type: 'prepend', operand: Uint8Array.of(value) });
   });
   return ops;
 }
 
-export function atomizeAppendOp(suffix: Uint8Array): Op[] {
-  const ops: Op[] = [];
+export function atomizeAppendOp(suffix: Uint8Array): Ops {
+  const ops: Ops = [];
   suffix.forEach((value: number): void => {
     ops.push({ type: 'append', operand: Uint8Array.of(value) });
   });
   return ops;
 }
 
-export function normalizeOps(operations: Op[]): Op[] {
+export function normalizeOps(operations: Ops): Ops {
   let prefix: Uint8Array = Uint8Array.of();
   let suffix: Uint8Array = Uint8Array.of();
   let reverse: boolean = false;
-  let ops: Op[] = [];
+  let ops: Ops = [];
   for (let i: number = 0; i < operations.length; i++) {
     const thisOp: Op = operations[i]!;
     switch (thisOp.type) {
@@ -190,13 +185,26 @@ export function normalizeOps(operations: Op[]): Op[] {
   return ops;
 }
 
-export function leafPathsFromTree(tree: Tree, path: Op[]): { operations: Op[]; leaf: Leaf }[] {
-  const result: { operations: Op[]; leaf: Leaf }[] = [];
+export function pathsToTree(leafPaths: Paths): Tree {
+  return leafPaths
+    .map((leafPath: Path): Tree => {
+      let tree: Tree = { leaves: newLeaves().add(leafPath.leaf), edges: newEdges() };
+      for (let i = leafPath.operations.length; 0 < i; i--) {
+        const thisOp: Op = leafPath.operations[i - 1]!;
+        tree = { leaves: newLeaves(), edges: newEdges().add(thisOp, tree) };
+      }
+      return tree;
+    })
+    .reduce(incorporateTreeToTree, newTree());
+}
+
+export function treeToPaths(tree: Tree, path: Ops = []): Paths {
+  const result: Paths = [];
   tree.leaves.values().forEach((leaf: Leaf): void => {
     result.push({ operations: path, leaf });
   });
-  tree.edges.entries().forEach(([op, subTree]: [Op, Tree]): void => {
-    leafPathsFromTree(subTree, path.concat([op])).forEach((leafPath: { operations: Op[]; leaf: Leaf }): void => {
+  tree.edges.entries().forEach(([op, subTree]: Edge): void => {
+    treeToPaths(subTree, path.concat([op])).forEach((leafPath: Path): void => {
       result.push(leafPath);
     });
   });
@@ -205,12 +213,11 @@ export function leafPathsFromTree(tree: Tree, path: Op[]): { operations: Op[]; l
 
 export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined {
   const tree: Tree = coalesceOperations(
-    leafPathsFromTree(timestamp.tree, [])
-      .map((leafPath: { operations: Op[]; leaf: Leaf }) => {
+    pathsToTree(
+      treeToPaths(timestamp.tree).map((leafPath: Path) => {
         return { operations: normalizeOps(leafPath.operations), leaf: leafPath.leaf };
-      })
-      .map(leafPathToTree)
-      .reduce(incorporateTreeToTree, newTree()),
+      }),
+    ),
   );
 
   return 0 === tree.leaves.size() + tree.edges.size()

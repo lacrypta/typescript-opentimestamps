@@ -16,7 +16,7 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
 import { callOp } from './internals';
 import { uint8ArrayToHex } from './utils';
@@ -63,7 +63,7 @@ export function infoTree(tree: Tree, msg: Uint8Array, verbose: boolean): string 
 
   const resultParts: string[] = ([] as string[]).concat(
     tree.leaves.values().map((leaf: Leaf): string => doIndent(infoLeaf(leaf))),
-    tree.edges.entries().map(([op, tree]: [Op, Tree]): string => doIndent(infoEdge(op, tree, msg, verbose))),
+    tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg, verbose))),
   );
   return resultParts.join('\n');
 }
