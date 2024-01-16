@@ -21,6 +21,7 @@ import type { Edge, Leaf, Op, Ops, Tree } from '../src/types';
 import {
   callOp,
   callOps,
+  decoalesceOperations,
   incorporateToTree,
   incorporateTreeToTree,
   newEdges,
@@ -498,6 +499,18 @@ describe('Utils', () => {
   describe('newTree()', () => {
     test('should build empty tree', () => {
       expect(treeToString(newTree())).toStrictEqual('[]()');
+    });
+  });
+
+  describe('decoalesceOperations()', () => {
+    it.each([
+      {
+        input: newTree(),
+        expected: newTree(),
+        name: 'should not touch an empty tree',
+      },
+    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
+      expect(treeToString(decoalesceOperations(input))).toStrictEqual(treeToString(expected));
     });
   });
 });
