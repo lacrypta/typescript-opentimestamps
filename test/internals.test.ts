@@ -507,7 +507,278 @@ describe('Utils', () => {
       {
         input: newTree(),
         expected: newTree(),
-        name: 'should not touch an empty tree',
+        name: 'should not modify an empty tree',
+      },
+      {
+        input: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        name: 'should not modify a tree with no edges',
+      },
+      {
+        input: {
+          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a tree with two or more edges',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a subtree with leaves',
+      },
+      {
+        input: {
+          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a subtree with no edges',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a subtree with a single edge',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges()
+                .add({ type: 'sha1' }, newTree())
+                .add({ type: 'sha256' }, newTree())
+                .add({ type: 'ripemd160' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges()
+                .add({ type: 'sha1' }, newTree())
+                .add({ type: 'sha256' }, newTree())
+                .add({ type: 'ripemd160' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a subtree with three or more edges',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a binary subtree if the operation is not binary',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a binary subtree if the operation is binary with more than 1 byte operand',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a binary subtree if the operation is binary with a 1 byte operand and the sub-operations are not equal to it',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges()
+                .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
+                .add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges()
+                .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
+                .add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify a singleton tree with a binary subtree if the operation is binary with a 1 byte operand and the sub-operations are not both equal to it',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges()
+                .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
+                .add({ type: 'prepend', operand: Uint8Array.of(4, 5) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges()
+            .add({ type: 'prepend', operand: Uint8Array.of(2, 3, 1) }, newTree())
+            .add({ type: 'prepend', operand: Uint8Array.of(4, 5, 1) }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should decoalesce prepend',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'append', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges()
+                .add({ type: 'append', operand: Uint8Array.of(2, 3) }, newTree())
+                .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges()
+            .add({ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree())
+            .add({ type: 'append', operand: Uint8Array.of(1, 4, 5) }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should decoalesce append',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'append', operand: Uint8Array.of(1) },
+            {
+              edges: newEdges()
+                .add(
+                  { type: 'append', operand: Uint8Array.of(2, 3) },
+                  {
+                    edges: newEdges().add(
+                      { type: 'prepend', operand: Uint8Array.of(6) },
+                      {
+                        leaves: newLeaves(),
+                        edges: newEdges()
+                          .add({ type: 'prepend', operand: Uint8Array.of(7, 8) }, newTree())
+                          .add({ type: 'prepend', operand: Uint8Array.of(9, 0) }, newTree()),
+                      },
+                    ),
+                    leaves: newLeaves(),
+                  },
+                )
+                .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges()
+            .add(
+              { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+              {
+                leaves: newLeaves(),
+                edges: newEdges()
+                  .add({ type: 'prepend', operand: Uint8Array.of(7, 8, 6) }, newTree())
+                  .add({ type: 'prepend', operand: Uint8Array.of(9, 0, 6) }, newTree()),
+              },
+            )
+            .add({ type: 'append', operand: Uint8Array.of(1, 4, 5) }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should recursively decoalesce',
       },
     ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
       expect(treeToString(decoalesceOperations(input))).toStrictEqual(treeToString(expected));
