@@ -19,10 +19,22 @@
 import type { Leaf, Path, Timestamp } from './types';
 
 import { treeToPaths, pathsToTree, normalizeTimestamp } from './internals';
+import { LeafHeader } from './types';
+import { uint8ArrayEquals, uint8ArrayFromHex } from './utils';
 
-export function shrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
+export function shrinkTimestamp(
+  timestamp: Timestamp,
+  chain: 'bitcoin' | 'litecoin' | 'ethereum' | Uint8Array,
+): Timestamp {
+  const chainHeader: Uint8Array = chain instanceof Uint8Array ? chain : uint8ArrayFromHex(LeafHeader[chain]);
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
-    .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
+    .filter(({ leaf }: { leaf: Leaf }): boolean => {
+      if ('pending' === leaf.type) {
+        return false;
+      }
+      const leafHeader: Uint8Array = 'unknown' === leaf.type ? leaf.header : uint8ArrayFromHex(LeafHeader[leaf.type]);
+      return uint8ArrayEquals(chainHeader, leafHeader);
+    })
     .reduce((left: Path | undefined, right: Path): Path => {
       if (undefined === left) {
         return right;
