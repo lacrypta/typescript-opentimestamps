@@ -18,13 +18,18 @@
 
 export type { Timestamp } from './types';
 
-export { readTimestamp as read } from './read';
-export { writeTimestamp as write } from './write';
 export { infoTimestamp as info } from './info';
+export { normalizeTimestamp as normalize } from './internals';
+export {
+  canShrinkTimestamp as canShrink,
+  canUpgradeTimestamp as canUpgrade,
+  canVerifyTimestamp as canVerify,
+} from './predicates';
+export { readTimestamp as read } from './read';
+export { shrinkTimestamp as shrink } from './shrink';
 export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
-export { normalizeTimestamp as normalize } from './internals';
 export { isTimestamp, validateTimestamp as validate } from './validation';
 export { verifyTimestamp as verify } from './verify';
-export { shrinkTimestamp as shrink } from './shrink';
 export * from './verifiers';
+export { writeTimestamp as write } from './write';
