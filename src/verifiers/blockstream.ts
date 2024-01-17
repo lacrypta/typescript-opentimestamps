@@ -33,10 +33,23 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   const block: unknown = JSON.parse(
     new TextDecoder().decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
   );
+  if (
+    'object' !== typeof block ||
+    null === block ||
+    !('merkle_root' in block) ||
+    'string' !== typeof block.merkle_root ||
+    !/^[0-9a-f]{64}$/i.test(block.merkle_root) ||
+    !('timestamp' in block) ||
+    'number' !== typeof block.timestamp ||
+    block.timestamp < 0 ||
+    !Number.isSafeInteger(block.timestamp)
+  ) {
+    throw new Error('Malformed response');
+  }
   const expected: Uint8Array = msg.toReversed();
-  const found: Uint8Array = uint8ArrayFromHex((block as { merkle_root: string }).merkle_root);
+  const found: Uint8Array = uint8ArrayFromHex(block.merkle_root);
   if (!uint8ArrayEquals(expected, found)) {
     throw new Error(`Merkle root mismatch (expected ${uint8ArrayToHex(expected)} but found ${uint8ArrayToHex(found)})`);
   }
-  return (block as { timestamp: number }).timestamp;
+  return block.timestamp;
 };

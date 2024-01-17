@@ -27,10 +27,23 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   const block: unknown = JSON.parse(
     new TextDecoder().decode(await fetchBody(new URL(`https://blockchain.info/rawblock/${leaf.height}`))),
   );
+  if (
+    'object' !== typeof block ||
+    null === block ||
+    !('mrkl_root' in block) ||
+    'string' !== typeof block.mrkl_root ||
+    !/^[0-9a-f]{64}$/i.test(block.mrkl_root) ||
+    !('time' in block) ||
+    'number' !== typeof block.time ||
+    block.time < 0 ||
+    !Number.isSafeInteger(block.time)
+  ) {
+    throw new Error('Malformed response');
+  }
   const expected: Uint8Array = msg.toReversed();
-  const found: Uint8Array = uint8ArrayFromHex((block as { mrkl_root: string }).mrkl_root);
+  const found: Uint8Array = uint8ArrayFromHex(block.mrkl_root);
   if (!uint8ArrayEquals(expected, found)) {
     throw new Error(`Merkle root mismatch (expected ${uint8ArrayToHex(expected)} but found ${uint8ArrayToHex(found)})`);
   }
-  return (block as { time: number }).time;
+  return block.time;
 };
