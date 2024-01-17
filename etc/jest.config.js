@@ -4,7 +4,8 @@
 module.exports = {
   clearMocks: true,
   collectCoverage: true,
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts', '<rootDir>/test/**/*.ts'],
+  coveragePathIgnorePatterns: ['\\.test\\.ts'],
   coverageDirectory: '<rootDir>/dist/.coverage',
   coverageProvider: 'babel',
   logHeapUsage: true,
