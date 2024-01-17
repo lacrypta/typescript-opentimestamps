@@ -63,7 +63,7 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
 
 // ref: https://stackoverflow.com/a/49129872
 export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
-  const result = new Uint8Array(
+  const result: Uint8Array = new Uint8Array(
     arrays
       .map((item: Uint8Array): number => item.length)
       .reduce((prev: number, curr: number): number => prev + curr, 0),
