@@ -178,7 +178,7 @@ describe('Utils', () => {
   describe('uint8ArrayConcat()', () => {
     it.each([
       {
-        arrays: [] as Uint8Array[],
+        arrays: [],
         expected: Uint8Array.of(),
         name: 'should return empty for empty input',
       },
@@ -514,7 +514,7 @@ describe('Utils', () => {
       it.each([
         {
           mergeMap: theEmptyMergeMap,
-          expected: [] as [number, string][],
+          expected: [],
           name: 'should return empty for empty MergeMap',
         },
         {
