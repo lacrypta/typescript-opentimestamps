@@ -23,7 +23,7 @@ import { uint8ArrayToHex } from './utils';
 
 export function indent(text: string): string {
   const [first, ...rest]: string[] = text.split('\n');
-  return ` -> ${first}\n` + rest.map((line: string): string => `    ${line}`).join('\n');
+  return [` -> ${first}`].concat(rest.map((line: string): string => `    ${line}`)).join('\n');
 }
 
 export function infoEdge(op: Op, tree: Tree, msg: Uint8Array, verbose: boolean): string {
