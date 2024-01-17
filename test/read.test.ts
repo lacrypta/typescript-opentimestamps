@@ -83,9 +83,9 @@ const treeToString: (tree: Tree) => string = (tree: Tree): string => {
   return `[${mergeSetToString(tree.leaves)}](${mergeMapToString(tree.edges)})`;
 };
 
-// const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestamp): string => {
-//   return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
-// };
+const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestamp): string => {
+  return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
+};
 
 describe('Read', () => {
   describe('getBytes()', () => {
@@ -738,12 +738,7 @@ describe('Read', () => {
         | { data: Uint8Array; expected: Timestamp; error: null }
         | { data: Uint8Array; expected: null; error: Error }) => {
         if (null === error) {
-          const { version, fileHash, tree }: Timestamp = readTimestamp(data);
-          const { version: expectedVersion, fileHash: expectedFileHash, tree: expectedTree }: Timestamp = expected;
-
-          expect(version).toStrictEqual(expectedVersion);
-          expect(fileHash).toStrictEqual(expectedFileHash);
-          expect(treeToString(tree)).toStrictEqual(treeToString(expectedTree));
+          expect(timestampToString(readTimestamp(data))).toStrictEqual(timestampToString(expected));
         } else {
           expect(() => readTimestamp(data)).toThrow(error);
         }
