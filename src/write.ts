@@ -107,10 +107,12 @@ export function writeEdge(edge: Edge): Uint8Array {
 }
 
 export function writeTree(tree: Tree): Uint8Array {
-  const leaves: Leaf[] = tree.leaves.values().toSorted(compareLeaves);
-  const edges: Edge[] = tree.edges.entries().toSorted(compareEdges);
+  const leaves: Leaf[] = tree.leaves.values();
+  const edges: Edge[] = tree.edges.entries();
   const totalLength: number = leaves.length + edges.length;
   const resultParts: Uint8Array[] = [];
+  leaves.sort(compareLeaves);
+  edges.sort(compareEdges);
   if (1 < totalLength) {
     for (let i = 0; i < totalLength - 1; i++) {
       resultParts.push(Uint8Array.of(nonFinal));
