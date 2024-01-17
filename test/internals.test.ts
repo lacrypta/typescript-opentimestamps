@@ -79,7 +79,7 @@ const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestam
   return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
 };
 
-describe('Utils', () => {
+describe('Internals', () => {
   describe('callOp()', () => {
     it.each([
       {
