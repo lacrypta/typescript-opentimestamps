@@ -22,8 +22,8 @@ import { LeafHeader, Tag, magicHeader, nonFinal } from './types';
 import { uint8ArrayCompare, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 export function writeUint(value: number): Uint8Array {
-  if (value < 0) {
-    throw new Error('Expected non-negative value');
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new Error('Expected safe non-negative value');
   }
   const resultParts: Uint8Array[] = [];
   while (0x7f < value) {
