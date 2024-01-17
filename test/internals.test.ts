@@ -16,17 +16,23 @@
 
 'use strict';
 
-import type { Edge, Leaf, Op, Ops, Tree } from '../src/types';
+import type { Edge, Leaf, Op, Ops, Paths, Tree } from '../src/types';
 
 import {
+  atomizeAppendOp,
+  atomizePrependOp,
   callOp,
   callOps,
+  coalesceOperations,
   decoalesceOperations,
   incorporateToTree,
   incorporateTreeToTree,
   newEdges,
   newLeaves,
   newTree,
+  normalizeOps,
+  pathsToTree,
+  treeToPaths,
 } from '../src/internals';
 import { MergeMap, MergeSet, uint8ArrayToHex } from '../src/utils';
 
@@ -782,6 +788,448 @@ describe('Utils', () => {
       },
     ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
       expect(treeToString(decoalesceOperations(input))).toStrictEqual(treeToString(expected));
+    });
+  });
+
+  describe('coalesceOperations()', () => {
+    it.each([
+      {
+        input: newTree(),
+        expected: newTree(),
+        name: 'should not modify an empty tree',
+      },
+      {
+        input: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        name: 'should not modify a tree with leaves',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify subtrees with leaves',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify non-singleton subtrees',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify tree with non binary operation on singleton subtrees',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'sha1' }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should not modify tree with binary operation on non-binary singleton subtrees',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should coalesce prepend',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add({ type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) }, newTree()),
+          leaves: newLeaves(),
+        },
+        name: 'should coalesce append',
+      },
+      {
+        input: {
+          edges: newEdges().add(
+            { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+            {
+              edges: newEdges().add(
+                { type: 'append', operand: Uint8Array.of(4, 5, 6) },
+                {
+                  edges: newEdges().add(
+                    { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+                    {
+                      edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+                      leaves: newLeaves(),
+                    },
+                  ),
+                  leaves: newLeaves(),
+                },
+              ),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: {
+          edges: newEdges().add(
+            { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
+            {
+              edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
+              leaves: newLeaves(),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should recursively coalesce',
+      },
+    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
+      expect(treeToString(coalesceOperations(input))).toStrictEqual(treeToString(expected));
+    });
+  });
+
+  describe('atomizePrependOp()', () => {
+    it.each([
+      {
+        input: Uint8Array.of(),
+        expected: [],
+        name: 'should return empty for empty input',
+      },
+      {
+        input: Uint8Array.of(1, 2, 3),
+        expected: [
+          { type: 'prepend', operand: Uint8Array.of(3) },
+          { type: 'prepend', operand: Uint8Array.of(2) },
+          { type: 'prepend', operand: Uint8Array.of(1) },
+        ] as Ops,
+        name: 'should atomize input',
+      },
+    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }) => {
+      expect(atomizePrependOp(input)).toStrictEqual(expected);
+    });
+  });
+
+  describe('atomizeAppendOp()', () => {
+    it.each([
+      {
+        input: Uint8Array.of(),
+        expected: [],
+        name: 'should return empty for empty input',
+      },
+      {
+        input: Uint8Array.of(1, 2, 3),
+        expected: [
+          { type: 'append', operand: Uint8Array.of(1) },
+          { type: 'append', operand: Uint8Array.of(2) },
+          { type: 'append', operand: Uint8Array.of(3) },
+        ] as Ops,
+        name: 'should atomize input',
+      },
+    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }) => {
+      expect(atomizeAppendOp(input)).toStrictEqual(expected);
+    });
+  });
+
+  describe('normalizeOps()', () => {
+    it.each([
+      {
+        input: [],
+        expected: [],
+        name: 'should return empty for empty input',
+      },
+      {
+        input: [{ type: 'reverse' }] as Ops,
+        expected: [{ type: 'reverse' }] as Ops,
+        name: 'should return reverse for odd reverse',
+      },
+      {
+        input: [{ type: 'reverse' }, { type: 'reverse' }, { type: 'reverse' }] as Ops,
+        expected: [{ type: 'reverse' }] as Ops,
+        name: 'should return reverse for odd reverse (again)',
+      },
+      {
+        input: [{ type: 'reverse' }, { type: 'reverse' }] as Ops,
+        expected: [],
+        name: 'should return empty for odd reverse',
+      },
+      {
+        input: [{ type: 'reverse' }, { type: 'reverse' }, { type: 'reverse' }, { type: 'reverse' }] as Ops,
+        expected: [],
+        name: 'should return empty for odd reverse (again)',
+      },
+      {
+        input: [
+          { type: 'append', operand: Uint8Array.of(1, 2) },
+          { type: 'append', operand: Uint8Array.of(3) },
+        ] as Ops,
+        expected: [
+          { type: 'append', operand: Uint8Array.of(1) },
+          { type: 'append', operand: Uint8Array.of(2) },
+          { type: 'append', operand: Uint8Array.of(3) },
+        ] as Ops,
+        name: 'should combine appends',
+      },
+      {
+        input: [
+          { type: 'prepend', operand: Uint8Array.of(1, 2) },
+          { type: 'prepend', operand: Uint8Array.of(3) },
+        ] as Ops,
+        expected: [
+          { type: 'prepend', operand: Uint8Array.of(2) },
+          { type: 'prepend', operand: Uint8Array.of(1) },
+          { type: 'prepend', operand: Uint8Array.of(3) },
+        ] as Ops,
+        name: 'should combine prepends',
+      },
+      {
+        input: [
+          { type: 'append', operand: Uint8Array.of(1, 2) },
+          { type: 'prepend', operand: Uint8Array.of(3, 4) },
+        ] as Ops,
+        expected: [
+          { type: 'prepend', operand: Uint8Array.of(4) },
+          { type: 'prepend', operand: Uint8Array.of(3) },
+          { type: 'append', operand: Uint8Array.of(1) },
+          { type: 'append', operand: Uint8Array.of(2) },
+        ] as Ops,
+        name: 'should move prepend over append',
+      },
+      {
+        input: [{ type: 'reverse' }, { type: 'prepend', operand: Uint8Array.of(1, 2) }] as Ops,
+        expected: [
+          { type: 'append', operand: Uint8Array.of(2) },
+          { type: 'append', operand: Uint8Array.of(1) },
+          { type: 'reverse' },
+        ] as Ops,
+        name: 'should move prepend over reverse',
+      },
+      {
+        input: [{ type: 'reverse' }, { type: 'append', operand: Uint8Array.of(1, 2) }] as Ops,
+        expected: [
+          { type: 'prepend', operand: Uint8Array.of(1) },
+          { type: 'prepend', operand: Uint8Array.of(2) },
+          { type: 'reverse' },
+        ] as Ops,
+        name: 'should move append over reverse',
+      },
+      {
+        input: [
+          { type: 'reverse' },
+          { type: 'append', operand: Uint8Array.of(1, 2) },
+          { type: 'prepend', operand: Uint8Array.of(3, 4) },
+          { type: 'sha1' },
+          { type: 'reverse' },
+          { type: 'append', operand: Uint8Array.of(5, 6) },
+          { type: 'prepend', operand: Uint8Array.of(7, 8) },
+        ] as Ops,
+        expected: [
+          { type: 'prepend', operand: Uint8Array.of(1) },
+          { type: 'prepend', operand: Uint8Array.of(2) },
+          { type: 'append', operand: Uint8Array.of(4) },
+          { type: 'append', operand: Uint8Array.of(3) },
+          { type: 'reverse' },
+          { type: 'sha1' },
+          { type: 'prepend', operand: Uint8Array.of(5) },
+          { type: 'prepend', operand: Uint8Array.of(6) },
+          { type: 'append', operand: Uint8Array.of(8) },
+          { type: 'append', operand: Uint8Array.of(7) },
+          { type: 'reverse' },
+        ] as Ops,
+        name: 'should treat independent segments separately',
+      },
+    ])('$name', ({ input, expected }: { input: Ops; expected: Ops }) => {
+      expect(normalizeOps(input)).toStrictEqual(expected);
+    });
+  });
+
+  describe('pathsToTree()', () => {
+    it.each([
+      {
+        paths: [],
+        expected: newTree(),
+        name: 'should return empty tree for empty paths',
+      },
+      {
+        paths: [{ operations: [], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
+        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        name: 'should return simple tree for simple path',
+      },
+      {
+        paths: [{ operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should return singleton tree for singleton path',
+      },
+      {
+        paths: [
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 456 } },
+        ] as Paths,
+        expected: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges(),
+              leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        name: 'should return singleton tree with double leaves for double paths',
+      },
+      {
+        paths: [
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
+          { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } },
+        ] as Paths,
+        expected: {
+          edges: newEdges()
+            .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+            .add({ type: 'sha256' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) }),
+          leaves: newLeaves(),
+        },
+        name: 'should return complex tree for complex paths',
+      },
+    ])('$name', ({ paths, expected }: { paths: Paths; expected: Tree }) => {
+      expect(treeToString(pathsToTree(paths))).toStrictEqual(treeToString(expected));
+    });
+  });
+
+  describe('treeToPaths()', () => {
+    it.each([
+      {
+        tree: newTree(),
+        expected: [],
+        name: 'should return empty paths for empty tree',
+      },
+      {
+        tree: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        expected: [{ operations: [], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
+        name: 'should return simple path for simple tree',
+      },
+      {
+        tree: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: [{ operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
+        name: 'should return singleton path for singleton tree',
+      },
+      {
+        tree: {
+          edges: newEdges().add(
+            { type: 'sha1' },
+            {
+              edges: newEdges(),
+              leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+            },
+          ),
+          leaves: newLeaves(),
+        },
+        expected: [
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 456 } },
+        ] as Paths,
+        name: 'should return singleton tree with double leaves for double paths',
+      },
+      {
+        tree: {
+          edges: newEdges()
+            .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+            .add({ type: 'sha256' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) }),
+          leaves: newLeaves(),
+        },
+        expected: [
+          { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
+          { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } },
+        ] as Paths,
+        name: 'should return complex paths for complex tree',
+      },
+    ])('$name', ({ tree, expected }: { tree: Tree; expected: Paths }) => {
+      expect(treeToPaths(tree)).toStrictEqual(expected);
     });
   });
 });
