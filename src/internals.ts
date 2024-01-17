@@ -23,7 +23,7 @@ import { keccak_256 } from '@noble/hashes/sha3';
 
 import type { Edge, Leaf, Op, Ops, Path, Paths, Timestamp, Tree } from './types';
 
-import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayToHex } from './utils';
+import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayReversed, uint8ArrayToHex } from './utils';
 
 export function callOp(op: Op, msg: Uint8Array): Uint8Array {
   switch (op.type) {
@@ -40,7 +40,7 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
     case 'prepend':
       return Uint8Array.of(...op.operand, ...msg);
     case 'reverse':
-      return msg.toReversed();
+      return uint8ArrayReversed(msg);
     case 'hexlify':
       return new TextEncoder().encode(uint8ArrayToHex(msg));
   }
@@ -177,7 +177,7 @@ export function coalesceOperations(tree: Tree): Tree {
 
 export function atomizePrependOp(prefix: Uint8Array): Ops {
   const ops: Ops = [];
-  prefix.toReversed().forEach((value: number): void => {
+  uint8ArrayReversed(prefix).forEach((value: number): void => {
     ops.push({ type: 'prepend', operand: Uint8Array.of(value) });
   });
   return ops;
@@ -200,12 +200,12 @@ export function normalizeOps(operations: Ops): Ops {
     const thisOp: Op = operations[i]!;
     switch (thisOp.type) {
       case 'reverse':
-        [prefix, reverse, suffix] = [suffix.toReversed(), !reverse, prefix.toReversed()];
+        [prefix, reverse, suffix] = [uint8ArrayReversed(suffix), !reverse, uint8ArrayReversed(prefix)];
         break;
       case 'append':
         // append(reverse(x), s) --> reverse(prepend(x, reverse(s)))
         if (reverse) {
-          prefix = uint8ArrayConcat([thisOp.operand.toReversed(), prefix]);
+          prefix = uint8ArrayConcat([uint8ArrayReversed(thisOp.operand), prefix]);
         } else {
           suffix = uint8ArrayConcat([suffix, thisOp.operand]);
         }
@@ -213,7 +213,7 @@ export function normalizeOps(operations: Ops): Ops {
       case 'prepend':
         // prepend(reverse(x), s) --> reverse(append(x, reverse(s)))
         if (reverse) {
-          suffix = uint8ArrayConcat([suffix, thisOp.operand.toReversed()]);
+          suffix = uint8ArrayConcat([suffix, uint8ArrayReversed(thisOp.operand)]);
         } else {
           prefix = uint8ArrayConcat([thisOp.operand, prefix]);
         }

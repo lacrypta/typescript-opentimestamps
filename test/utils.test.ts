@@ -27,6 +27,7 @@ import {
   fetchBody,
   retrieveGetBody,
   retrievePostBody,
+  uint8ArrayReversed,
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -199,6 +200,23 @@ describe('Utils', () => {
       },
     ])('$name', ({ arrays, expected }: { arrays: Uint8Array[]; expected: Uint8Array }) => {
       expect(uint8ArrayConcat(arrays)).toEqual(expected);
+    });
+  });
+
+  describe('uint8ArrayReversed()', () => {
+    it.each([
+      {
+        array: Uint8Array.of(),
+        expected: Uint8Array.of(),
+        name: 'should return empty for empty array',
+      },
+      {
+        array: Uint8Array.of(1, 2, 3),
+        expected: Uint8Array.of(3, 2, 1),
+        name: 'should reverse non-return array',
+      },
+    ])('$name', ({ array, expected }: { array: Uint8Array; expected: Uint8Array }) => {
+      expect(uint8ArrayReversed(array)).toEqual(expected);
     });
   });
 

@@ -18,7 +18,7 @@
 
 import type { Leaf, Verifier } from '../types';
 
-import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex, uint8ArrayToHex } from '../utils';
+import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex, uint8ArrayReversed, uint8ArrayToHex } from '../utils';
 
 export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
@@ -46,7 +46,7 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
   ) {
     throw new Error('Malformed response');
   }
-  const expected: Uint8Array = msg.toReversed();
+  const expected: Uint8Array = uint8ArrayReversed(msg);
   const found: Uint8Array = uint8ArrayFromHex(block.merkle_root);
   if (!uint8ArrayEquals(expected, found)) {
     throw new Error(`Merkle root mismatch (expected ${uint8ArrayToHex(expected)} but found ${uint8ArrayToHex(found)})`);

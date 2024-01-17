@@ -76,6 +76,14 @@ export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
   return result;
 }
 
+export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
+  const result: Uint8Array = new Uint8Array(array.length);
+  array.forEach((value: number, index: number) => {
+    result.set([value], array.length - index - 1);
+  });
+  return result;
+}
+
 export class MergeSet<V> {
   private mapping: Record<string, V> = {};
 
