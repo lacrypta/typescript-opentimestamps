@@ -203,10 +203,20 @@ export function normalizeOps(operations: Ops): Ops {
         [prefix, reverse, suffix] = [suffix.toReversed(), !reverse, prefix.toReversed()];
         break;
       case 'append':
-        suffix = uint8ArrayConcat([suffix, thisOp.operand]);
+        // append(reverse(x), s) --> reverse(prepend(x, reverse(s)))
+        if (reverse) {
+          prefix = uint8ArrayConcat([thisOp.operand.toReversed(), prefix]);
+        } else {
+          suffix = uint8ArrayConcat([suffix, thisOp.operand]);
+        }
         break;
       case 'prepend':
-        prefix = uint8ArrayConcat([thisOp.operand, prefix]);
+        // prepend(reverse(x), s) --> reverse(append(x, reverse(s)))
+        if (reverse) {
+          suffix = uint8ArrayConcat([suffix, thisOp.operand.toReversed()]);
+        } else {
+          prefix = uint8ArrayConcat([thisOp.operand, prefix]);
+        }
         break;
       default:
         if (0 !== prefix.length) {
