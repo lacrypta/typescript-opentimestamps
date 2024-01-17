@@ -37,47 +37,7 @@ import {
 } from '../src/internals';
 import { MergeMap, MergeSet, uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
 
-const opToString: (op: Op) => string = (op: Op): string => {
-  switch (op.type) {
-    case 'append':
-    case 'prepend':
-      return `${op.type}:${uint8ArrayToHex(op.operand)}`;
-    default:
-      return op.type;
-  }
-};
-
-const leafToString: (leaf: Leaf) => string = (leaf: Leaf): string => {
-  switch (leaf.type) {
-    case 'pending':
-      return `${leaf.type}:${leaf.url.toString()}`;
-    case 'unknown':
-      return `${leaf.type}:${uint8ArrayToHex(leaf.header)}:${uint8ArrayToHex(leaf.payload)}`;
-    default:
-      return `${leaf.type}:${leaf.height}`;
-  }
-};
-
-const mergeSetToString: (ms: MergeSet<Leaf>) => string = (ms: MergeSet<Leaf>): string => {
-  return ms.values().map(leafToString).join(',');
-};
-
-const mergeMapToString: (mm: MergeMap<Op, Tree>) => string = (mm: MergeMap<Op, Tree>): string => {
-  return mm
-    .entries()
-    .map(([op, subTree]: [Op, Tree]) => {
-      return `${opToString(op)}=>{${treeToString(subTree)}}`;
-    })
-    .join(',');
-};
-
-const treeToString: (tree: Tree) => string = (tree: Tree): string => {
-  return `[${mergeSetToString(tree.leaves)}](${mergeMapToString(tree.edges)})`;
-};
-
-const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestamp): string => {
-  return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
-};
+import { mergeMapToString, mergeSetToString, timestampToString, treeToString } from './helpers';
 
 describe('Internals', () => {
   describe('callOp()', () => {
