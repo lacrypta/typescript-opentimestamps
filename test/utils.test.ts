@@ -175,7 +175,7 @@ describe('Utils', () => {
     });
   });
 
-  describe('uint8ArrayToHex()', () => {
+  describe('uint8ArrayConcat()', () => {
     it.each([
       {
         arrays: [] as Uint8Array[],
