@@ -18,7 +18,7 @@
 
 import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
-import { LeafHeader, RLeafHeader, Tag, magicHeader, nonFinal } from './types';
+import { LeafHeader, Tag, magicHeader, nonFinal } from './types';
 import { uint8ArrayCompare, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 export function writeUint(value: number): Uint8Array {
@@ -44,8 +44,8 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
 
 export function compareLeaves(left: Leaf, right: Leaf): number {
   const headerCompare: number = uint8ArrayCompare(
-    'unknown' == left.type ? left.header : uint8ArrayFromHex(RLeafHeader[left.type as keyof typeof RLeafHeader]),
-    'unknown' == right.type ? right.header : uint8ArrayFromHex(RLeafHeader[right.type as keyof typeof RLeafHeader]),
+    'unknown' == left.type ? left.header : uint8ArrayFromHex(LeafHeader[left.type as keyof typeof LeafHeader]),
+    'unknown' == right.type ? right.header : uint8ArrayFromHex(LeafHeader[right.type as keyof typeof LeafHeader]),
   );
   if (0 === headerCompare) {
     switch (left.type) {
