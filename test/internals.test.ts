@@ -16,7 +16,7 @@
 
 'use strict';
 
-import type { Edge, Leaf, Op, Ops, Paths, Tree } from '../src/types';
+import type { Edge, FileHash, Leaf, Op, Ops, Paths, Timestamp, Tree } from '../src/types';
 
 import {
   atomizeAppendOp,
@@ -31,10 +31,11 @@ import {
   newLeaves,
   newTree,
   normalizeOps,
+  normalizeTimestamp,
   pathsToTree,
   treeToPaths,
 } from '../src/internals';
-import { MergeMap, MergeSet, uint8ArrayToHex } from '../src/utils';
+import { MergeMap, MergeSet, uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
 
 const opToString: (op: Op) => string = (op: Op): string => {
   switch (op.type) {
@@ -65,13 +66,17 @@ const mergeMapToString: (mm: MergeMap<Op, Tree>) => string = (mm: MergeMap<Op, T
   return mm
     .entries()
     .map(([op, subTree]: [Op, Tree]) => {
-      return opToString(op) + '=>{' + treeToString(subTree) + '}';
+      return `${opToString(op)}=>{${treeToString(subTree)}}`;
     })
     .join(',');
 };
 
 const treeToString: (tree: Tree) => string = (tree: Tree): string => {
-  return '[' + mergeSetToString(tree.leaves) + '](' + mergeMapToString(tree.edges) + ')';
+  return `[${mergeSetToString(tree.leaves)}](${mergeMapToString(tree.edges)})`;
+};
+
+const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestamp): string => {
+  return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
 };
 
 describe('Utils', () => {
@@ -1189,6 +1194,14 @@ describe('Utils', () => {
       },
       {
         tree: {
+          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
+          leaves: newLeaves(),
+        },
+        expected: [],
+        name: 'should return empty paths for barren tree',
+      },
+      {
+        tree: {
           edges: newEdges().add(
             { type: 'sha1' },
             { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
@@ -1230,6 +1243,58 @@ describe('Utils', () => {
       },
     ])('$name', ({ tree, expected }: { tree: Tree; expected: Paths }) => {
       expect(treeToPaths(tree)).toStrictEqual(expected);
+    });
+  });
+
+  describe('normalizeTimestamp()', () => {
+    const version: number = 1;
+    const fileHash: FileHash = {
+      algorithm: 'sha256',
+      value: uint8ArrayFromHex('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
+    };
+    it.each([
+      {
+        timestamp: { version, fileHash, tree: newTree() } as Timestamp,
+        expected: undefined,
+        name: 'should return undefined for empty tree',
+      },
+      {
+        timestamp: {
+          version,
+          fileHash,
+          tree: {
+            edges: newEdges()
+              .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+              .add(
+                { type: 'sha256' },
+                { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+              ),
+            leaves: newLeaves(),
+          },
+        } as Timestamp,
+        expected: {
+          version,
+          fileHash,
+          tree: {
+            edges: newEdges()
+              .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+              .add(
+                { type: 'sha256' },
+                { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+              ),
+            leaves: newLeaves(),
+          },
+        },
+        name: 'should return timestamp for non-empty timestamp',
+      },
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp | undefined }) => {
+      if (undefined === expected) {
+        expect(normalizeTimestamp(timestamp)).toBeUndefined();
+      } else {
+        const result: Timestamp | undefined = normalizeTimestamp(timestamp);
+        expect(result).not.toBeUndefined();
+        expect(timestampToString(result as Timestamp)).toStrictEqual(timestampToString(expected));
+      }
     });
   });
 });
