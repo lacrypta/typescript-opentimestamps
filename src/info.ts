@@ -52,7 +52,10 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
   if (undefined !== newMsg) {
     resultParts.push(`    = ${uint8ArrayToHex(newMsg)}`);
   }
-  resultParts.push(infoTree(tree, newMsg));
+  const treeInfo: string = infoTree(tree, newMsg);
+  if ('' !== treeInfo) {
+    resultParts.push(treeInfo);
+  }
   return resultParts.join('\n');
 }
 
@@ -81,6 +84,9 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
 export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): string {
   const resultParts: string[] = [];
   resultParts.push(infoFileHash(timestamp.fileHash, verbose));
-  resultParts.push(indent(infoTree(timestamp.tree, verbose ? timestamp.fileHash.value : undefined)));
+  const treeInfo: string = infoTree(timestamp.tree, verbose ? timestamp.fileHash.value : undefined);
+  if ('' !== treeInfo) {
+    resultParts.push(indent(treeInfo));
+  }
   return resultParts.join('\n');
 }
