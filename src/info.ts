@@ -26,24 +26,6 @@ export function indent(text: string): string {
   return [` -> ${first}`].concat(rest.map((line: string): string => `    ${line}`)).join('\n');
 }
 
-export function infoEdge(op: Op, tree: Tree, msg: Uint8Array, verbose: boolean): string {
-  const resultParts: string[] = [];
-  const newMsg: Uint8Array = callOp(op, msg);
-  switch (op.type) {
-    case 'append':
-    case 'prepend':
-      resultParts.push(`msg = ${op.type}(msg, ${uint8ArrayToHex(op.operand)})`);
-      break;
-    default:
-      resultParts.push(`msg = ${op.type}(msg)`);
-  }
-  if (verbose) {
-    resultParts.push(`    = ${uint8ArrayToHex(newMsg)}`);
-  }
-  resultParts.push(infoTree(tree, newMsg, verbose));
-  return resultParts.join('\n');
-}
-
 export function infoLeaf(leaf: Leaf): string {
   switch (leaf.type) {
     case 'pending':
@@ -55,7 +37,25 @@ export function infoLeaf(leaf: Leaf): string {
   }
 }
 
-export function infoTree(tree: Tree, msg: Uint8Array, verbose: boolean): string {
+export function infoEdge(op: Op, tree: Tree, msg: Uint8Array | undefined): string {
+  const resultParts: string[] = [];
+  const newMsg: Uint8Array | undefined = undefined === msg ? undefined : callOp(op, msg);
+  switch (op.type) {
+    case 'append':
+    case 'prepend':
+      resultParts.push(`msg = ${op.type}(msg, ${uint8ArrayToHex(op.operand)})`);
+      break;
+    default:
+      resultParts.push(`msg = ${op.type}(msg)`);
+  }
+  if (undefined !== newMsg) {
+    resultParts.push(`    = ${uint8ArrayToHex(newMsg)}`);
+  }
+  resultParts.push(infoTree(tree, newMsg));
+  return resultParts.join('\n');
+}
+
+export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
   const leavesSize: number = tree.leaves.size();
   const edgesSize: number = tree.edges.size();
 
@@ -64,7 +64,7 @@ export function infoTree(tree: Tree, msg: Uint8Array, verbose: boolean): string 
   const resultParts: string[] = tree.leaves
     .values()
     .map((leaf: Leaf): string => doIndent(infoLeaf(leaf)))
-    .concat(tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg, verbose))));
+    .concat(tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg))));
   return resultParts.join('\n');
 }
 
@@ -80,6 +80,6 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
 export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): string {
   const resultParts: string[] = [];
   resultParts.push(infoFileHash(timestamp.fileHash, verbose));
-  resultParts.push(indent(infoTree(timestamp.tree, timestamp.fileHash.value, verbose)));
+  resultParts.push(indent(infoTree(timestamp.tree, verbose ? timestamp.fileHash.value : undefined)));
   return resultParts.join('\n');
 }
