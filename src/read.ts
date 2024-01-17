@@ -177,10 +177,5 @@ export function readTimestamp(data: Uint8Array): Timestamp {
     throw new Error('Garbage at EOF');
   }
 
-  const result: Timestamp | undefined = normalizeTimestamp({ version, fileHash, tree });
-  if (undefined === result) {
-    throw new Error('Empty timestamp');
-  }
-
-  return result;
+  return normalizeTimestamp({ version, fileHash, tree })!;
 }
