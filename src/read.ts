@@ -25,7 +25,7 @@ import { validateCalendarUrl } from './validation';
 
 export function getBytes(length: number, data: Uint8Array, index: number): [Uint8Array, number] {
   const result: Uint8Array = data.slice(index, index + length);
-  if (result.length !== length) {
+  if (data.length < index + length || result.length !== length) {
     throw new Error(`Unexpected EOF reading bytes at position ${index}`);
   }
   return [result, index + length];
