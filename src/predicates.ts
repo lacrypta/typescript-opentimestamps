@@ -17,30 +17,11 @@
 'use strict';
 
 import { treeToPaths } from './internals';
-import { LeafHeader, Path, Paths, Timestamp } from './types';
-import { uint8ArrayEquals, uint8ArrayFromHex } from './utils';
+import { Path, Paths, Timestamp } from './types';
 
-export function canShrinkTimestamp(
-  timestamp: Timestamp,
-  chain: 'bitcoin' | 'litecoin' | 'ethereum' | Uint8Array,
-): boolean {
-  const chainHeader: Uint8Array = chain instanceof Uint8Array ? chain : uint8ArrayFromHex(LeafHeader[chain]);
+export function canShrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {
   const paths: Paths = treeToPaths(timestamp.tree);
-  return (
-    paths.some(
-      ({ leaf }: Path): boolean =>
-        'pending' !== leaf.type &&
-        uint8ArrayEquals(chainHeader, 'unknown' === leaf.type ? leaf.header : uint8ArrayFromHex(LeafHeader[leaf.type])),
-    ) &&
-    paths.some(
-      ({ leaf }: Path): boolean =>
-        'pending' === leaf.type ||
-        !uint8ArrayEquals(
-          chainHeader,
-          'unknown' === leaf.type ? leaf.header : uint8ArrayFromHex(LeafHeader[leaf.type]),
-        ),
-    )
-  );
+  return 1 < paths.length && paths.some(({ leaf }: Path): boolean => chain === leaf.type);
 }
 
 export function canUpgradeTimestamp(timestamp: Timestamp): boolean {
