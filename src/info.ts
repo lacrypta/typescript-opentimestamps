@@ -83,6 +83,9 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
 
 export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): string {
   const resultParts: string[] = [];
+  if (verbose) {
+    resultParts.push(`# version: ${timestamp.version}`);
+  }
   resultParts.push(infoFileHash(timestamp.fileHash, verbose));
   const treeInfo: string = infoTree(timestamp.tree, verbose ? timestamp.fileHash.value : undefined);
   if ('' !== treeInfo) {
