@@ -37,8 +37,9 @@ export function infoLeaf(leaf: Leaf): string {
   }
 }
 
-export function infoEdge(op: Op, tree: Tree, msg: Uint8Array | undefined): string {
+export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
   const resultParts: string[] = [];
+  const [op, tree]: [Op, Tree] = edge;
   const newMsg: Uint8Array | undefined = undefined === msg ? undefined : callOp(op, msg);
   switch (op.type) {
     case 'append':
@@ -64,7 +65,7 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
   const resultParts: string[] = tree.leaves
     .values()
     .map((leaf: Leaf): string => doIndent(infoLeaf(leaf)))
-    .concat(tree.edges.entries().map(([op, tree]: Edge): string => doIndent(infoEdge(op, tree, msg))));
+    .concat(tree.edges.entries().map((edge: Edge): string => doIndent(infoEdge(edge, msg))));
   return resultParts.join('\n');
 }
 
