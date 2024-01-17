@@ -59,19 +59,19 @@ describe('Utils', () => {
       {
         hex: '1',
         expected: null,
-        error: 'Hex value should be of even length, found 1',
+        error: new Error('Hex value should be of even length, found 1'),
         name: 'should fail for odd length',
       },
       {
         hex: '12345',
         expected: null,
-        error: 'Hex value should be of even length, found 5',
+        error: new Error('Hex value should be of even length, found 5'),
         name: 'should fail for odd length (again)',
       },
       {
         hex: '0z',
         expected: null,
-        error: 'Malformed hex string',
+        error: new Error('Malformed hex string'),
         name: 'should fail for non-hexadecimal string',
       },
     ])(
@@ -80,11 +80,11 @@ describe('Utils', () => {
         hex,
         expected,
         error,
-      }: { hex: string; expected: Uint8Array; error: null } | { hex: string; expected: null; error: string }) => {
-        if (null !== error) {
-          expect(() => uint8ArrayFromHex(hex)).toThrow(new Error(error));
-        } else {
+      }: { hex: string; expected: Uint8Array; error: null } | { hex: string; expected: null; error: Error }) => {
+        if (null === error) {
           expect(uint8ArrayFromHex(hex)).toStrictEqual(expected);
+        } else {
+          expect(() => uint8ArrayFromHex(hex)).toThrow(error);
         }
       },
     );
