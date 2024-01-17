@@ -29,9 +29,9 @@ export function indent(text: string): string {
 export function infoLeaf(leaf: Leaf): string {
   switch (leaf.type) {
     case 'pending':
-      return `pending(msg, ${leaf.url.toString()})`;
+      return `pendingVerify(msg, ${leaf.url.toString()})`;
     case 'unknown':
-      return `unknown<${uint8ArrayToHex(leaf.header)}>(msg, ${uint8ArrayToHex(leaf.payload)})`;
+      return `unknownVerify<${uint8ArrayToHex(leaf.header)}>(msg, ${uint8ArrayToHex(leaf.payload)})`;
     default:
       return `${leaf.type}Verify(msg, ${leaf.height})`;
   }
