@@ -20,7 +20,7 @@ import type { Edge, Leaf, Op, Timestamp, Tree } from '../src/types';
 
 import { MergeMap, MergeSet, uint8ArrayToHex } from '../src/utils';
 
-export const opToString: (op: Op) => string = (op: Op): string => {
+export function opToString(op: Op): string {
   switch (op.type) {
     case 'append':
     case 'prepend':
@@ -28,14 +28,14 @@ export const opToString: (op: Op) => string = (op: Op): string => {
     default:
       return op.type;
   }
-};
+}
 
-export const edgeToString: (edge: Edge) => string = (edge: Edge): string => {
+export function edgeToString(edge: Edge): string {
   const [op, tree]: Edge = edge;
   return `${opToString(op)}=>{${treeToString(tree)}}`;
-};
+}
 
-export const leafToString: (leaf: Leaf) => string = (leaf: Leaf): string => {
+export function leafToString(leaf: Leaf): string {
   switch (leaf.type) {
     case 'pending':
       return `${leaf.type}:${leaf.url.toString()}`;
@@ -44,33 +44,33 @@ export const leafToString: (leaf: Leaf) => string = (leaf: Leaf): string => {
     default:
       return `${leaf.type}:${leaf.height}`;
   }
-};
+}
 
-export const leafOrEdgeToString: (leafOrEdge: Leaf | Edge) => string = (leafOrEdge: Leaf | Edge): string => {
+export function leafOrEdgeToString(leafOrEdge: Leaf | Edge): string {
   if (Array.isArray(leafOrEdge)) {
     return edgeToString(leafOrEdge);
   } else {
     return leafToString(leafOrEdge);
   }
-};
+}
 
-export const mergeSetToString: (ms: MergeSet<Leaf>) => string = (ms: MergeSet<Leaf>): string => {
+export function mergeSetToString(ms: MergeSet<Leaf>): string {
   return ms.values().map(leafToString).join(',');
-};
+}
 
-export const mergeMapToString: (mm: MergeMap<Op, Tree>) => string = (mm: MergeMap<Op, Tree>): string => {
+export function mergeMapToString(mm: MergeMap<Op, Tree>): string {
   return mm
     .entries()
     .map(([op, subTree]: [Op, Tree]) => {
       return `${opToString(op)}=>{${treeToString(subTree)}}`;
     })
     .join(',');
-};
+}
 
-export const treeToString: (tree: Tree) => string = (tree: Tree): string => {
+export function treeToString(tree: Tree): string {
   return `[${mergeSetToString(tree.leaves)}](${mergeMapToString(tree.edges)})`;
-};
+}
 
-export const timestampToString: (timestamp: Timestamp) => string = (timestamp: Timestamp): string => {
+export function timestampToString(timestamp: Timestamp): string {
   return `<${[timestamp.version.toString(), timestamp.fileHash.algorithm, uint8ArrayToHex(timestamp.fileHash.value), treeToString(timestamp.tree)].join(':')}>`;
-};
+}
