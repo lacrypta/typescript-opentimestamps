@@ -57,7 +57,7 @@ export async function submitTimestamp(
           );
           const [tree, end]: [Tree, number] = readTree(body, 0);
           if (end !== body.length) {
-            throw new Error('Garbage at end of calendar response}');
+            throw new Error('Garbage at end of calendar response');
           }
           return tree;
         } catch (e: unknown) {
