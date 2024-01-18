@@ -61,11 +61,7 @@ export async function submitTimestamp(
           }
           return tree;
         } catch (e: unknown) {
-          if (e instanceof Error) {
-            return new Error(`Error (${url.toString()}): ${e.message}`);
-          } else {
-            return new Error(`Error (${url.toString()}): Unknown error contacting calendar`);
-          }
+          return new Error(`Error (${url.toString()}): ${(e as Error).message}`);
         }
       }),
     )
