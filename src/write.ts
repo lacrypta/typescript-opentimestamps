@@ -16,10 +16,11 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
 
+import { compareEdges, compareLeaves } from './internals';
 import { LeafHeader, Tag, magicHeader, nonFinal } from './types';
-import { uint8ArrayCompare, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
+import { uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 export function writeUint(value: number): Uint8Array {
   if (!Number.isSafeInteger(value) || value < 0) {
@@ -40,40 +41,6 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
 
 export function writeFileHash(fileHash: FileHash): Uint8Array {
   return uint8ArrayConcat([Uint8Array.of(Tag[fileHash.algorithm]), fileHash.value]);
-}
-
-export function compareLeaves(left: Leaf, right: Leaf): number {
-  const headerCompare: number = uint8ArrayCompare(
-    'unknown' == left.type ? left.header : uint8ArrayFromHex(LeafHeader[left.type as keyof typeof LeafHeader]),
-    'unknown' == right.type ? right.header : uint8ArrayFromHex(LeafHeader[right.type as keyof typeof LeafHeader]),
-  );
-  if (0 === headerCompare) {
-    switch (left.type) {
-      case 'pending':
-        return uint8ArrayCompare(
-          new TextEncoder().encode(left.url.toString()),
-          new TextEncoder().encode((right as { url: URL }).url.toString()),
-        );
-      case 'unknown':
-        return uint8ArrayCompare(left.payload, (right as { payload: Uint8Array }).payload);
-      default:
-        return left.height - (right as { height: number }).height;
-    }
-  }
-  return headerCompare;
-}
-
-export function compareOps(left: Op, right: Op): number {
-  const tagCompare: number = Tag[left.type] - Tag[right.type];
-  if (0 === tagCompare && ('append' === left.type || 'prepend' === left.type)) {
-    return uint8ArrayCompare(left.operand, (right as { operand: Uint8Array }).operand);
-  }
-  return tagCompare;
-}
-
-export function compareEdges(left: Edge, right: Edge): number {
-  const [[leftOp], [rightOp]]: [Edge, Edge] = [left, right];
-  return compareOps(leftOp, rightOp);
 }
 
 export function writeLeaf(leaf: Leaf): Uint8Array {

@@ -18,7 +18,7 @@
 
 import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
-import { callOp } from './internals';
+import { callOp, compareEdges, compareLeaves } from './internals';
 import { uint8ArrayToHex } from './utils';
 
 export function indent(text: string): string {
@@ -60,8 +60,12 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
 }
 
 export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
-  const leavesSize: number = tree.leaves.size();
-  const edgesSize: number = tree.edges.size();
+  const leaves: Leaf[] = tree.leaves.values();
+  const edges: Edge[] = tree.edges.entries();
+  const leavesSize: number = leaves.length;
+  const edgesSize: number = edges.length;
+  leaves.sort(compareLeaves);
+  edges.sort(compareEdges);
 
   const doIndent: (x: string) => string = 1 < leavesSize + edgesSize ? indent : (x: string) => x;
 

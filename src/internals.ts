@@ -23,7 +23,16 @@ import { keccak_256 } from '@noble/hashes/sha3';
 
 import type { Edge, Leaf, Op, Ops, Path, Paths, Timestamp, Tree } from './types';
 
-import { MergeMap, MergeSet, uint8ArrayConcat, uint8ArrayReversed, uint8ArrayToHex } from './utils';
+import { LeafHeader, Tag } from './types';
+import {
+  MergeMap,
+  MergeSet,
+  uint8ArrayCompare,
+  uint8ArrayConcat,
+  uint8ArrayFromHex,
+  uint8ArrayReversed,
+  uint8ArrayToHex,
+} from './utils';
 
 export function callOp(op: Op, msg: Uint8Array): Uint8Array {
   switch (op.type) {
@@ -48,6 +57,40 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
 
 export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
   return ops.reduce((prevMsg: Uint8Array, op: Op): Uint8Array => callOp(op, prevMsg), msg);
+}
+
+export function compareLeaves(left: Leaf, right: Leaf): number {
+  const headerCompare: number = uint8ArrayCompare(
+    'unknown' == left.type ? left.header : uint8ArrayFromHex(LeafHeader[left.type as keyof typeof LeafHeader]),
+    'unknown' == right.type ? right.header : uint8ArrayFromHex(LeafHeader[right.type as keyof typeof LeafHeader]),
+  );
+  if (0 === headerCompare) {
+    switch (left.type) {
+      case 'pending':
+        return uint8ArrayCompare(
+          new TextEncoder().encode(left.url.toString()),
+          new TextEncoder().encode((right as { url: URL }).url.toString()),
+        );
+      case 'unknown':
+        return uint8ArrayCompare(left.payload, (right as { payload: Uint8Array }).payload);
+      default:
+        return left.height - (right as { height: number }).height;
+    }
+  }
+  return headerCompare;
+}
+
+export function compareOps(left: Op, right: Op): number {
+  const tagCompare: number = Tag[left.type] - Tag[right.type];
+  if (0 === tagCompare && ('append' === left.type || 'prepend' === left.type)) {
+    return uint8ArrayCompare(left.operand, (right as { operand: Uint8Array }).operand);
+  }
+  return tagCompare;
+}
+
+export function compareEdges(left: Edge, right: Edge): number {
+  const [[leftOp], [rightOp]]: [Edge, Edge] = [left, right];
+  return compareOps(leftOp, rightOp);
 }
 
 export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
