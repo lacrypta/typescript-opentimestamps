@@ -28,7 +28,7 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
   );
   const [upgradedTree, end]: [Tree, number] = readTree(body, 0);
   if (end !== body.length) {
-    throw new Error(`Garbage at end of calendar response}`);
+    throw new Error('Garbage at end of calendar response');
   }
   return upgradedTree;
 }
