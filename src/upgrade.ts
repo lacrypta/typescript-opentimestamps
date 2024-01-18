@@ -36,35 +36,39 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
 export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
   const { paths, errors }: { paths: Paths; errors: Error[] } = (
     await Promise.all(
-      treeToPaths(tree).map(async ({ operations, leaf }: Path): Promise<Paths | Error> => {
+      treeToPaths(tree).map(async ({ operations, leaf }: Path): Promise<{ paths: Paths; errors: Error[] }> => {
         if ('pending' !== leaf.type) {
-          return [{ operations, leaf }];
+          return { paths: [{ operations, leaf }], errors: [] };
         } else {
-          try {
-            return upgradeFromCalendar(leaf.url, callOps(operations, msg)).then((upgradedTree: Tree): Paths => {
-              return treeToPaths(upgradedTree).map(
-                ({ operations: upgradedOperations, leaf: upgradedLeaf }: Path): Path => {
-                  return { operations: operations.concat(upgradedOperations), leaf: upgradedLeaf };
-                },
-              );
+          return upgradeFromCalendar(leaf.url, callOps(operations, msg))
+            .then((upgradedTree: Tree): { paths: Paths; errors: Error[] } => {
+              return {
+                paths: treeToPaths(upgradedTree).map(
+                  ({ operations: upgradedOperations, leaf: upgradedLeaf }: Path): Path => {
+                    return { operations: operations.concat(upgradedOperations), leaf: upgradedLeaf };
+                  },
+                ),
+                errors: [],
+              };
+            })
+            .catch((e: unknown): { paths: Paths; errors: Error[] } => {
+              return {
+                paths: [{ operations, leaf }],
+                errors: [new Error(`Error (${leaf.url.toString()}): ${(e as Error).message}`)],
+              };
             });
-          } catch (e: unknown) {
-            if (e instanceof Error) {
-              return new Error(`Error (${leaf.url.toString()}): ${e.message}`);
-            } else {
-              return new Error(`Error (${leaf.url.toString()}): Unknown error contacting calendar`);
-            }
-          }
         }
       }),
     )
   ).reduce(
-    (prev: { paths: Paths; errors: Error[] }, current: Error | Paths): { paths: Paths; errors: Error[] } => {
-      if (current instanceof Error) {
-        return { paths: prev.paths, errors: prev.errors.concat([current]) };
-      } else {
-        return { paths: prev.paths.concat(current), errors: prev.errors };
-      }
+    (
+      prev: { paths: Paths; errors: Error[] },
+      current: { paths: Paths; errors: Error[] },
+    ): { paths: Paths; errors: Error[] } => {
+      return {
+        paths: prev.paths.concat(current.paths),
+        errors: prev.errors.concat(current.errors),
+      };
     },
     { paths: [], errors: [] },
   );
