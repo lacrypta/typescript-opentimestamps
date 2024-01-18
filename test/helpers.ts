@@ -61,7 +61,7 @@ export function mergeSetToString(ms: MergeSet<Leaf>): string {
 export function mergeMapToString(mm: MergeMap<Op, Tree>): string {
   return mm
     .entries()
-    .map(([op, subTree]: [Op, Tree]) => {
+    .map(([op, subTree]: [Op, Tree]): string => {
       return `${opToString(op)}=>{${treeToString(subTree)}}`;
     })
     .join(',');

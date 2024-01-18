@@ -21,8 +21,8 @@ import type { Leaf } from '../../src/types';
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
 import { verify } from '../../src/verifiers/blockstream';
 
-describe('blockstream', () => {
-  describe('verify()', () => {
+describe('blockstream', (): void => {
+  describe('verify()', (): void => {
     it.each([
       {
         msg: Uint8Array.of(),
@@ -183,7 +183,7 @@ describe('blockstream', () => {
             blockBody: Uint8Array;
             expected: null;
             error: Error;
-          }) => {
+          }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {

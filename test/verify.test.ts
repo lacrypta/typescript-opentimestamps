@@ -22,8 +22,8 @@ import { newEdges, newLeaves } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 import { verifyTimestamp } from '../src/verify';
 
-describe('Verify', () => {
-  describe('verifyTimestamp()', () => {
+describe('Verify', (): void => {
+  describe('verifyTimestamp()', (): void => {
     it.each([
       {
         bitcoinVerifierResponse: null,
@@ -89,7 +89,7 @@ describe('Verify', () => {
             bitcoinVerifierError: Error | string;
             litecoinVerifierError: Error | string;
             expected: { attestations: Record<number, string[]>; errors: Record<string, Error[]> };
-          }) => {
+          }): void => {
         void expect(
           verifyTimestamp(
             {

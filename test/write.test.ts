@@ -22,8 +22,8 @@ import { newEdges, newLeaves, newTree } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 import { writeBytes, writeEdge, writeFileHash, writeLeaf, writeTimestamp, writeTree, writeUint } from '../src/write';
 
-describe('Write', () => {
-  describe('writeUint()', () => {
+describe('Write', (): void => {
+  describe('writeUint()', (): void => {
     it.each([
       {
         input: -1,
@@ -68,17 +68,21 @@ describe('Write', () => {
         input,
         expected,
         error,
-      }: { input: number; expected: Uint8Array; error: null } | { input: number; expected: null; error: Error }) => {
+      }:
+        | { input: number; expected: Uint8Array; error: null }
+        | { input: number; expected: null; error: Error }): void => {
         if (null === error) {
           expect(writeUint(input)).toStrictEqual(expected);
         } else {
-          expect(() => writeUint(input)).toThrow(error);
+          expect((): void => {
+            writeUint(input);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('writeBytes()', () => {
+  describe('writeBytes()', (): void => {
     it.each([
       {
         input: Uint8Array.of(),
@@ -90,12 +94,12 @@ describe('Write', () => {
         expected: Uint8Array.of('something'.length, ...new TextEncoder().encode('something')),
         name: 'should write empty bytes',
       },
-    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Uint8Array }) => {
+    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Uint8Array }): void => {
       expect(writeBytes(input)).toStrictEqual(expected);
     });
   });
 
-  describe('writeFileHash()', () => {
+  describe('writeFileHash()', (): void => {
     it.each([
       {
         input: { algorithm: 'sha1', value: uint8ArrayFromHex('0123456789abcdef0123456789abcdef01234567') } as FileHash,
@@ -126,12 +130,12 @@ describe('Write', () => {
         expected: uint8ArrayFromHex('67' + '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
         name: 'should write keccak256 fileHash',
       },
-    ])('$name', ({ input, expected }: { input: FileHash; expected: Uint8Array }) => {
+    ])('$name', ({ input, expected }: { input: FileHash; expected: Uint8Array }): void => {
       expect(writeFileHash(input)).toStrictEqual(expected);
     });
   });
 
-  describe('writeLeaf()', () => {
+  describe('writeLeaf()', (): void => {
     it.each([
       {
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
@@ -158,12 +162,12 @@ describe('Write', () => {
         expected: uint8ArrayFromHex('000102030405060708020900'),
         name: 'should write unknown leaf',
       },
-    ])('$name', ({ leaf, expected }: { leaf: Leaf; expected: Uint8Array }) => {
+    ])('$name', ({ leaf, expected }: { leaf: Leaf; expected: Uint8Array }): void => {
       expect(writeLeaf(leaf)).toStrictEqual(expected);
     });
   });
 
-  describe('writeEdge()', () => {
+  describe('writeEdge()', (): void => {
     it.each([
       {
         edge: [{ type: 'sha1' }, newTree()] as Edge,
@@ -205,12 +209,12 @@ describe('Write', () => {
         expected: uint8ArrayFromHex('f103010203'),
         name: 'should write prepend edge',
       },
-    ])('$name', ({ edge, expected }: { edge: Edge; expected: Uint8Array }) => {
+    ])('$name', ({ edge, expected }: { edge: Edge; expected: Uint8Array }): void => {
       expect(writeEdge(edge)).toStrictEqual(expected);
     });
   });
 
-  describe('writeTree()', () => {
+  describe('writeTree()', (): void => {
     it.each([
       {
         tree: newTree(),
@@ -251,12 +255,12 @@ describe('Write', () => {
         expected: uint8ArrayFromHex('ff000588960d73d71901017bff0006869a0d73d71b45017bff0208'),
         name: 'should write tree with edges and leaves',
       },
-    ])('$name', ({ tree, expected }: { tree: Tree; expected: Uint8Array }) => {
+    ])('$name', ({ tree, expected }: { tree: Tree; expected: Uint8Array }): void => {
       expect(writeTree(tree)).toStrictEqual(expected);
     });
   });
 
-  describe('writeTimestamp()', () => {
+  describe('writeTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -296,7 +300,7 @@ describe('Write', () => {
         ),
         name: 'should write non-empty timestamp',
       },
-    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Uint8Array }) => {
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Uint8Array }): void => {
       expect(writeTimestamp(timestamp)).toStrictEqual(expected);
     });
   });

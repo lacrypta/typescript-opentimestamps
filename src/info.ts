@@ -67,7 +67,7 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
   leaves.sort(compareLeaves);
   edges.sort(compareEdges);
 
-  const doIndent: (x: string) => string = 1 < leavesSize + edgesSize ? indent : (x: string) => x;
+  const doIndent: (x: string) => string = 1 < leavesSize + edgesSize ? indent : (x: string): string => x;
 
   const resultParts: string[] = tree.leaves
     .values()

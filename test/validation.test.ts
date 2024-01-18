@@ -46,8 +46,8 @@ import {
   validateVersion,
 } from '../src/validation';
 
-describe('Validation', () => {
-  describe('validateNonNullObject()', () => {
+describe('Validation', (): void => {
+  describe('validateNonNullObject()', (): void => {
     it.each([
       {
         obj: {},
@@ -69,16 +69,18 @@ describe('Validation', () => {
         error: new Error('Expected non-null object'),
         name: 'should fail for non-object input',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateNonNullObject(obj)).toBe(obj);
       } else {
-        expect(() => validateNonNullObject(obj)).toThrow(error);
+        expect((): void => {
+          validateNonNullObject(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateUint8Array()', () => {
+  describe('validateUint8Array()', (): void => {
     it.each([
       {
         obj: {},
@@ -90,16 +92,18 @@ describe('Validation', () => {
         error: null,
         name: 'should return correctly for Uint8Array input',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateUint8Array(obj)).toBe(obj);
       } else {
-        expect(() => validateUint8Array(obj)).toThrow(error);
+        expect((): void => {
+          validateUint8Array(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateURL()', () => {
+  describe('validateURL()', (): void => {
     it.each([
       {
         obj: {},
@@ -111,16 +115,18 @@ describe('Validation', () => {
         error: null,
         name: 'should return correctly for Uint8Array input',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateURL(obj)).toBe(obj);
       } else {
-        expect(() => validateURL(obj)).toThrow(error);
+        expect((): void => {
+          validateURL(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateCalendarUrl()', () => {
+  describe('validateCalendarUrl()', (): void => {
     it.each([
       {
         obj: null,
@@ -157,16 +163,18 @@ describe('Validation', () => {
         error: null,
         name: 'should return the same input when valid',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateCalendarUrl(obj)).toStrictEqual(obj);
       } else {
-        expect(() => validateCalendarUrl(obj)).toThrow(error);
+        expect((): void => {
+          validateCalendarUrl(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateNonNegativeInteger()', () => {
+  describe('validateNonNegativeInteger()', (): void => {
     it.each([
       {
         obj: null,
@@ -198,16 +206,18 @@ describe('Validation', () => {
         error: null,
         name: 'should return 123 for 123 input',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateNonNegativeInteger(obj)).toBe(obj);
       } else {
-        expect(() => validateNonNegativeInteger(obj)).toThrow(error);
+        expect((): void => {
+          validateNonNegativeInteger(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateOneOfStrings()', () => {
+  describe('validateOneOfStrings()', (): void => {
     it.each([
       {
         value: '',
@@ -233,16 +243,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when in options',
       },
-    ])('$name', ({ value, options, error }: { value: string; options: string[]; error: Error | null }) => {
+    ])('$name', ({ value, options, error }: { value: string; options: string[]; error: Error | null }): void => {
       if (null === error) {
         expect(validateOneOfStrings(value, options)).toBe(value);
       } else {
-        expect(() => validateOneOfStrings(value, options)).toThrow(error);
+        expect((): void => {
+          validateOneOfStrings(value, options);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasTypeKey()', () => {
+  describe('validateObjectHasTypeKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -259,16 +271,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .type key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasTypeKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasTypeKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasTypeKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasHeightKey()', () => {
+  describe('validateObjectHasHeightKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -280,16 +294,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .height key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasHeightKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasHeightKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasHeightKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasUrlKey()', () => {
+  describe('validateObjectHasUrlKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -301,16 +317,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .url key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasUrlKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasUrlKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasUrlKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasHeaderKey()', () => {
+  describe('validateObjectHasHeaderKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -332,16 +350,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .header key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasHeaderKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasHeaderKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasHeaderKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasPayloadKey()', () => {
+  describe('validateObjectHasPayloadKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -353,16 +373,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .payload key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasPayloadKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasPayloadKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasPayloadKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasOperandKey()', () => {
+  describe('validateObjectHasOperandKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -374,16 +396,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .operand key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasOperandKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasOperandKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasOperandKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasLeavesKey()', () => {
+  describe('validateObjectHasLeavesKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -403,7 +427,7 @@ describe('Validation', () => {
       {
         obj: {
           leaves: new MergeSet<Leaf>(
-            (_key: Leaf) => '',
+            (_key: Leaf): string => '',
             (_left: Leaf, _right: Leaf): Leaf => {
               return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
             },
@@ -412,16 +436,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .leaves key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasLeavesKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasLeavesKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasLeavesKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHasEdgesKey()', () => {
+  describe('validateObjectHasEdgesKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -441,7 +467,7 @@ describe('Validation', () => {
       {
         obj: {
           edges: new MergeMap<Op, Tree>(
-            (_key: Op) => '',
+            (_key: Op): string => '',
             (left: Tree, right: Tree): Tree => {
               return incorporateTreeToTree(left, right);
             },
@@ -450,16 +476,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .edges key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHasEdgesKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHasEdgesKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHasEdgesKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHashAlgorithmKey()', () => {
+  describe('validateObjectHashAlgorithmKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -496,16 +524,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .algorithm key (keccak256)',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHashAlgorithmKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHashAlgorithmKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHashAlgorithmKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHashValueKey()', () => {
+  describe('validateObjectHashValueKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -527,16 +557,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .value key',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateObjectHashValueKey(obj)).toBe(obj);
       } else {
-        expect(() => validateObjectHashValueKey(obj)).toThrow(error);
+        expect((): void => {
+          validateObjectHashValueKey(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateLeaf()', () => {
+  describe('validateLeaf()', (): void => {
     it.each([
       {
         obj: { type: 'none of the above' },
@@ -633,16 +665,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when "unknown" leaf is well-formed',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateLeaf(obj)).toBe(obj);
       } else {
-        expect(() => validateLeaf(obj)).toThrow(error);
+        expect((): void => {
+          validateLeaf(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateOp()', () => {
+  describe('validateOp()', (): void => {
     it.each([
       {
         obj: { type: 'none of the above' },
@@ -709,16 +743,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when .type is prepend and is well-formed',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateOp(obj)).toBe(obj);
       } else {
-        expect(() => validateOp(obj)).toThrow(error);
+        expect((): void => {
+          validateOp(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateTree()', () => {
+  describe('validateTree()', (): void => {
     it.each([
       {
         obj: {},
@@ -733,7 +769,7 @@ describe('Validation', () => {
       {
         obj: {
           leaves: new MergeSet<Leaf>(
-            (_key: Leaf) => '',
+            (_key: Leaf): string => '',
             (_left: Leaf, _right: Leaf): Leaf => {
               return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
             },
@@ -745,7 +781,7 @@ describe('Validation', () => {
       {
         obj: {
           leaves: new MergeSet<Leaf>(
-            (_key: Leaf) => '',
+            (_key: Leaf): string => '',
             (_left: Leaf, _right: Leaf): Leaf => {
               return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
             },
@@ -758,13 +794,13 @@ describe('Validation', () => {
       {
         obj: {
           leaves: new MergeSet<Leaf>(
-            (_key: Leaf) => '',
+            (_key: Leaf): string => '',
             (_left: Leaf, _right: Leaf): Leaf => {
               return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
             },
           ),
           edges: new MergeMap<Op, Tree>(
-            (_key: Op) => '',
+            (_key: Op): string => '',
             (left: Tree, right: Tree): Tree => {
               return incorporateTreeToTree(left, right);
             },
@@ -773,16 +809,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when .edges is null',
       },
-    ])('$name', ({ obj, error }: { obj: object; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
         expect(validateTree(obj)).toBe(obj);
       } else {
-        expect(() => validateTree(obj)).toThrow(error);
+        expect((): void => {
+          validateTree(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateFileHashValue()', () => {
+  describe('validateFileHashValue()', (): void => {
     it.each([
       {
         algorithm: 'none of the above',
@@ -896,17 +934,19 @@ describe('Validation', () => {
         error,
       }:
         | { algorithm: string; value: Uint8Array; expected: FileHash; error: null }
-        | { algorithm: string; value: Uint8Array; expected: null; error: Error }) => {
+        | { algorithm: string; value: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(validateFileHashValue(algorithm, value)).toStrictEqual(expected);
         } else {
-          expect(() => validateFileHashValue(algorithm, value)).toThrow(error);
+          expect((): void => {
+            validateFileHashValue(algorithm, value);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('validateFileHash()', () => {
+  describe('validateFileHash()', (): void => {
     it.each([
       {
         fileHash: { algorithm: 'none of the above', value: uint8ArrayFromHex('') },
@@ -985,16 +1025,18 @@ describe('Validation', () => {
         error: new Error('Expected 32 byte hash'),
         name: 'should fail for keccak256 for non 32-byte value (again)',
       },
-    ])('$name', ({ fileHash, error }: { fileHash: unknown; error: Error | null }) => {
+    ])('$name', ({ fileHash, error }: { fileHash: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateFileHash(fileHash)).toBe(fileHash);
       } else {
-        expect(() => validateFileHash(fileHash)).toThrow(error);
+        expect((): void => {
+          validateFileHash(fileHash);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateVersion()', () => {
+  describe('validateVersion()', (): void => {
     it.each([
       {
         version: null,
@@ -1011,16 +1053,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass when well-formed .version given',
       },
-    ])('$name', ({ version, error }: { version: unknown; error: Error | null }) => {
+    ])('$name', ({ version, error }: { version: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateVersion(version)).toBe(version);
       } else {
-        expect(() => validateVersion(version)).toThrow(error);
+        expect((): void => {
+          validateVersion(version);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('validateTimestamp()', () => {
+  describe('validateTimestamp()', (): void => {
     it.each([
       {
         obj: 123,
@@ -1073,13 +1117,13 @@ describe('Validation', () => {
           },
           tree: {
             leaves: new MergeSet<Leaf>(
-              (_key: Leaf) => '',
+              (_key: Leaf): string => '',
               (_left: Leaf, _right: Leaf): Leaf => {
                 return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
               },
             ),
             edges: new MergeMap<Op, Tree>(
-              (_key: Op) => '',
+              (_key: Op): string => '',
               (left: Tree, right: Tree): Tree => {
                 return incorporateTreeToTree(left, right);
               },
@@ -1089,16 +1133,18 @@ describe('Validation', () => {
         error: null,
         name: 'should pass for well-formed timestamp',
       },
-    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }) => {
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect(validateTimestamp(obj)).toBe(obj);
       } else {
-        expect(() => validateTimestamp(obj)).toThrow(error);
+        expect((): void => {
+          validateTimestamp(obj);
+        }).toThrow(error);
       }
     });
   });
 
-  describe('isTimestamp()', () => {
+  describe('isTimestamp()', (): void => {
     it.each([
       {
         obj: 123,
@@ -1151,13 +1197,13 @@ describe('Validation', () => {
           },
           tree: {
             leaves: new MergeSet<Leaf>(
-              (_key: Leaf) => '',
+              (_key: Leaf): string => '',
               (_left: Leaf, _right: Leaf): Leaf => {
                 return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
               },
             ),
             edges: new MergeMap<Op, Tree>(
-              (_key: Op) => '',
+              (_key: Op): string => '',
               (left: Tree, right: Tree): Tree => {
                 return incorporateTreeToTree(left, right);
               },
@@ -1167,7 +1213,7 @@ describe('Validation', () => {
         expected: true,
         name: 'should pass for well-formed timestamp',
       },
-    ])('$name', ({ obj, expected }: { obj: unknown; expected: boolean }) => {
+    ])('$name', ({ obj, expected }: { obj: unknown; expected: boolean }): void => {
       expect(isTimestamp(obj)).toStrictEqual(expected);
     });
   });

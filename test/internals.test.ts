@@ -42,8 +42,8 @@ import { MergeMap, MergeSet, uint8ArrayFromHex, uint8ArrayToHex } from '../src/u
 
 import { mergeMapToString, mergeSetToString, timestampToString, treeToString } from './helpers';
 
-describe('Internals', () => {
-  describe('callOp()', () => {
+describe('Internals', (): void => {
+  describe('callOp()', (): void => {
     it.each([
       {
         op: { type: 'sha1' } as Op,
@@ -85,12 +85,12 @@ describe('Internals', () => {
         expected: '303130323033303430353036',
         name: 'should correctly apply hexlify operation',
       },
-    ])('$name', ({ op, expected }: { op: Op; expected: string }) => {
+    ])('$name', ({ op, expected }: { op: Op; expected: string }): void => {
       expect(uint8ArrayToHex(callOp(op, Uint8Array.of(1, 2, 3, 4, 5, 6)))).toStrictEqual(expected);
     });
   });
 
-  describe('callOps()', () => {
+  describe('callOps()', (): void => {
     it.each([
       {
         ops: [{ type: 'sha1' }, { type: 'sha1' }] as Ops,
@@ -132,12 +132,12 @@ describe('Internals', () => {
         expected: '35643231316261643866346565373065313663376433343361383338666333343461316564393631',
         name: 'should correctly apply sha1, hexlify operations',
       },
-    ])('$name', ({ ops, expected }: { ops: Ops; expected: string }) => {
+    ])('$name', ({ ops, expected }: { ops: Ops; expected: string }): void => {
       expect(uint8ArrayToHex(callOps(ops, Uint8Array.of(1, 2, 3, 4, 5, 6)))).toStrictEqual(expected);
     });
   });
 
-  describe('compareLeaves()', () => {
+  describe('compareLeaves()', (): void => {
     it.each([
       {
         left: { type: 'bitcoin', height: 123 } as Leaf,
@@ -241,12 +241,12 @@ describe('Internals', () => {
         expected: 1,
         name: 'should order unknown according to payload (reversed)',
       },
-    ])('$name', ({ left, right, expected }: { left: Leaf; right: Leaf; expected: number }) => {
+    ])('$name', ({ left, right, expected }: { left: Leaf; right: Leaf; expected: number }): void => {
       expect(compareLeaves(left, right)).toStrictEqual(expected);
     });
   });
 
-  describe('compareOps()', () => {
+  describe('compareOps()', (): void => {
     it.each([
       {
         left: { type: 'sha1' } as Op,
@@ -284,12 +284,12 @@ describe('Internals', () => {
         expected: 3,
         name: 'should order binary according to operand (reversed)',
       },
-    ])('$name', ({ left, right, expected }: { left: Op; right: Op; expected: number }) => {
+    ])('$name', ({ left, right, expected }: { left: Op; right: Op; expected: number }): void => {
       expect(compareOps(left, right)).toStrictEqual(expected);
     });
   });
 
-  describe('compareEdges()', () => {
+  describe('compareEdges()', (): void => {
     it.each([
       {
         left: [{ type: 'sha1' }, newTree()] as Edge,
@@ -327,12 +327,12 @@ describe('Internals', () => {
         expected: 3,
         name: 'should order binary according to operand (reversed)',
       },
-    ])('$name', ({ left, right, expected }: { left: Edge; right: Edge; expected: number }) => {
+    ])('$name', ({ left, right, expected }: { left: Edge; right: Edge; expected: number }): void => {
       expect(compareEdges(left, right)).toStrictEqual(expected);
     });
   });
 
-  describe('incorporateTreeToTree()', () => {
+  describe('incorporateTreeToTree()', (): void => {
     it.each([
       {
         left: newTree(),
@@ -432,12 +432,12 @@ describe('Internals', () => {
         },
         name: 'should incorporate edges into leaves',
       },
-    ])('$name', ({ left, right, expected }: { left: Tree; right: Tree; expected: Tree }) => {
+    ])('$name', ({ left, right, expected }: { left: Tree; right: Tree; expected: Tree }): void => {
       expect(treeToString(incorporateTreeToTree(left, right))).toStrictEqual(treeToString(expected));
     });
   });
 
-  describe('incorporateToTree()', () => {
+  describe('incorporateToTree()', (): void => {
     it.each([
       {
         left: newTree(),
@@ -458,12 +458,12 @@ describe('Internals', () => {
         expected: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
         name: 'should incorporate edges into empty tree',
       },
-    ])('$name', ({ left, right, expected }: { left: Tree; right: Edge | Leaf; expected: Tree }) => {
+    ])('$name', ({ left, right, expected }: { left: Tree; right: Edge | Leaf; expected: Tree }): void => {
       expect(treeToString(incorporateToTree(left, right))).toStrictEqual(treeToString(expected));
     });
   });
 
-  describe('newEdges()', () => {
+  describe('newEdges()', (): void => {
     it.each([
       {
         edges: [] as Edge[],
@@ -509,7 +509,7 @@ describe('Internals', () => {
         expected: newEdges().add({ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()),
         name: 'should not discriminate by same operand',
       },
-    ])('$name', ({ edges, expected }: { edges: Edge[]; expected: MergeMap<Op, Tree> }) => {
+    ])('$name', ({ edges, expected }: { edges: Edge[]; expected: MergeMap<Op, Tree> }): void => {
       expect(
         mergeMapToString(
           edges.reduce((prev: MergeMap<Op, Tree>, edge: Edge): MergeMap<Op, Tree> => prev.add(...edge), newEdges()),
@@ -518,7 +518,7 @@ describe('Internals', () => {
     });
   });
 
-  describe('newLeaves()', () => {
+  describe('newLeaves()', (): void => {
     it.each([
       {
         leaves: [] as Leaf[],
@@ -656,7 +656,7 @@ describe('Internals', () => {
         expected: newLeaves().add({ type: 'ethereum', height: 123 }),
         name: 'should not discriminate by same ethereum height',
       },
-    ])('$name', ({ leaves, expected }: { leaves: Leaf[]; expected: MergeSet<Leaf> }) => {
+    ])('$name', ({ leaves, expected }: { leaves: Leaf[]; expected: MergeSet<Leaf> }): void => {
       expect(
         mergeSetToString(
           leaves.reduce((prev: MergeSet<Leaf>, leaf: Leaf): MergeSet<Leaf> => prev.add(leaf), newLeaves()),
@@ -665,13 +665,13 @@ describe('Internals', () => {
     });
   });
 
-  describe('newTree()', () => {
-    test('should build empty tree', () => {
+  describe('newTree()', (): void => {
+    test('should build empty tree', (): void => {
       expect(treeToString(newTree())).toStrictEqual('[]()');
     });
   });
 
-  describe('decoalesceOperations()', () => {
+  describe('decoalesceOperations()', (): void => {
     it.each([
       {
         input: newTree(),
@@ -949,12 +949,12 @@ describe('Internals', () => {
         },
         name: 'should recursively decoalesce',
       },
-    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
+    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }): void => {
       expect(treeToString(decoalesceOperations(input))).toStrictEqual(treeToString(expected));
     });
   });
 
-  describe('coalesceOperations()', () => {
+  describe('coalesceOperations()', (): void => {
     it.each([
       {
         input: newTree(),
@@ -1121,12 +1121,12 @@ describe('Internals', () => {
         },
         name: 'should recursively coalesce',
       },
-    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }) => {
+    ])('$name', ({ input, expected }: { input: Tree; expected: Tree }): void => {
       expect(treeToString(coalesceOperations(input))).toStrictEqual(treeToString(expected));
     });
   });
 
-  describe('atomizePrependOp()', () => {
+  describe('atomizePrependOp()', (): void => {
     it.each([
       {
         input: Uint8Array.of(),
@@ -1142,12 +1142,12 @@ describe('Internals', () => {
         ] as Ops,
         name: 'should atomize input',
       },
-    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }) => {
+    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }): void => {
       expect(atomizePrependOp(input)).toStrictEqual(expected);
     });
   });
 
-  describe('atomizeAppendOp()', () => {
+  describe('atomizeAppendOp()', (): void => {
     it.each([
       {
         input: Uint8Array.of(),
@@ -1163,12 +1163,12 @@ describe('Internals', () => {
         ] as Ops,
         name: 'should atomize input',
       },
-    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }) => {
+    ])('$name', ({ input, expected }: { input: Uint8Array; expected: Ops }): void => {
       expect(atomizeAppendOp(input)).toStrictEqual(expected);
     });
   });
 
-  describe('normalizeOps()', () => {
+  describe('normalizeOps()', (): void => {
     it.each([
       {
         input: [],
@@ -1275,12 +1275,12 @@ describe('Internals', () => {
         ] as Ops,
         name: 'should treat independent segments separately',
       },
-    ])('$name', ({ input, expected }: { input: Ops; expected: Ops }) => {
+    ])('$name', ({ input, expected }: { input: Ops; expected: Ops }): void => {
       expect(normalizeOps(input)).toStrictEqual(expected);
     });
   });
 
-  describe('pathsToTree()', () => {
+  describe('pathsToTree()', (): void => {
     it.each([
       {
         paths: [],
@@ -1333,12 +1333,12 @@ describe('Internals', () => {
         },
         name: 'should return complex tree for complex paths',
       },
-    ])('$name', ({ paths, expected }: { paths: Paths; expected: Tree }) => {
+    ])('$name', ({ paths, expected }: { paths: Paths; expected: Tree }): void => {
       expect(treeToString(pathsToTree(paths))).toStrictEqual(treeToString(expected));
     });
   });
 
-  describe('treeToPaths()', () => {
+  describe('treeToPaths()', (): void => {
     it.each([
       {
         tree: newTree(),
@@ -1399,12 +1399,12 @@ describe('Internals', () => {
         ] as Paths,
         name: 'should return complex paths for complex tree',
       },
-    ])('$name', ({ tree, expected }: { tree: Tree; expected: Paths }) => {
+    ])('$name', ({ tree, expected }: { tree: Tree; expected: Paths }): void => {
       expect(treeToPaths(tree)).toStrictEqual(expected);
     });
   });
 
-  describe('normalizeTimestamp()', () => {
+  describe('normalizeTimestamp()', (): void => {
     const version: number = 1;
     const fileHash: FileHash = {
       algorithm: 'sha256',
@@ -1445,7 +1445,7 @@ describe('Internals', () => {
         },
         name: 'should return timestamp for non-empty timestamp',
       },
-    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp | undefined }) => {
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp | undefined }): void => {
       if (undefined === expected) {
         expect(normalizeTimestamp(timestamp)).toBeUndefined();
       } else {

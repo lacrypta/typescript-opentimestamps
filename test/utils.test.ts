@@ -30,8 +30,8 @@ import {
   uint8ArrayReversed,
 } from '../src/utils';
 
-describe('Utils', () => {
-  describe('uint8ArrayToHex()', () => {
+describe('Utils', (): void => {
+  describe('uint8ArrayToHex()', (): void => {
     it.each([
       {
         array: Uint8Array.of(),
@@ -43,12 +43,12 @@ describe('Utils', () => {
         expected: '0102030405060708090a0b0c0d0e0f101112131415',
         name: 'should correctly convert to hex',
       },
-    ])('$name', ({ array, expected }: { array: Uint8Array; expected: string }) => {
+    ])('$name', ({ array, expected }: { array: Uint8Array; expected: string }): void => {
       expect(uint8ArrayToHex(array)).toEqual(expected);
     });
   });
 
-  describe('uint8ArrayFromHex()', () => {
+  describe('uint8ArrayFromHex()', (): void => {
     it.each([
       {
         hex: '',
@@ -80,17 +80,19 @@ describe('Utils', () => {
         hex,
         expected,
         error,
-      }: { hex: string; expected: Uint8Array; error: null } | { hex: string; expected: null; error: Error }) => {
+      }: { hex: string; expected: Uint8Array; error: null } | { hex: string; expected: null; error: Error }): void => {
         if (null === error) {
           expect(uint8ArrayFromHex(hex)).toStrictEqual(expected);
         } else {
-          expect(() => uint8ArrayFromHex(hex)).toThrow(error);
+          expect((): void => {
+            uint8ArrayFromHex(hex);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('uint8ArrayEquals()', () => {
+  describe('uint8ArrayEquals()', (): void => {
     it.each([
       {
         left: Uint8Array.of(),
@@ -116,12 +118,12 @@ describe('Utils', () => {
         expected: true,
         name: 'should return true for equal arrays',
       },
-    ])('$name', ({ left, right, expected }: { left: Uint8Array; right: Uint8Array; expected: boolean }) => {
+    ])('$name', ({ left, right, expected }: { left: Uint8Array; right: Uint8Array; expected: boolean }): void => {
       expect(uint8ArrayEquals(left, right)).toEqual(expected);
     });
   });
 
-  describe('uint8ArrayCompare()', () => {
+  describe('uint8ArrayCompare()', (): void => {
     it.each([
       {
         left: Uint8Array.of(),
@@ -171,12 +173,12 @@ describe('Utils', () => {
         expected: -1,
         name: 'should return negative for bigger right array of different length',
       },
-    ])('$name', ({ left, right, expected }: { left: Uint8Array; right: Uint8Array; expected: number }) => {
+    ])('$name', ({ left, right, expected }: { left: Uint8Array; right: Uint8Array; expected: number }): void => {
       expect(uint8ArrayCompare(left, right)).toEqual(expected);
     });
   });
 
-  describe('uint8ArrayConcat()', () => {
+  describe('uint8ArrayConcat()', (): void => {
     it.each([
       {
         arrays: [],
@@ -198,12 +200,12 @@ describe('Utils', () => {
         expected: Uint8Array.of(1, 2, 3, 4, 5, 6),
         name: 'should treat empty arrays as non-existing',
       },
-    ])('$name', ({ arrays, expected }: { arrays: Uint8Array[]; expected: Uint8Array }) => {
+    ])('$name', ({ arrays, expected }: { arrays: Uint8Array[]; expected: Uint8Array }): void => {
       expect(uint8ArrayConcat(arrays)).toEqual(expected);
     });
   });
 
-  describe('uint8ArrayReversed()', () => {
+  describe('uint8ArrayReversed()', (): void => {
     it.each([
       {
         array: Uint8Array.of(),
@@ -215,19 +217,19 @@ describe('Utils', () => {
         expected: Uint8Array.of(3, 2, 1),
         name: 'should reverse non-return array',
       },
-    ])('$name', ({ array, expected }: { array: Uint8Array; expected: Uint8Array }) => {
+    ])('$name', ({ array, expected }: { array: Uint8Array; expected: Uint8Array }): void => {
       expect(uint8ArrayReversed(array)).toEqual(expected);
     });
   });
 
-  describe('MergeSet<V>', () => {
-    const theToKey: (key: number) => string = (key: number) => key.toString();
-    const theCombine: (left: number, right: number) => number = (left: number, right: number) =>
+  describe('MergeSet<V>', (): void => {
+    const theToKey: (key: number) => string = (key: number): string => key.toString();
+    const theCombine: (left: number, right: number) => number = (left: number, right: number): number =>
       (left % 100) * 100 + right;
 
     const theEmptyMergeSet: MergeSet<number> = new MergeSet<number>(theToKey, theCombine);
 
-    describe('constructor', () => {
+    describe('constructor', (): void => {
       it.each([
         {
           toKey: theToKey,
@@ -245,13 +247,13 @@ describe('Utils', () => {
           toKey: (key: number) => string;
           combine: (left: number, right: number) => number;
           expected: MergeSet<number>;
-        }) => {
+        }): void => {
           expect(new MergeSet<number>(toKey, combine)).toEqual(expected);
         },
       );
     });
 
-    describe('size()', () => {
+    describe('size()', (): void => {
       it.each([
         {
           mergeSet: theEmptyMergeSet,
@@ -268,12 +270,12 @@ describe('Utils', () => {
           expected: 1,
           name: 'should return 1 for singleton MergeSet (again)',
         },
-      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: number }) => {
+      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: number }): void => {
         expect(mergeSet.size()).toEqual(expected);
       });
     });
 
-    describe('values()', () => {
+    describe('values()', (): void => {
       it.each([
         {
           mergeSet: theEmptyMergeSet,
@@ -295,12 +297,12 @@ describe('Utils', () => {
           expected: [101, 2],
           name: 'should return non-singleton for non-singleton MergeSet',
         },
-      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: number[] }) => {
+      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: number[] }): void => {
         expect(mergeSet.values()).toEqual(expected);
       });
     });
 
-    describe('remove()', () => {
+    describe('remove()', (): void => {
       it.each([
         {
           mergeSet: new MergeSet<number>(theToKey, theCombine),
@@ -328,13 +330,21 @@ describe('Utils', () => {
         },
       ])(
         '$name',
-        ({ mergeSet, item, expected }: { mergeSet: MergeSet<number>; item: number; expected: MergeSet<number> }) => {
+        ({
+          mergeSet,
+          item,
+          expected,
+        }: {
+          mergeSet: MergeSet<number>;
+          item: number;
+          expected: MergeSet<number>;
+        }): void => {
           expect(mergeSet.remove(item)).toEqual(expected);
         },
       );
     });
 
-    describe('add()', () => {
+    describe('add()', (): void => {
       it.each([
         {
           mergeSet: new MergeSet<number>(theToKey, theCombine),
@@ -356,13 +366,21 @@ describe('Utils', () => {
         },
       ])(
         '$name',
-        ({ mergeSet, item, expected }: { mergeSet: MergeSet<number>; item: number; expected: MergeSet<number> }) => {
+        ({
+          mergeSet,
+          item,
+          expected,
+        }: {
+          mergeSet: MergeSet<number>;
+          item: number;
+          expected: MergeSet<number>;
+        }): void => {
           expect(mergeSet.add(item)).toEqual(expected);
         },
       );
     });
 
-    describe('incorporate()', () => {
+    describe('incorporate()', (): void => {
       it.each([
         {
           mergeSet: new MergeSet<number>(theToKey, theCombine),
@@ -398,13 +416,13 @@ describe('Utils', () => {
           mergeSet: MergeSet<number>;
           other: MergeSet<number>;
           expected: MergeSet<number>;
-        }) => {
+        }): void => {
           expect(mergeSet.incorporate(other)).toEqual(expected);
         },
       );
     });
 
-    describe('clone()', () => {
+    describe('clone()', (): void => {
       it.each([
         {
           mergeSet: new MergeSet<number>(theToKey, theCombine),
@@ -416,19 +434,20 @@ describe('Utils', () => {
           expected: new MergeSet<number>(theToKey, theCombine).add(1).add(1).add(2),
           name: 'should return same MergeSet when cloning non-empty MergeSet',
         },
-      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: MergeSet<number> }) => {
+      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: MergeSet<number> }): void => {
         expect(mergeSet.clone()).toEqual(expected);
       });
     });
   });
 
-  describe('MergeMap<K, V>', () => {
-    const theToKey: (key: number) => string = (key: number) => key.toString();
-    const theCombine: (left: string, right: string) => string = (left: string, right: string) => `(${left}:${right})`;
+  describe('MergeMap<K, V>', (): void => {
+    const theToKey: (key: number) => string = (key: number): string => key.toString();
+    const theCombine: (left: string, right: string) => string = (left: string, right: string): string =>
+      `(${left}:${right})`;
 
     const theEmptyMergeMap: MergeMap<number, string> = new MergeMap<number, string>(theToKey, theCombine);
 
-    describe('constructor', () => {
+    describe('constructor', (): void => {
       it.each([
         {
           toKey: theToKey,
@@ -446,13 +465,13 @@ describe('Utils', () => {
           toKey: (key: number) => string;
           combine: (left: string, right: string) => string;
           expected: MergeMap<number, string>;
-        }) => {
+        }): void => {
           expect(new MergeMap<number, string>(toKey, combine)).toEqual(expected);
         },
       );
     });
 
-    describe('size()', () => {
+    describe('size()', (): void => {
       it.each([
         {
           mergeMap: theEmptyMergeMap,
@@ -469,12 +488,12 @@ describe('Utils', () => {
           expected: 1,
           name: 'should return 1 for singleton MergeMap (again)',
         },
-      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number }) => {
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number }): void => {
         expect(mergeMap.size()).toEqual(expected);
       });
     });
 
-    describe('keys()', () => {
+    describe('keys()', (): void => {
       it.each([
         {
           mergeMap: theEmptyMergeMap,
@@ -496,12 +515,12 @@ describe('Utils', () => {
           expected: [1, 2],
           name: 'should return non-singleton for non-singleton MergeMap',
         },
-      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number[] }) => {
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: number[] }): void => {
         expect(mergeMap.keys()).toEqual(expected);
       });
     });
 
-    describe('values()', () => {
+    describe('values()', (): void => {
       it.each([
         {
           mergeMap: theEmptyMergeMap,
@@ -523,12 +542,12 @@ describe('Utils', () => {
           expected: ['(a:b)', 'c'],
           name: 'should return non-singleton for non-singleton MergeMap',
         },
-      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: string[] }) => {
+      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: string[] }): void => {
         expect(mergeMap.values()).toEqual(expected);
       });
     });
 
-    describe('entries()', () => {
+    describe('entries()', (): void => {
       it.each([
         {
           mergeMap: theEmptyMergeMap,
@@ -553,12 +572,15 @@ describe('Utils', () => {
           ] as [number, string][],
           name: 'should return non-singleton for non-singleton MergeMap',
         },
-      ])('$name', ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: [number, string][] }) => {
-        expect(mergeMap.entries()).toEqual(expected);
-      });
+      ])(
+        '$name',
+        ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: [number, string][] }): void => {
+          expect(mergeMap.entries()).toEqual(expected);
+        },
+      );
     });
 
-    describe('remove()', () => {
+    describe('remove()', (): void => {
       it.each([
         {
           mergeMap: new MergeMap<number, string>(theToKey, theCombine),
@@ -594,13 +616,13 @@ describe('Utils', () => {
           mergeMap: MergeMap<number, string>;
           item: number;
           expected: MergeMap<number, string>;
-        }) => {
+        }): void => {
           expect(mergeMap.remove(item)).toEqual(expected);
         },
       );
     });
 
-    describe('add()', () => {
+    describe('add()', (): void => {
       it.each([
         {
           mergeMap: new MergeMap<number, string>(theToKey, theCombine),
@@ -635,13 +657,13 @@ describe('Utils', () => {
           key: number;
           value: string;
           expected: MergeMap<number, string>;
-        }) => {
+        }): void => {
           expect(mergeMap.add(key, value)).toEqual(expected);
         },
       );
     });
 
-    describe('incorporate()', () => {
+    describe('incorporate()', (): void => {
       it.each([
         {
           mergeMap: new MergeMap<number, string>(theToKey, theCombine),
@@ -677,13 +699,13 @@ describe('Utils', () => {
           mergeMap: MergeMap<number, string>;
           other: MergeMap<number, string>;
           expected: MergeMap<number, string>;
-        }) => {
+        }): void => {
           expect(mergeMap.incorporate(other)).toEqual(expected);
         },
       );
     });
 
-    describe('clone()', () => {
+    describe('clone()', (): void => {
       it.each([
         {
           mergeMap: new MergeMap<number, string>(theToKey, theCombine),
@@ -697,14 +719,14 @@ describe('Utils', () => {
         },
       ])(
         '$name',
-        ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: MergeMap<number, string> }) => {
+        ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: MergeMap<number, string> }): void => {
           expect(mergeMap.clone()).toEqual(expected);
         },
       );
     });
   });
 
-  describe('fetchBody()', () => {
+  describe('fetchBody()', (): void => {
     it.each([
       {
         response: uint8ArrayFromHex('123abc'),
@@ -784,7 +806,7 @@ describe('Utils', () => {
             responseError: string | Error | null;
             expected: null;
             error: Error;
-          }) => {
+          }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
@@ -803,8 +825,8 @@ describe('Utils', () => {
     );
   });
 
-  describe('retrieveGetBody()', () => {
-    test('should use GET method', () => {
+  describe('retrieveGetBody()', (): void => {
+    test('should use GET method', (): void => {
       jest
         .spyOn(globalThis, 'fetch')
         .mockImplementation((_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
@@ -816,7 +838,7 @@ describe('Utils', () => {
     });
   });
 
-  describe('retrievePostBody()', () => {
+  describe('retrievePostBody()', (): void => {
     it.each([
       {
         body: Uint8Array.of(),
@@ -828,7 +850,7 @@ describe('Utils', () => {
         expected: 'method:POST;body:010203',
         name: 'should post when non-empty body',
       },
-    ])('$name', ({ body, expected }: { body: Uint8Array; expected: string }) => {
+    ])('$name', ({ body, expected }: { body: Uint8Array; expected: string }): void => {
       jest
         .spyOn(globalThis, 'fetch')
         .mockImplementation(

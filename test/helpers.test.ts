@@ -31,8 +31,8 @@ import {
 import { newEdges, newLeaves, newTree } from '../src/internals';
 import { MergeMap, MergeSet, uint8ArrayFromHex } from '../src/utils';
 
-describe('Helpers', () => {
-  describe('opToString()', () => {
+describe('Helpers', (): void => {
+  describe('opToString()', (): void => {
     it.each([
       {
         input: { type: 'sha1' } as Op,
@@ -74,12 +74,12 @@ describe('Helpers', () => {
         expected: 'prepend:010203',
         name: 'should stringify prepend',
       },
-    ])('$name', ({ input, expected }: { input: Op; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Op; expected: string }): void => {
       expect(opToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('edgeToString()', () => {
+  describe('edgeToString()', (): void => {
     it.each([
       {
         input: [{ type: 'sha1' }, newTree()] as Edge,
@@ -121,12 +121,12 @@ describe('Helpers', () => {
         expected: 'prepend:010203=>{[]()}',
         name: 'should stringify prepend edge',
       },
-    ])('$name', ({ input, expected }: { input: Edge; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Edge; expected: string }): void => {
       expect(edgeToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('leafToString()', () => {
+  describe('leafToString()', (): void => {
     it.each([
       {
         input: { type: 'pending', url: new URL('https://www.example.com') } as Leaf,
@@ -153,12 +153,12 @@ describe('Helpers', () => {
         expected: 'ethereum:123',
         name: 'should stringify ethereum leaf',
       },
-    ])('$name', ({ input, expected }: { input: Leaf; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Leaf; expected: string }): void => {
       expect(leafToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('leafOrEdgeToString()', () => {
+  describe('leafOrEdgeToString()', (): void => {
     it.each([
       {
         input: [{ type: 'sha1' }, newTree()] as Edge,
@@ -225,12 +225,12 @@ describe('Helpers', () => {
         expected: 'ethereum:123',
         name: 'should stringify ethereum leaf',
       },
-    ])('$name', ({ input, expected }: { input: Leaf | Edge; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Leaf | Edge; expected: string }): void => {
       expect(leafOrEdgeToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('mergeSetToString()', () => {
+  describe('mergeSetToString()', (): void => {
     it.each([
       {
         input: newLeaves(),
@@ -247,12 +247,12 @@ describe('Helpers', () => {
         expected: 'bitcoin:123,bitcoin:456',
         name: 'should stringify non-empty MergeSet',
       },
-    ])('$name', ({ input, expected }: { input: MergeSet<Leaf>; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: MergeSet<Leaf>; expected: string }): void => {
       expect(mergeSetToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('mergeMapToString()', () => {
+  describe('mergeMapToString()', (): void => {
     it.each([
       {
         input: newEdges(),
@@ -269,12 +269,12 @@ describe('Helpers', () => {
         expected: 'sha1=>{[]()},sha256=>{[]()}',
         name: 'should stringify singleton MergeMap',
       },
-    ])('$name', ({ input, expected }: { input: MergeMap<Op, Tree>; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: MergeMap<Op, Tree>; expected: string }): void => {
       expect(mergeMapToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('treeToString()', () => {
+  describe('treeToString()', (): void => {
     it.each([
       {
         input: newTree(),
@@ -315,12 +315,12 @@ describe('Helpers', () => {
         expected: '[bitcoin:123,bitcoin:456](sha1=>{[]()},sha256=>{[]()})',
         name: 'should stringify tree with two leaves and two edges',
       },
-    ])('$name', ({ input, expected }: { input: Tree; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Tree; expected: string }): void => {
       expect(treeToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('timestampToString()', () => {
+  describe('timestampToString()', (): void => {
     it.each([
       {
         input: {
@@ -344,7 +344,7 @@ describe('Helpers', () => {
           '<1:sha1:0011223344556677889900aabbccddeeff112233:[bitcoin:123,bitcoin:456](sha1=>{[]()},sha256=>{[]()})>',
         name: 'should stringify non-empty timestamp',
       },
-    ])('$name', ({ input, expected }: { input: Timestamp; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: Timestamp; expected: string }): void => {
       expect(timestampToString(input)).toStrictEqual(expected);
     });
   });

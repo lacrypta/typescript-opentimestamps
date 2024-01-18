@@ -21,8 +21,8 @@ import type { Leaf } from '../../src/types';
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
 import { verify } from '../../src/verifiers/blockchain.info';
 
-describe('blockchain.info', () => {
-  describe('verify()', () => {
+describe('blockchain.info', (): void => {
+  describe('verify()', (): void => {
     it.each([
       {
         msg: Uint8Array.of(),
@@ -156,7 +156,7 @@ describe('blockchain.info', () => {
             body: Uint8Array;
             expected: null;
             error: Error;
-          }) => {
+          }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {

@@ -39,8 +39,8 @@ import { uint8ArrayFromHex } from '../src/utils';
 
 import { leafOrEdgeToString, timestampToString, treeToString } from './helpers';
 
-describe('Read', () => {
-  describe('getBytes()', () => {
+describe('Read', (): void => {
+  describe('getBytes()', (): void => {
     it.each([
       {
         length: 0,
@@ -92,17 +92,19 @@ describe('Read', () => {
         error,
       }:
         | { length: number; data: Uint8Array; index: number; expected: [Uint8Array, number]; error: null }
-        | { length: number; data: Uint8Array; index: number; expected: null; error: Error }) => {
+        | { length: number; data: Uint8Array; index: number; expected: null; error: Error }): void => {
         if (null === error) {
           expect(getBytes(length, data, index)).toStrictEqual(expected);
         } else {
-          expect(() => getBytes(length, data, index)).toThrow(error);
+          expect((): void => {
+            getBytes(length, data, index);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('getByte()', () => {
+  describe('getByte()', (): void => {
     it.each([
       {
         data: Uint8Array.of(),
@@ -155,17 +157,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; index: number; expected: [number, number]; error: null }
-        | { data: Uint8Array; index: number; expected: null; error: Error }) => {
+        | { data: Uint8Array; index: number; expected: null; error: Error }): void => {
         if (null === error) {
           expect(getByte(data, index)).toStrictEqual(expected);
         } else {
-          expect(() => getByte(data, index)).toThrow(error);
+          expect((): void => {
+            getByte(data, index);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readUint()', () => {
+  describe('readUint()', (): void => {
     it.each([
       {
         data: Uint8Array.of(0),
@@ -193,17 +197,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [number, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readUint(data, 0)).toStrictEqual(expected);
         } else {
-          expect(() => readUint(data, 0)).toThrow(error);
+          expect((): void => {
+            readUint(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readBytes()', () => {
+  describe('readBytes()', (): void => {
     it.each([
       {
         data: Uint8Array.of(0),
@@ -237,17 +243,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [Uint8Array, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readBytes(data, 0)).toStrictEqual(expected);
         } else {
-          expect(() => readBytes(data, 0)).toThrow(error);
+          expect((): void => {
+            readBytes(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readUrl()', () => {
+  describe('readUrl()', (): void => {
     it.each([
       {
         data: Uint8Array.of(23, ...new TextEncoder().encode('https://www.example.com')),
@@ -269,17 +277,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [URL, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readUrl(data, 0)).toStrictEqual(expected);
         } else {
-          expect(() => readUrl(data, 0)).toThrow(error);
+          expect((): void => {
+            readUrl(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readLiteral()', () => {
+  describe('readLiteral()', (): void => {
     it.each([
       {
         data: Uint8Array.of(1, 2, 3),
@@ -304,17 +314,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; literal: Uint8Array; expected: [Uint8Array, number]; error: null }
-        | { data: Uint8Array; literal: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; literal: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readLiteral(data, 0, literal)).toStrictEqual(expected);
         } else {
-          expect(() => readLiteral(data, 0, literal)).toThrow(error);
+          expect((): void => {
+            readLiteral(data, 0, literal);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readDoneLeafPayload()', () => {
+  describe('readDoneLeafPayload()', (): void => {
     it.each([
       {
         payload: Uint8Array.of(1, 2),
@@ -336,17 +348,19 @@ describe('Read', () => {
         error,
       }:
         | { payload: Uint8Array; expected: number; error: null }
-        | { payload: Uint8Array; expected: null; error: Error }) => {
+        | { payload: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readDoneLeafPayload(payload)).toStrictEqual(expected);
         } else {
-          expect(() => readDoneLeafPayload(payload)).toThrow(error);
+          expect((): void => {
+            readDoneLeafPayload(payload);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readPendingLeafPayload()', () => {
+  describe('readPendingLeafPayload()', (): void => {
     it.each([
       {
         payload: Uint8Array.of(23, ...new TextEncoder().encode('https://www.example.com'), 1, 2, 3),
@@ -368,17 +382,19 @@ describe('Read', () => {
         error,
       }:
         | { payload: Uint8Array; expected: URL; error: null }
-        | { payload: Uint8Array; expected: null; error: Error }) => {
+        | { payload: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readPendingLeafPayload(payload)).toStrictEqual(expected);
         } else {
-          expect(() => readPendingLeafPayload(payload)).toThrow(error);
+          expect((): void => {
+            readPendingLeafPayload(payload);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readLeaf()', () => {
+  describe('readLeaf()', (): void => {
     it.each([
       {
         data: Uint8Array.of(...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
@@ -417,12 +433,12 @@ describe('Read', () => {
         ] as [Leaf, number],
         name: 'should read unknown leaf',
       },
-    ])('$name', ({ data, expected }: { data: Uint8Array; expected: [Leaf, number] }) => {
+    ])('$name', ({ data, expected }: { data: Uint8Array; expected: [Leaf, number] }): void => {
       expect(readLeaf(data, 0)).toStrictEqual(expected);
     });
   });
 
-  describe('readEdgeOrLeaf()', () => {
+  describe('readEdgeOrLeaf()', (): void => {
     it.each([
       {
         data: Uint8Array.of(0x77),
@@ -465,20 +481,22 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [Edge | Leaf, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           const [expectedResult, expectedIdx]: [Edge | Leaf, number] = expected;
           const [result, idx]: [Edge | Leaf, number] = readEdgeOrLeaf(data, 0);
           expect(leafOrEdgeToString(result)).toStrictEqual(leafOrEdgeToString(expectedResult));
           expect(idx).toStrictEqual(expectedIdx);
         } else {
-          expect(() => readEdgeOrLeaf(data, 0)).toThrow(error);
+          expect((): void => {
+            readEdgeOrLeaf(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readTree()', () => {
+  describe('readTree()', (): void => {
     it.each([
       {
         data: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
@@ -519,20 +537,22 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [Tree, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           const [expectedResult, expectedIdx]: [Tree, number] = expected;
           const [result, idx]: [Tree, number] = readTree(data, 0);
           expect(treeToString(result)).toStrictEqual(treeToString(expectedResult));
           expect(idx).toStrictEqual(expectedIdx);
         } else {
-          expect(() => readTree(data, 0)).toThrow(error);
+          expect((): void => {
+            readTree(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readFileHash()', () => {
+  describe('readFileHash()', (): void => {
     it.each([
       {
         data: Uint8Array.of(0x77),
@@ -596,17 +616,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [FileHash, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readFileHash(data, 0)).toStrictEqual(expected);
         } else {
-          expect(() => readFileHash(data, 0)).toThrow(error);
+          expect((): void => {
+            readFileHash(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readVersion()', () => {
+  describe('readVersion()', (): void => {
     it.each([
       {
         data: Uint8Array.of(2),
@@ -628,17 +650,19 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: [number, number]; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(readVersion(data, 0)).toStrictEqual(expected);
         } else {
-          expect(() => readVersion(data, 0)).toThrow(error);
+          expect((): void => {
+            readVersion(data, 0);
+          }).toThrow(error);
         }
       },
     );
   });
 
-  describe('readTimestamp()', () => {
+  describe('readTimestamp()', (): void => {
     it.each([
       {
         data: Uint8Array.of(
@@ -688,11 +712,13 @@ describe('Read', () => {
         error,
       }:
         | { data: Uint8Array; expected: Timestamp; error: null }
-        | { data: Uint8Array; expected: null; error: Error }) => {
+        | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(timestampToString(readTimestamp(data))).toStrictEqual(timestampToString(expected));
         } else {
-          expect(() => readTimestamp(data)).toThrow(error);
+          expect((): void => {
+            readTimestamp(data);
+          }).toThrow(error);
         }
       },
     );

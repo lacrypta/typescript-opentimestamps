@@ -146,7 +146,7 @@ export function newTree(): Tree {
 }
 
 export function decoalesceOperations(tree: Tree): Tree {
-  tree.edges.values().forEach((subTree: Tree) => decoalesceOperations(subTree));
+  tree.edges.values().forEach((subTree: Tree): Tree => decoalesceOperations(subTree));
   if (1 === tree.edges.size()) {
     const [op, subTree]: Edge = tree.edges.entries()[0]!;
     if (0 === subTree.leaves.size() && 2 === subTree.edges.size()) {
@@ -156,7 +156,7 @@ export function decoalesceOperations(tree: Tree): Tree {
         'prepend:prepend' ===
           subTree.edges
             .keys()
-            .map((subOp: Op) => subOp.type)
+            .map((subOp: Op): string => subOp.type)
             .join(':')
       ) {
         const [[subOp1, subSubTree1], [subOp2, subSubTree2]]: [Edge, Edge] = subTree.edges.entries() as [Edge, Edge];
@@ -176,7 +176,7 @@ export function decoalesceOperations(tree: Tree): Tree {
         'append:append' ===
           subTree.edges
             .keys()
-            .map((subOp: Op) => subOp.type)
+            .map((subOp: Op): string => subOp.type)
             .join(':')
       ) {
         const [[subOp1, subSubTree1], [subOp2, subSubTree2]]: [Edge, Edge] = subTree.edges.entries() as [Edge, Edge];
@@ -321,7 +321,7 @@ export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined 
   const tree: Tree = decoalesceOperations(
     coalesceOperations(
       pathsToTree(
-        treeToPaths(timestamp.tree).map((path: Path) => {
+        treeToPaths(timestamp.tree).map((path: Path): { operations: Ops; leaf: Leaf } => {
           return { operations: normalizeOps(path.operations), leaf: path.leaf };
         }),
       ),

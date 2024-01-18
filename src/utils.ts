@@ -23,7 +23,9 @@
  * @returns The resulting Hex string.
  */
 export function uint8ArrayToHex(data: Uint8Array): string {
-  return data.reduce((result: string, value: number) => result + value.toString(16).padStart(2, '0'), '').toLowerCase();
+  return data
+    .reduce((result: string, value: number): string => result + value.toString(16).padStart(2, '0'), '')
+    .toLowerCase();
 }
 
 /**
@@ -39,7 +41,7 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
     throw new Error(`Hex value should be of even length, found ${hex.length}`);
   }
   return Uint8Array.from(
-    (hex.match(/../g) ?? []).map((pair: string) => {
+    (hex.match(/../g) ?? []).map((pair: string): number => {
       if (!pair.match(/^[0-9a-f]{2}$/i)) {
         throw new Error('Malformed hex string');
       }
@@ -49,7 +51,9 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
 }
 
 export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
-  return left.length === right.length && left.every((element: number, index: number) => element === right[index]);
+  return (
+    left.length === right.length && left.every((element: number, index: number): boolean => element === right[index])
+  );
 }
 
 export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
@@ -78,7 +82,7 @@ export function uint8ArrayConcat(arrays: Uint8Array[]): Uint8Array {
 
 export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
   const result: Uint8Array = new Uint8Array(array.length);
-  array.forEach((value: number, index: number) => {
+  array.forEach((value: number, index: number): void => {
     result.set([value], array.length - index - 1);
   });
   return result;
@@ -116,7 +120,9 @@ export class MergeSet<V> {
   }
 
   public incorporate(other: typeof this): this {
-    Object.entries(other.mapping).forEach(([key, value]: [string, V]) => this.doAdd(key, value));
+    Object.entries(other.mapping).forEach(([key, value]: [string, V]): void => {
+      this.doAdd(key, value);
+    });
     return this;
   }
 
@@ -154,7 +160,7 @@ export class MergeMap<K, V> {
   }
 
   public entries(): [K, V][] {
-    return this.keys().map((key: K) => [key, this.mapping[this.toKey(key)]!]);
+    return this.keys().map((key: K): [K, V] => [key, this.mapping[this.toKey(key)]!]);
   }
 
   public remove(value: K): this {
@@ -171,7 +177,9 @@ export class MergeMap<K, V> {
   }
 
   public incorporate(other: typeof this): this {
-    other.entries().map(([key, value]: [K, V]) => this.doAdd(key, value));
+    other.entries().forEach(([key, value]: [K, V]): void => {
+      this.doAdd(key, value);
+    });
     return this;
   }
 

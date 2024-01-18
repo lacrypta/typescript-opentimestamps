@@ -24,8 +24,8 @@ import { uint8ArrayFromHex } from '../src/utils';
 
 import { timestampToString } from './helpers';
 
-describe('Submit', () => {
-  describe('defaultCalendarUrls', () => {
+describe('Submit', (): void => {
+  describe('defaultCalendarUrls', (): void => {
     it.each([
       {
         input: new URL('https://alice.btc.calendar.opentimestamps.org'),
@@ -47,13 +47,13 @@ describe('Submit', () => {
         expected: true,
         name: 'should contain Catallaxy',
       },
-    ])('$name', ({ input, expected }: { input: URL; expected: boolean }) => {
+    ])('$name', ({ input, expected }: { input: URL; expected: boolean }): void => {
       const sInput: string = input.toString();
-      expect(defaultCalendarUrls.some((url: URL) => url.toString() === sInput)).toStrictEqual(expected);
+      expect(defaultCalendarUrls.some((url: URL): boolean => url.toString() === sInput)).toStrictEqual(expected);
     });
   });
 
-  describe('submitTimestamp()', () => {
+  describe('submitTimestamp()', (): void => {
     it.each([
       {
         responseBody: null,
@@ -120,7 +120,7 @@ describe('Submit', () => {
             responseBody: null;
             responseError: Error | string;
             expected: { timestamp: Timestamp | undefined; errors: Error[] };
-          }) => {
+          }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
@@ -229,7 +229,7 @@ describe('Submit', () => {
             responseBody: null;
             responseError: Error | string;
             expected: { timestamp: Timestamp | undefined; errors: Error[] };
-          }) => {
+          }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {

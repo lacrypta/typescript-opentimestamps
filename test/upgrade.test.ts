@@ -24,8 +24,8 @@ import { uint8ArrayFromHex } from '../src/utils';
 
 import { timestampToString, treeToString } from './helpers';
 
-describe('Upgrade', () => {
-  describe('upgradeFromCalendar()', () => {
+describe('Upgrade', (): void => {
+  describe('upgradeFromCalendar()', (): void => {
     it.each([
       {
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
@@ -47,7 +47,7 @@ describe('Upgrade', () => {
         error,
       }:
         | { calendarResponse: Uint8Array; result: Tree; error: null }
-        | { calendarResponse: Uint8Array; result: null; error: Error }) => {
+        | { calendarResponse: Uint8Array; result: null; error: Error }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
@@ -67,7 +67,7 @@ describe('Upgrade', () => {
     );
   });
 
-  describe('upgradeTree()', () => {
+  describe('upgradeTree()', (): void => {
     it.each([
       {
         tree: {
@@ -121,7 +121,7 @@ describe('Upgrade', () => {
         tree: Tree;
         calendarResponse: Uint8Array;
         expected: [Tree, Error[]];
-      }) => {
+      }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
@@ -144,7 +144,7 @@ describe('Upgrade', () => {
     );
   });
 
-  describe('upgradeTimestamp()', () => {
+  describe('upgradeTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -240,7 +240,7 @@ describe('Upgrade', () => {
         timestamp: Timestamp;
         calendarResponse: Uint8Array;
         expected: { timestamp: Timestamp; errors: Error[] };
-      }) => {
+      }): void => {
         jest
           .spyOn(globalThis, 'fetch')
           .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {

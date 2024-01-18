@@ -22,8 +22,8 @@ import { newEdges, newLeaves } from '../src/internals';
 import { canShrinkTimestamp, canUpgradeTimestamp, canVerifyTimestamp } from '../src/predicates';
 import { uint8ArrayFromHex } from '../src/utils';
 
-describe('Predicates', () => {
-  describe('canShrinkTimestamp()', () => {
+describe('Predicates', (): void => {
+  describe('canShrinkTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -63,12 +63,12 @@ describe('Predicates', () => {
         expected: false,
         name: 'should return false when already shrunken',
       },
-    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }) => {
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }): void => {
       expect(canShrinkTimestamp(timestamp, 'bitcoin')).toStrictEqual(expected);
     });
   });
 
-  describe('canUpgradeTimestamp()', () => {
+  describe('canUpgradeTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -110,12 +110,12 @@ describe('Predicates', () => {
         expected: true,
         name: 'should return true when multiple pending',
       },
-    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }) => {
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }): void => {
       expect(canUpgradeTimestamp(timestamp)).toStrictEqual(expected);
     });
   });
 
-  describe('canVerifyTimestamp()', () => {
+  describe('canVerifyTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -157,7 +157,7 @@ describe('Predicates', () => {
         expected: false,
         name: 'should return false when only pending',
       },
-    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }) => {
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: boolean }): void => {
       expect(canVerifyTimestamp(timestamp)).toStrictEqual(expected);
     });
   });

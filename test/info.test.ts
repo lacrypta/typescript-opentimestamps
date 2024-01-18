@@ -22,8 +22,8 @@ import { indent, infoEdge, infoFileHash, infoLeaf, infoTimestamp, infoTree } fro
 import { newEdges, newLeaves, newTree } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 
-describe('Info', () => {
-  describe('indent()', () => {
+describe('Info', (): void => {
+  describe('indent()', (): void => {
     it.each([
       {
         input: '',
@@ -40,12 +40,12 @@ describe('Info', () => {
         expected: ' -> something\n    else\n    entirely',
         name: 'should indent multiline string',
       },
-    ])('$name', ({ input, expected }: { input: string; expected: string }) => {
+    ])('$name', ({ input, expected }: { input: string; expected: string }): void => {
       expect(indent(input)).toStrictEqual(expected);
     });
   });
 
-  describe('infoLeaf()', () => {
+  describe('infoLeaf()', (): void => {
     it.each([
       {
         leaf: { type: 'pending', url: new URL('http://www.example.com') } as Leaf,
@@ -76,12 +76,12 @@ describe('Info', () => {
         expected: 'ethereumVerify(msg, 123)',
         name: 'show ethereum leaf',
       },
-    ])('$name', ({ leaf, expected }: { leaf: Leaf; expected: string }) => {
+    ])('$name', ({ leaf, expected }: { leaf: Leaf; expected: string }): void => {
       expect(infoLeaf(leaf)).toStrictEqual(expected);
     });
   });
 
-  describe('infoEdge()', () => {
+  describe('infoEdge()', (): void => {
     it.each([
       {
         edge: [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()] as Edge,
@@ -122,12 +122,12 @@ describe('Info', () => {
         expected: 'msg = reverse(msg)\n    = 060504\nmsg = reverse(msg)\n    = 040506',
         name: 'should show subtree (verbose)',
       },
-    ])('$name', ({ edge, msg, expected }: { edge: Edge; msg: Uint8Array | undefined; expected: string }) => {
+    ])('$name', ({ edge, msg, expected }: { edge: Edge; msg: Uint8Array | undefined; expected: string }): void => {
       expect(infoEdge(edge, msg)).toStrictEqual(expected);
     });
   });
 
-  describe('infoTree()', () => {
+  describe('infoTree()', (): void => {
     it.each([
       {
         tree: newTree(),
@@ -206,12 +206,12 @@ describe('Info', () => {
           ' -> bitcoinVerify(msg, 123)\n -> msg = sha1(msg)\n        = 7037807198c22a7d2b0807371d763779a84fdfcf\n    bitcoinVerify(msg, 456)',
         name: 'should show tree with leaves and edges (verbose)',
       },
-    ])('$name', ({ tree, msg, expected }: { tree: Tree; msg: Uint8Array | undefined; expected: string }) => {
+    ])('$name', ({ tree, msg, expected }: { tree: Tree; msg: Uint8Array | undefined; expected: string }): void => {
       expect(infoTree(tree, msg)).toStrictEqual(expected);
     });
   });
 
-  describe('infoFileHash()', () => {
+  describe('infoFileHash()', (): void => {
     it.each([
       {
         fileHash: {
@@ -231,12 +231,12 @@ describe('Info', () => {
         expected: 'msg = sha256(FILE)\n    = 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
         name: 'should show fileHash (verbose)',
       },
-    ])('$name', ({ fileHash, verbose, expected }: { fileHash: FileHash; verbose: boolean; expected: string }) => {
+    ])('$name', ({ fileHash, verbose, expected }: { fileHash: FileHash; verbose: boolean; expected: string }): void => {
       expect(infoFileHash(fileHash, verbose)).toStrictEqual(expected);
     });
   });
 
-  describe('infoTimestamp()', () => {
+  describe('infoTimestamp()', (): void => {
     it.each([
       {
         timestamp: {
@@ -304,11 +304,14 @@ describe('Info', () => {
           '# version: 1\nmsg = sha1(FILE)\n    = 0123456789abcdef0123456789abcdef01234567\n ->  -> bitcoinVerify(msg, 123)\n     -> msg = sha1(msg)\n            = ef473bbc24024ac1d66b318ac96bb31a95fd9a7d\n        bitcoinVerify(msg, 456)',
         name: 'should show non-empty timestamp (verbose)',
       },
-    ])('$name', ({ timestamp, verbose, expected }: { timestamp: Timestamp; verbose: boolean; expected: string }) => {
-      expect(infoTimestamp(timestamp, verbose)).toStrictEqual(expected);
-    });
+    ])(
+      '$name',
+      ({ timestamp, verbose, expected }: { timestamp: Timestamp; verbose: boolean; expected: string }): void => {
+        expect(infoTimestamp(timestamp, verbose)).toStrictEqual(expected);
+      },
+    );
 
-    test('should default to non-verbose', () => {
+    test('should default to non-verbose', (): void => {
       expect(
         infoTimestamp({
           version: 1,

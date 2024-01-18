@@ -20,8 +20,8 @@ import { LeafHeader, RLeafHeader, Tag, magicHeader, nonFinal } from '../src/type
 
 import { uint8ArrayToHex } from '../src/utils';
 
-describe('Types', () => {
-  describe('Tag', () => {
+describe('Types', (): void => {
+  describe('Tag', (): void => {
     it.each([
       {
         element: 'attestation',
@@ -68,12 +68,12 @@ describe('Types', () => {
         expected: 0xf3,
         name: 'should have correct hexlify value',
       },
-    ])('$name', ({ element, expected }: { element: string; expected: number }) => {
+    ])('$name', ({ element, expected }: { element: string; expected: number }): void => {
       expect(Tag[element as keyof typeof Tag]).toStrictEqual(expected);
     });
   });
 
-  describe('LeafHeader', () => {
+  describe('LeafHeader', (): void => {
     it.each([
       {
         element: 'bitcoin',
@@ -95,12 +95,12 @@ describe('Types', () => {
         expected: '83dfe30d2ef90c8e',
         name: 'should have correct pending value',
       },
-    ])('$name', ({ element, expected }: { element: string; expected: string }) => {
+    ])('$name', ({ element, expected }: { element: string; expected: string }): void => {
       expect(LeafHeader[element as keyof typeof LeafHeader]).toStrictEqual(expected);
     });
   });
 
-  describe('RLeafHeader', () => {
+  describe('RLeafHeader', (): void => {
     it.each([
       {
         element: '0588960d73d71901',
@@ -122,21 +122,21 @@ describe('Types', () => {
         expected: 'pending',
         name: 'should have correct pending value',
       },
-    ])('$name', ({ element, expected }: { element: string; expected: string }) => {
+    ])('$name', ({ element, expected }: { element: string; expected: string }): void => {
       expect(RLeafHeader[element as keyof typeof RLeafHeader]).toStrictEqual(expected);
     });
   });
 
-  describe('magicHeader', () => {
-    test('should have correct value', () => {
+  describe('magicHeader', (): void => {
+    test('should have correct value', (): void => {
       expect(uint8ArrayToHex(magicHeader)).toStrictEqual(
         '004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294',
       );
     });
   });
 
-  describe('nonFinal', () => {
-    test('should have correct value', () => {
+  describe('nonFinal', (): void => {
+    test('should have correct value', (): void => {
       expect(nonFinal).toStrictEqual(255);
     });
   });

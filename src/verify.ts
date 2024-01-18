@@ -58,7 +58,7 @@ export async function verifyTimestamp(
           [],
         ),
     )
-  ).forEach(([verifierName, leafResult]: [string, number | undefined | Error]) => {
+  ).forEach(([verifierName, leafResult]: [string, number | undefined | Error]): void => {
     if (undefined === leafResult) {
       return;
     } else if (leafResult instanceof Error) {
