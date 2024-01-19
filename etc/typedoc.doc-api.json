@@ -4,8 +4,9 @@
   "plugin": [
     "typedoc-plugin-keywords",
     "typedoc-plugin-katex",
-    "typedoc-plugin-remove-references",
-    "typedoc-plugin-mermaid"
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-mermaid",
+    "typedoc-plugin-remove-references"
   ],
   "keywords": ["OpenTimestamps", "library"],
   "markedOptions": {
