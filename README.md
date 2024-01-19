@@ -17,7 +17,7 @@ It currently supports stamping, upgrading, and verifying timestamps, as well as 
 ## Background
 
 The OpenTimestamps project currently hosts a number of Server, Client, and CLI [implementations](https://opentimestamps.org/#code-repositories).
-This is our contribution to the list, adding TypeScript to the list.
+This is our contribution to that list, adding TypeScript to it.
 
 The project may be used as-is in Typescript directly, or it may be compiled and packaged for usage in the browser or NodeJS modules.
 
@@ -93,18 +93,18 @@ It exports the following functions:
 - **`read`:** read a `Uint8Array` and transform it into a `Timestamp` if valid.
 - **`shrink`:** eliminate all but the _oldest_ attestation found in the given `Timestamp` for the given chain.
 - **`submit`:** submit the given `Timestamp` to a Calendar for eventual inclusion in a blockchain.
-- **`upgrade`:** upgrade the given `Timestamp` cia a Calendar so as to make it independently verifiable.
+- **`upgrade`:** upgrade the given `Timestamp` via a Calendar so as to make it independently verifiable.
 - **`isTimestamp`:** a [TypeScript type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) that simply applies validation to the given `Timestamp`.
 - **`validate`:** validate the given parameter and determine whether it is indeed a `Timestamp` object.
 - **`verify`:** verify the given `Timestamp` against the blockchain(s).
-- **_verifiers_:** a set of predefined lambda functions that will query the blockchain via explorer provider APIs to check for the presence of a given Merkle root on-chain.
+- **_verifiers_:** a set of predefined lambda functions that will query the blockchain via explorer-provider APIs to check for the presence of a given Merkle root on-chain.
 - **`write`:** generate a `Uint8Array` consisting of the standard serialization of the given `Timestamp` value.
 
 More in-depth information and prototypes can be found in the generated documentation.
 
 ## Contributing
 
-This project uses [`pnpm`](https://pnpm.io/) (think `npm` but faster), you'll need to [install it](https://pnpm.io/installation) if you don't already have it.
+This project uses [`pnpm`](https://pnpm.io/) (think `npm` but faster), you'll need to [install it](https://pnpm.io/installation) if you haven't already.
 
 You may clone the repository as usual:
 
@@ -135,7 +135,7 @@ pnpm test
 pnpm doc
 ```
 
-Now navigate to `/dist/docs/api/index.html` (for the end-use documentation) or `/dist/docs/internal/index.html` (for developer documentation) and peruse the generated documentation to your leisure.
+Now navigate to `/dist/docs/api/index.html` (for the end-use documentation) or `/dist/docs/internal/index.html` (for developer documentation) and peruse the generated documentation at your leisure.
 
 Please follow contribution guidelines at [the GitHub repository](https://github.com/lacrypta/typescript-opentimestamps), we encourage PRs!
 
