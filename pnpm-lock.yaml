@@ -1499,7 +1499,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001579
-      electron-to-chromium: 1.4.637
+      electron-to-chromium: 1.4.639
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.22.2)
     dev: true
@@ -1758,8 +1758,8 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==, tarball: https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz}
     dev: true
 
-  /electron-to-chromium@1.4.637:
-    resolution: {integrity: sha512-G7j3UCOukFtxVO1vWrPQUoDk3kL70mtvjc/DC/k2o7lE0wAdq+Vwp1ipagOow+BH0uVztFysLWbkM/RTIrbK3w==, tarball: https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.4.637.tgz}
+  /electron-to-chromium@1.4.639:
+    resolution: {integrity: sha512-CkKf3ZUVZchr+zDpAlNLEEy2NJJ9T64ULWaDgy3THXXlPVPkLu3VOs9Bac44nebVtdwl2geSj6AxTtGDOxoXhg==, tarball: https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.4.639.tgz}
     dev: true
 
   /emittery@0.13.1:
@@ -4118,7 +4118,7 @@ packages:
   /typedoc-plugin-keywords@1.6.0(typedoc@0.25.7):
     resolution: {integrity: sha512-URyCIHw6+Lwil0ywy6lVb2TckfDVGjAWnRnTAiiSZaRaglI6vaaP1EhhwEipOIlHaJSnHZfdwpWe1t4mffTIpA==, tarball: https://registry.npmjs.org/typedoc-plugin-keywords/-/typedoc-plugin-keywords-1.6.0.tgz}
     peerDependencies:
-      typedoc: ^0.25.7
+      typedoc: ^0.25.4
     dependencies:
       typedoc: 0.25.7(typescript@5.3.3)
       typescript: 5.3.3
@@ -4127,7 +4127,7 @@ packages:
   /typedoc-plugin-mermaid@1.10.0(typedoc@0.25.7):
     resolution: {integrity: sha512-NMo+m5FY5SuNR2dgDYwLO/Bu8O1927xPm1B5S5QcqBD9JiNaWP6jbyuPUltJtq9KEZOme3QwLVe1ZPSDr3tsmw==, tarball: https://registry.npmjs.org/typedoc-plugin-mermaid/-/typedoc-plugin-mermaid-1.10.0.tgz}
     peerDependencies:
-      typedoc: ^0.25.7
+      typedoc: '>=0.23.0'
     dependencies:
       html-escaper: 3.0.3
       typedoc: 0.25.7(typescript@5.3.3)
