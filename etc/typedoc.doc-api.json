@@ -24,12 +24,7 @@
   "navigationLinks": {
     "La Crypta": "https://lacrypta.ar"
   },
-  "visibilityFilters": {
-    "protected": true,
-    "private": true,
-    "inherited": false,
-    "external": true
-  },
+  "visibilityFilters": {},
   "validation": {
     "notExported": true,
     "invalidLink": true,
