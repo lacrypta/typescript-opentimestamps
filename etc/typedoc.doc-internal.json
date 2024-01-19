@@ -27,7 +27,7 @@
   "visibilityFilters": {
     "protected": true,
     "private": true,
-    "inherited": false,
+    "inherited": true,
     "external": true
   },
   "validation": {
