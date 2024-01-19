@@ -7,7 +7,7 @@
     "typedoc-plugin-remove-references",
     "typedoc-plugin-mermaid"
   ],
-  "keywords": ["NOSOpenTimestampsTR", "library"],
+  "keywords": ["OpenTimestamps", "library"],
   "markedOptions": {
     "gfm": true
   },
