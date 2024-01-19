@@ -135,7 +135,6 @@ describe('Upgrade', (): void => {
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (_reason: any): void => {
-              console.log(_reason);
               throw new Error('unexpected');
             },
           ),
@@ -260,7 +259,6 @@ describe('Upgrade', (): void => {
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (_reason: any): void => {
-              console.log(_reason);
               throw new Error('unexpected');
             },
           ),
