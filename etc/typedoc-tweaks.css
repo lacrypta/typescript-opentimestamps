@@ -1,0 +1,8 @@
+a.external[target='_blank'] {
+  background-image: none;
+  padding-right: 0px;
+}
+
+div.mermaid {
+  text-align: center;
+}

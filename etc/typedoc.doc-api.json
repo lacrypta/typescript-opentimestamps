@@ -39,5 +39,6 @@
   "treatValidationWarningsAsErrors": false,
   "logLevel": "Verbose",
   "disableSources": false,
-  "tsconfig": "./tsconfig.build.json"
+  "tsconfig": "./tsconfig.build.json",
+  "customCss": "./typedoc-tweaks.css"
 }
