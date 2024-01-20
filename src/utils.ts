@@ -89,14 +89,14 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
 }
 
 export class MergeSet<V> {
-  private mapping: Record<string, V> = {};
+  private readonly mapping: Record<string, V> = {};
 
   constructor(
     private readonly toKey: (key: V) => string,
     private readonly combine: (left: V, right: V) => V,
   ) {}
 
-  protected doAdd(key: string, value: V): this {
+  private doAdd(key: string, value: V): this {
     this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, value) : value;
     return this;
   }
@@ -132,15 +132,15 @@ export class MergeSet<V> {
 }
 
 export class MergeMap<K, V> {
-  private keySet: Record<string, K> = {};
-  private mapping: Record<string, V> = {};
+  private readonly keySet: Record<string, K> = {};
+  private readonly mapping: Record<string, V> = {};
 
   constructor(
     private readonly toKey: (key: K) => string,
     private readonly combine: (left: V, right: V) => V,
   ) {}
 
-  protected doAdd(key: K, value: V): this {
+  private doAdd(key: K, value: V): this {
     const sKey: string = this.toKey(key);
     this.keySet[sKey] = key;
     this.mapping[sKey] = sKey in this.mapping ? this.combine(this.mapping[sKey]!, value) : value;
