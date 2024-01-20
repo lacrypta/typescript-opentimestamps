@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { LeafHeader, RLeafHeader, Tag, magicHeader, nonFinal } from '../src/types';
+import { LeafHeader, Tag, magicHeader, nonFinal } from '../src/types';
 
 import { uint8ArrayToHex } from '../src/utils';
 
@@ -97,33 +97,6 @@ describe('Types', (): void => {
       },
     ])('$name', ({ element, expected }: { element: string; expected: string }): void => {
       expect(LeafHeader[element as keyof typeof LeafHeader]).toStrictEqual(expected);
-    });
-  });
-
-  describe('RLeafHeader', (): void => {
-    it.each([
-      {
-        element: '0588960d73d71901',
-        expected: 'bitcoin',
-        name: 'should have correct bitcoin value',
-      },
-      {
-        element: '06869a0d73d71b45',
-        expected: 'litecoin',
-        name: 'should have correct litecoin value',
-      },
-      {
-        element: '30fe8087b5c7ead7',
-        expected: 'ethereum',
-        name: 'should have correct ethereum value',
-      },
-      {
-        element: '83dfe30d2ef90c8e',
-        expected: 'pending',
-        name: 'should have correct pending value',
-      },
-    ])('$name', ({ element, expected }: { element: string; expected: string }): void => {
-      expect(RLeafHeader[element as keyof typeof RLeafHeader]).toStrictEqual(expected);
     });
   });
 

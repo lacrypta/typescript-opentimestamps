@@ -19,7 +19,7 @@
 import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
 
 import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
-import { RLeafHeader, Tag, magicHeader, nonFinal } from './types';
+import { Tag, magicHeader, nonFinal } from './types';
 import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';
 
@@ -90,11 +90,13 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
   const sHeader: string = uint8ArrayToHex(header);
   switch (sHeader) {
     case '0588960d73d71901':
+      return [{ type: 'bitcoin', height: readDoneLeafPayload(payload) }, idx2];
     case '06869a0d73d71b45':
+      return [{ type: 'litecoin', height: readDoneLeafPayload(payload) }, idx2];
     case '30fe8087b5c7ead7':
-      return [{ type: RLeafHeader[sHeader], height: readDoneLeafPayload(payload) }, idx2];
+      return [{ type: 'ethereum', height: readDoneLeafPayload(payload) }, idx2];
     case '83dfe30d2ef90c8e':
-      return [{ type: RLeafHeader[sHeader], url: readPendingLeafPayload(payload) }, idx2];
+      return [{ type: 'pending', url: readPendingLeafPayload(payload) }, idx2];
     default:
       return [{ type: 'unknown', header, payload }, idx2];
   }

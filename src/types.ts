@@ -76,13 +76,7 @@ export enum LeafHeader {
   litecoin = '06869a0d73d71b45',
   ethereum = '30fe8087b5c7ead7',
   pending = '83dfe30d2ef90c8e',
-}
 
-export enum RLeafHeader {
-  '0588960d73d71901' = 'bitcoin',
-  '06869a0d73d71b45' = 'litecoin',
-  '30fe8087b5c7ead7' = 'ethereum',
-  '83dfe30d2ef90c8e' = 'pending',
 }
 
 export const magicHeader: Uint8Array = uint8ArrayFromHex(
