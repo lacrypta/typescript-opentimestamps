@@ -1004,8 +1004,8 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==, tarball: https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.27.8.tgz}
     dev: true
 
-  /@sinonjs/commons@3.0.0:
-    resolution: {integrity: sha512-jXBtWAF4vmdNmZgD5FoKsVLv3rPgDnLgPbU84LIJ3otV44vJlDRokVng5v8NFJdCf/da9legHcKaRuZs4L7faA==, tarball: https://registry.npmjs.org/@sinonjs/commons/-/commons-3.0.0.tgz}
+  /@sinonjs/commons@3.0.1:
+    resolution: {integrity: sha512-K3mCHKQ9sVh8o1C9cxkwxaOmXoAMlDxC1mYyHrjqOWEcBjYr76t96zL2zlj5dUGZ3HSw240X1qgH3Mjf1yJWpQ==, tarball: https://registry.npmjs.org/@sinonjs/commons/-/commons-3.0.1.tgz}
     dependencies:
       type-detect: 4.0.8
     dev: true
@@ -1013,7 +1013,7 @@ packages:
   /@sinonjs/fake-timers@10.3.0:
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==, tarball: https://registry.npmjs.org/@sinonjs/fake-timers/-/fake-timers-10.3.0.tgz}
     dependencies:
-      '@sinonjs/commons': 3.0.0
+      '@sinonjs/commons': 3.0.1
     dev: true
 
   /@types/babel__core@7.20.5:
