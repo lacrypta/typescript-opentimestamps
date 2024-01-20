@@ -16,5 +16,9 @@
 
 'use strict';
 
-export { verify as verifyViaBlockchainInfo } from './blockchain.info';
-export { verify as verifyViaBlockstream } from './blockstream';
+import type { Verifier } from '../types';
+
+import { default as verifyViaBlockchainInfo } from './blockchain.info';
+import { default as verifyViaBlockstream } from './blockstream';
+
+export default { verifyViaBlockchainInfo, verifyViaBlockstream } satisfies Record<string, Verifier>;

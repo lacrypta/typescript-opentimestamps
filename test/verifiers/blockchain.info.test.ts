@@ -19,7 +19,7 @@
 import type { Leaf } from '../../src/types';
 
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
-import { verify } from '../../src/verifiers/blockchain.info';
+import { default as verify } from '../../src/verifiers/blockchain.info';
 
 const textEncoder: TextEncoder = new TextEncoder();
 

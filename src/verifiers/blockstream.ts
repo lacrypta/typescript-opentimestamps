@@ -27,7 +27,7 @@ import {
   uint8ArrayToHex,
 } from '../utils';
 
-export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
+export default (async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
     return undefined;
   }
@@ -59,4 +59,4 @@ export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<num
     throw new Error(`Merkle root mismatch (expected ${uint8ArrayToHex(expected)} but found ${uint8ArrayToHex(found)})`);
   }
   return block.timestamp;
-};
+}) satisfies Verifier;

@@ -16,7 +16,8 @@
 
 'use strict';
 
-export type { Timestamp } from './types';
+export type { MergeSet, MergeMap } from './utils';
+export type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
 
 export { infoTimestamp as info } from './info';
 export { normalizeTimestamp as normalize } from './internals';
@@ -30,6 +31,7 @@ export { shrinkTimestamp as shrink } from './shrink';
 export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
 export { isTimestamp, validateTimestamp as validate } from './validation';
-export { verifyTimestamp as verify } from './verify';
-export * from './verifiers';
 export { writeTimestamp as write } from './write';
+
+export { verifyTimestamp as verify } from './verify';
+export { default as verifiers } from './verifiers';
