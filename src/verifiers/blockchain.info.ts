@@ -18,14 +18,21 @@
 
 import type { Leaf, Verifier } from '../types';
 
-import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex, uint8ArrayReversed, uint8ArrayToHex } from '../utils';
+import {
+  fetchBody,
+  textDecoder,
+  uint8ArrayEquals,
+  uint8ArrayFromHex,
+  uint8ArrayReversed,
+  uint8ArrayToHex,
+} from '../utils';
 
 export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
     return undefined;
   }
   const block: unknown = JSON.parse(
-    new TextDecoder().decode(await fetchBody(new URL(`https://blockchain.info/rawblock/${leaf.height}`))),
+    textDecoder.decode(await fetchBody(new URL(`https://blockchain.info/rawblock/${leaf.height}`))),
   );
   if (
     'object' !== typeof block ||

@@ -18,20 +18,27 @@
 
 import type { Leaf, Verifier } from '../types';
 
-import { fetchBody, uint8ArrayEquals, uint8ArrayFromHex, uint8ArrayReversed, uint8ArrayToHex } from '../utils';
+import {
+  fetchBody,
+  textDecoder,
+  uint8ArrayEquals,
+  uint8ArrayFromHex,
+  uint8ArrayReversed,
+  uint8ArrayToHex,
+} from '../utils';
 
 export const verify: Verifier = async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
     return undefined;
   }
-  const blockHash: string = new TextDecoder().decode(
+  const blockHash: string = textDecoder.decode(
     await fetchBody(new URL(`https://blockstream.info/api/block-height/${leaf.height}`)),
   );
   if (!/^[0-9a-f]{64}$/i.test(blockHash)) {
     throw new Error('Malformed block hash');
   }
   const block: unknown = JSON.parse(
-    new TextDecoder().decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
+    textDecoder.decode(await fetchBody(new URL(`https://blockstream.info/api/block/${blockHash}`))),
   );
   if (
     'object' !== typeof block ||

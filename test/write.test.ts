@@ -22,6 +22,8 @@ import { newEdges, newLeaves, newTree } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 import { writeBytes, writeEdge, writeFileHash, writeLeaf, writeTimestamp, writeTree, writeUint } from '../src/write';
 
+const textEncoder: TextEncoder = new TextEncoder();
+
 describe('Write', (): void => {
   describe('writeUint()', (): void => {
     it.each([
@@ -90,8 +92,8 @@ describe('Write', (): void => {
         name: 'should write empty bytes',
       },
       {
-        input: new TextEncoder().encode('something'),
-        expected: Uint8Array.of('something'.length, ...new TextEncoder().encode('something')),
+        input: textEncoder.encode('something'),
+        expected: Uint8Array.of('something'.length, ...textEncoder.encode('something')),
         name: 'should write empty bytes',
       },
     ])('$name', ({ input, expected }: { input: Uint8Array; expected: Uint8Array }): void => {

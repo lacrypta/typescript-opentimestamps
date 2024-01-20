@@ -20,7 +20,7 @@ import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
 
 import { compareEdges, compareLeaves } from './internals';
 import { LeafHeader, Tag, magicHeader, nonFinal } from './types';
-import { uint8ArrayConcat, uint8ArrayFromHex } from './utils';
+import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 export function writeUint(value: number): Uint8Array {
   if (!Number.isSafeInteger(value) || value < 0) {
@@ -49,7 +49,7 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
   switch (leaf.type) {
     case 'pending':
       resultParts.push(uint8ArrayFromHex(LeafHeader[leaf.type]));
-      resultParts.push(writeBytes(writeBytes(new TextEncoder().encode(leaf.url.toString()))));
+      resultParts.push(writeBytes(writeBytes(textEncoder.encode(leaf.url.toString()))));
       break;
     case 'unknown':
       resultParts.push(leaf.header);

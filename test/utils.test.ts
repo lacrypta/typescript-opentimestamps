@@ -28,7 +28,11 @@ import {
   retrieveGetBody,
   retrievePostBody,
   uint8ArrayReversed,
+  textDecoder as textDecoderUnderTest,
+  textEncoder as textEncoderUnderTest,
 } from '../src/utils';
+
+const textEncoder: TextEncoder = new TextEncoder();
 
 describe('Utils', (): void => {
   describe('uint8ArrayToHex()', (): void => {
@@ -833,7 +837,7 @@ describe('Utils', (): void => {
           return Promise.resolve(new Response(`method:${init?.method}`));
         });
       expect(retrieveGetBody(new URL('http://www.example.com'))).toStrictEqual(
-        Promise.resolve(new TextEncoder().encode('method:GET')),
+        Promise.resolve(textEncoder.encode('method:GET')),
       );
     });
   });
@@ -856,7 +860,7 @@ describe('Utils', (): void => {
         .mockImplementation(
           async (_input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response> => {
             return new Response(
-              new TextEncoder().encode(
+              textEncoder.encode(
                 `method:${init?.method};body:${uint8ArrayToHex(
                   new Uint8Array(await new Response(init?.body).arrayBuffer()),
                 )}`,
@@ -865,8 +869,20 @@ describe('Utils', (): void => {
           },
         );
       void expect(retrievePostBody(new URL('http://www.example.com'), body)).resolves.toStrictEqual(
-        new TextEncoder().encode(expected),
+        textEncoder.encode(expected),
       );
+    });
+  });
+
+  describe('textEncoder', (): void => {
+    test('should be of TextEncoder class', (): void => {
+      expect(textEncoderUnderTest.constructor.name).toStrictEqual(new TextEncoder().constructor.name);
+    });
+  });
+
+  describe('textDecoder', (): void => {
+    test('should be of TextDecoder class', (): void => {
+      expect(textDecoderUnderTest.constructor.name).toStrictEqual(new TextDecoder().constructor.name);
     });
   });
 });

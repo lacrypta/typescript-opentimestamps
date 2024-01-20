@@ -21,6 +21,8 @@ import type { Leaf } from '../../src/types';
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
 import { verify } from '../../src/verifiers/blockchain.info';
 
+const textEncoder: TextEncoder = new TextEncoder();
+
 describe('blockchain.info', (): void => {
   describe('verify()', (): void => {
     it.each([
@@ -35,7 +37,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode('123'),
+        body: textEncoder.encode('123'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-object response',
@@ -43,7 +45,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode('null'),
+        body: textEncoder.encode('null'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on null response',
@@ -51,7 +53,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode('{}'),
+        body: textEncoder.encode('{}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on missing .mrkl_root key',
@@ -59,7 +61,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode('{"mrkl_root":123}'),
+        body: textEncoder.encode('{"mrkl_root":123}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-string .mrkl_root',
@@ -67,7 +69,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode('{"mrkl_root":"something"}'),
+        body: textEncoder.encode('{"mrkl_root":"something"}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-hex .mrkl_root',
@@ -75,9 +77,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
-          '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}',
-        ),
+        body: textEncoder.encode('{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on missing .time key',
@@ -85,7 +85,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
+        body: textEncoder.encode(
           '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","time":"something"}',
         ),
         expected: null,
@@ -95,7 +95,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
+        body: textEncoder.encode(
           '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","time":-123}',
         ),
         expected: null,
@@ -105,7 +105,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
+        body: textEncoder.encode(
           '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","time":12345678901234567890}',
         ),
         expected: null,
@@ -115,7 +115,7 @@ describe('blockchain.info', (): void => {
       {
         msg: Uint8Array.of(4, 5, 6),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
+        body: textEncoder.encode(
           '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","time":123}',
         ),
         expected: null,
@@ -127,7 +127,7 @@ describe('blockchain.info', (): void => {
       {
         msg: uint8ArrayReversed(uint8ArrayFromHex('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef')),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        body: new TextEncoder().encode(
+        body: textEncoder.encode(
           '{"mrkl_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","time":123}',
         ),
         expected: 123,

@@ -39,6 +39,8 @@ import { uint8ArrayFromHex } from '../src/utils';
 
 import { leafOrEdgeToString, timestampToString, treeToString } from './helpers';
 
+const textEncoder: TextEncoder = new TextEncoder();
+
 describe('Read', (): void => {
   describe('getBytes()', (): void => {
     it.each([
@@ -258,13 +260,13 @@ describe('Read', (): void => {
   describe('readUrl()', (): void => {
     it.each([
       {
-        data: Uint8Array.of(23, ...new TextEncoder().encode('https://www.example.com')),
+        data: Uint8Array.of(23, ...textEncoder.encode('https://www.example.com')),
         expected: [new URL('https://www.example.com'), 24] as [URL, number],
         error: null,
         name: 'should read URL',
       },
       {
-        data: Uint8Array.of(22, ...new TextEncoder().encode('http://www.example.com')),
+        data: Uint8Array.of(22, ...textEncoder.encode('http://www.example.com')),
         expected: null,
         error: new Error('Invalid URL'),
         name: 'should fail for non-https URL',
@@ -363,13 +365,13 @@ describe('Read', (): void => {
   describe('readPendingLeafPayload()', (): void => {
     it.each([
       {
-        payload: Uint8Array.of(23, ...new TextEncoder().encode('https://www.example.com'), 1, 2, 3),
+        payload: Uint8Array.of(23, ...textEncoder.encode('https://www.example.com'), 1, 2, 3),
         expected: null,
         error: new Error('Garbage at end of Pending attestation payload'),
         name: 'should fail when containing garbage at end',
       },
       {
-        payload: Uint8Array.of(23, ...new TextEncoder().encode('https://www.example.com')),
+        payload: Uint8Array.of(23, ...textEncoder.encode('https://www.example.com')),
         expected: new URL('https://www.example.com'),
         error: null,
         name: 'should pass for height payload',
@@ -416,7 +418,7 @@ describe('Read', (): void => {
           ...uint8ArrayFromHex('83dfe30d2ef90c8e'),
           24,
           23,
-          ...new TextEncoder().encode('https://www.example.com'),
+          ...textEncoder.encode('https://www.example.com'),
         ),
         expected: [{ type: 'pending', url: new URL('https://www.example.com') }, 33] as [Leaf, number],
         name: 'should read pending leaf',

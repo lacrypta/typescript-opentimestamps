@@ -21,6 +21,8 @@ import type { Leaf } from '../../src/types';
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
 import { verify } from '../../src/verifiers/blockstream';
 
+const textEncoder: TextEncoder = new TextEncoder();
+
 describe('blockstream', (): void => {
   describe('verify()', (): void => {
     it.each([
@@ -37,7 +39,7 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('something'),
+        blockHashBody: textEncoder.encode('something'),
         blockBody: Uint8Array.of(),
         status: 200,
         expected: null,
@@ -48,8 +50,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode('123'),
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode('123'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-object response',
@@ -57,8 +59,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode('null'),
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode('null'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on null response',
@@ -66,8 +68,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode('{}'),
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode('{}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on missing .merkle_root key',
@@ -75,8 +77,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode('{"merkle_root":123}'),
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode('{"merkle_root":123}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-string .merkle_root',
@@ -84,8 +86,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode('{"merkle_root":"something"}'),
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode('{"merkle_root":"something"}'),
         expected: null,
         error: new Error('Malformed response'),
         name: 'should fail on non-hex .merkle_root',
@@ -93,8 +95,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}',
         ),
         expected: null,
@@ -104,8 +106,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","timestamp":"something"}',
         ),
         expected: null,
@@ -115,8 +117,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","timestamp":-123}',
         ),
         expected: null,
@@ -126,8 +128,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","timestamp":12345678901234567890}',
         ),
         expected: null,
@@ -137,8 +139,8 @@ describe('blockstream', (): void => {
       {
         msg: Uint8Array.of(4, 5, 6),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","timestamp":123}',
         ),
         expected: null,
@@ -150,8 +152,8 @@ describe('blockstream', (): void => {
       {
         msg: uint8ArrayReversed(uint8ArrayFromHex('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef')),
         leaf: { type: 'bitcoin', height: 123 } as Leaf,
-        blockHashBody: new TextEncoder().encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
-        blockBody: new TextEncoder().encode(
+        blockHashBody: textEncoder.encode('fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'),
+        blockBody: textEncoder.encode(
           '{"merkle_root":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","timestamp":123}',
         ),
         expected: 123,

@@ -20,7 +20,7 @@ import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
 
 import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
 import { RLeafHeader, Tag, magicHeader, nonFinal } from './types';
-import { uint8ArrayEquals, uint8ArrayToHex } from './utils';
+import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';
 
 export function getBytes(length: number, data: Uint8Array, index: number): [Uint8Array, number] {
@@ -55,7 +55,7 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
 
 export function readUrl(data: Uint8Array, index: number): [URL, number] {
   const [url, idx]: [Uint8Array, number] = readBytes(data, index);
-  return [new URL(validateCalendarUrl(new TextDecoder().decode(url))), idx];
+  return [new URL(validateCalendarUrl(textDecoder.decode(url))), idx];
 }
 
 export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array): [Uint8Array, number] {

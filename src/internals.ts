@@ -27,6 +27,7 @@ import { LeafHeader, Tag } from './types';
 import {
   MergeMap,
   MergeSet,
+  textEncoder,
   uint8ArrayCompare,
   uint8ArrayConcat,
   uint8ArrayFromHex,
@@ -51,7 +52,7 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
     case 'reverse':
       return uint8ArrayReversed(msg);
     case 'hexlify':
-      return new TextEncoder().encode(uint8ArrayToHex(msg));
+      return textEncoder.encode(uint8ArrayToHex(msg));
   }
 }
 
@@ -68,8 +69,8 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
     switch (left.type) {
       case 'pending':
         return uint8ArrayCompare(
-          new TextEncoder().encode(left.url.toString()),
-          new TextEncoder().encode((right as { url: URL }).url.toString()),
+          textEncoder.encode(left.url.toString()),
+          textEncoder.encode((right as { url: URL }).url.toString()),
         );
       case 'unknown':
         return uint8ArrayCompare(left.payload, (right as { payload: Uint8Array }).payload);
