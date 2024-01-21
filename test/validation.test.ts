@@ -20,6 +20,7 @@ import { incorporateTreeToTree } from '../src/internals';
 import { FileHash, Leaf, Op, Tree } from '../src/types';
 import { MergeMap, MergeSet, uint8ArrayFromHex } from '../src/utils';
 import {
+  assertTimestamp,
   isTimestamp,
   validateCalendarUrl,
   validateFileHash,
@@ -1139,6 +1140,86 @@ describe('Validation', (): void => {
       } else {
         expect((): void => {
           validateTimestamp(obj);
+        }).toThrow(error);
+      }
+    });
+  });
+
+  describe('assertTimestamp()', (): void => {
+    it.each([
+      {
+        obj: 123,
+        error: new Error('Expected non-null object'),
+        name: 'should fail when input is not a non-null object',
+      },
+      {
+        obj: {},
+        error: new Error('Expected key .version'),
+        name: 'should fail when input has no .version key',
+      },
+      {
+        obj: { version: null },
+        error: new Error('Expected key .fileHash'),
+        name: 'should fail when input has no .fileHash key',
+      },
+      {
+        obj: { version: null, fileHash: null },
+        error: new Error('Expected key .tree'),
+        name: 'should fail when input has no .tree key',
+      },
+      {
+        obj: { version: null, fileHash: null, tree: null },
+        error: new Error('Expected number'),
+        name: 'should fail when input has malformed .version',
+      },
+      {
+        obj: { version: 1, fileHash: null, tree: null },
+        error: new Error('Expected non-null object'),
+        name: 'should fail when input has malformed .fileHash',
+      },
+      {
+        obj: {
+          version: 1,
+          fileHash: {
+            algorithm: 'sha256',
+            value: uint8ArrayFromHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
+          },
+          tree: null,
+        },
+        error: new Error('Expected non-null object'),
+        name: 'should fail when input has malformed .tree',
+      },
+      {
+        obj: {
+          version: 1,
+          fileHash: {
+            algorithm: 'sha256',
+            value: uint8ArrayFromHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
+          },
+          tree: {
+            leaves: new MergeSet<Leaf>(
+              (_key: Leaf): string => '',
+              (_left: Leaf, _right: Leaf): Leaf => {
+                return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
+              },
+            ),
+            edges: new MergeMap<Op, Tree>(
+              (_key: Op): string => '',
+              (left: Tree, right: Tree): Tree => {
+                return incorporateTreeToTree(left, right);
+              },
+            ),
+          },
+        },
+        error: null,
+        name: 'should pass for well-formed timestamp',
+      },
+    ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
+      if (null === error) {
+        expect((): void => { assertTimestamp(obj); }).not.toThrow();
+      } else {
+        expect((): void => {
+          assertTimestamp(obj);
         }).toThrow(error);
       }
     });

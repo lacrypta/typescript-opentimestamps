@@ -309,3 +309,7 @@ export function isTimestamp(timestamp: unknown): timestamp is Timestamp {
     return false;
   }
 }
+
+export function assertTimestamp(timestamp: unknown): asserts timestamp is Timestamp {
+  void validateTimestamp(timestamp);
+}

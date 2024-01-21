@@ -30,7 +30,7 @@ export { readTimestamp as read } from './read';
 export { shrinkTimestamp as shrink } from './shrink';
 export { submitTimestamp as submit } from './submit';
 export { upgradeTimestamp as upgrade } from './upgrade';
-export { isTimestamp, validateTimestamp as validate } from './validation';
+export { isTimestamp, assertTimestamp, validateTimestamp as validate } from './validation';
 export { writeTimestamp as write } from './write';
 
 export { verifyTimestamp as verify } from './verify';
