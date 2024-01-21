@@ -227,9 +227,8 @@ describe('Utils', (): void => {
   });
 
   describe('MergeSet<V>', (): void => {
-    const theToKey: (key: number) => string = (key: number): string => key.toString();
-    const theCombine: (left: number, right: number) => number = (left: number, right: number): number =>
-      (left % 100) * 100 + right;
+    const theToKey: MergeSet.ToKey<number> = (key: number): string => key.toString();
+    const theCombine: MergeSet.Combine<number> = (left: number, right: number): number => (left % 100) * 100 + right;
 
     const theEmptyMergeSet: MergeSet<number> = new MergeSet<number>(theToKey, theCombine);
 

@@ -88,13 +88,24 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
   return result;
 }
 
-export class MergeSet<V> {
-  private readonly mapping: Record<string, V> = {};
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace MergeSet {
+  export type ToKey<V> = (key: V) => string;
+  export type Combine<V> = (left: V, right: V) => V;
+}
 
-  constructor(
-    private readonly toKey: (key: V) => string,
-    private readonly combine: (left: V, right: V) => V,
-  ) {}
+export class MergeSet<V> {
+  private readonly mapping: Record<string, V>;
+
+  private readonly toKey: MergeSet.ToKey<V>;
+
+  private readonly combine: MergeSet.Combine<V>;
+
+  constructor(toKey: MergeSet.ToKey<V>, combine: MergeSet.Combine<V>) {
+    this.mapping = {};
+    this.toKey = toKey;
+    this.combine = combine;
+  }
 
   private doAdd(key: string, value: V): this {
     this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, value) : value;
