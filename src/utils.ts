@@ -125,10 +125,6 @@ export class MergeSet<V> {
     });
     return this;
   }
-
-  public clone(): MergeSet<V> {
-    return new MergeSet<V>(this.toKey, this.combine).incorporate(this);
-  }
 }
 
 export class MergeMap<K, V> {
@@ -181,10 +177,6 @@ export class MergeMap<K, V> {
       this.doAdd(key, value);
     });
     return this;
-  }
-
-  public clone(): MergeMap<K, V> {
-    return new MergeMap<K, V>(this.toKey, this.combine).incorporate(this);
   }
 }
 

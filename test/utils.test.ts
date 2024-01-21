@@ -425,23 +425,6 @@ describe('Utils', (): void => {
         },
       );
     });
-
-    describe('clone()', (): void => {
-      it.each([
-        {
-          mergeSet: new MergeSet<number>(theToKey, theCombine),
-          expected: new MergeSet<number>(theToKey, theCombine),
-          name: 'should return empty MergeSet when cloning empty MergeSet',
-        },
-        {
-          mergeSet: new MergeSet<number>(theToKey, theCombine).add(1).add(2).add(1),
-          expected: new MergeSet<number>(theToKey, theCombine).add(1).add(1).add(2),
-          name: 'should return same MergeSet when cloning non-empty MergeSet',
-        },
-      ])('$name', ({ mergeSet, expected }: { mergeSet: MergeSet<number>; expected: MergeSet<number> }): void => {
-        expect(mergeSet.clone()).toEqual(expected);
-      });
-    });
   });
 
   describe('MergeMap<K, V>', (): void => {
@@ -705,26 +688,6 @@ describe('Utils', (): void => {
           expected: MergeMap<number, string>;
         }): void => {
           expect(mergeMap.incorporate(other)).toEqual(expected);
-        },
-      );
-    });
-
-    describe('clone()', (): void => {
-      it.each([
-        {
-          mergeMap: new MergeMap<number, string>(theToKey, theCombine),
-          expected: new MergeMap<number, string>(theToKey, theCombine),
-          name: 'should return empty MergeMap when cloning empty MergeMap',
-        },
-        {
-          mergeMap: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(2, 'b').add(1, 'c'),
-          expected: new MergeMap<number, string>(theToKey, theCombine).add(1, 'a').add(1, 'c').add(2, 'b'),
-          name: 'should return same MergeMap when cloning non-empty MergeMap',
-        },
-      ])(
-        '$name',
-        ({ mergeMap, expected }: { mergeMap: MergeMap<number, string>; expected: MergeMap<number, string> }): void => {
-          expect(mergeMap.clone()).toEqual(expected);
         },
       );
     });
