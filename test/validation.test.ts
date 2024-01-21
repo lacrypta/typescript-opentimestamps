@@ -1216,7 +1216,9 @@ describe('Validation', (): void => {
       },
     ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
-        expect((): void => { assertTimestamp(obj); }).not.toThrow();
+        expect((): void => {
+          assertTimestamp(obj);
+        }).not.toThrow();
       } else {
         expect((): void => {
           assertTimestamp(obj);
