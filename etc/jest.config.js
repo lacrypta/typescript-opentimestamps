@@ -1,6 +1,4 @@
-// eslint-disable-next-line tsdoc/syntax
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-// eslint-disable-next-line no-undef
 module.exports = {
   clearMocks: true,
   collectCoverage: true,

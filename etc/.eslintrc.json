@@ -5,7 +5,7 @@
     "project": "./etc/tsconfig.eslint.json"
   },
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/strict-type-checked", "prettier"],
-  "plugins": ["import", "@typescript-eslint", "eslint-plugin-tsdoc"],
+  "plugins": ["import", "@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-non-null-assertion": 0,
     "@typescript-eslint/no-unused-vars": [
@@ -17,8 +17,7 @@
         "caughtErrorsIgnorePattern": "^_",
         "destructuredArrayIgnorePattern": "^_"
       }
-    ],
-    "tsdoc/syntax": ["error"]
+    ]
   },
   "ignorePatterns": ["pnpm-lock.yaml", "dist/"],
   "settings": {
