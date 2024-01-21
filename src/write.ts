@@ -32,15 +32,15 @@ export function writeUint(value: number): Uint8Array {
     value >>>= 7;
   }
   resultParts.push(Uint8Array.of(value));
-  return uint8ArrayConcat(resultParts);
+  return uint8ArrayConcat(...resultParts);
 }
 
 export function writeBytes(bytes: Uint8Array): Uint8Array {
-  return uint8ArrayConcat([writeUint(bytes.length), bytes]);
+  return uint8ArrayConcat(writeUint(bytes.length), bytes);
 }
 
 export function writeFileHash(fileHash: FileHash): Uint8Array {
-  return uint8ArrayConcat([Uint8Array.of(Tag[fileHash.algorithm]), fileHash.value]);
+  return uint8ArrayConcat(Uint8Array.of(Tag[fileHash.algorithm]), fileHash.value);
 }
 
 export function writeLeaf(leaf: Leaf): Uint8Array {
@@ -59,7 +59,7 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
       resultParts.push(uint8ArrayFromHex(LeafHeader[leaf.type]));
       resultParts.push(writeBytes(writeUint(leaf.height)));
   }
-  return uint8ArrayConcat(resultParts);
+  return uint8ArrayConcat(...resultParts);
 }
 
 export function writeEdge(edge: Edge): Uint8Array {
@@ -70,7 +70,7 @@ export function writeEdge(edge: Edge): Uint8Array {
     resultParts.push(writeBytes(op.operand));
   }
   resultParts.push(writeTree(tree));
-  return uint8ArrayConcat(resultParts);
+  return uint8ArrayConcat(...resultParts);
 }
 
 export function writeTree(tree: Tree): Uint8Array {
@@ -95,14 +95,14 @@ export function writeTree(tree: Tree): Uint8Array {
   } else if (0 < leaves.length) {
     resultParts.push(writeLeaf(leaves[leaves.length - 1]!));
   }
-  return uint8ArrayConcat(resultParts);
+  return uint8ArrayConcat(...resultParts);
 }
 
 export function writeTimestamp(timestamp: Timestamp): Uint8Array {
-  return uint8ArrayConcat([
+  return uint8ArrayConcat(
     magicHeader,
     writeUint(timestamp.version),
     writeFileHash(timestamp.fileHash),
     writeTree(timestamp.tree),
-  ]);
+  );
 }

@@ -164,11 +164,11 @@ export function decoalesceOperations(tree: Tree): Tree {
         tree.edges
           .remove(op)
           .add(
-            { type: 'prepend', operand: uint8ArrayConcat([(subOp1 as { operand: Uint8Array }).operand, op.operand]) },
+            { type: 'prepend', operand: uint8ArrayConcat((subOp1 as { operand: Uint8Array }).operand, op.operand) },
             subSubTree1,
           )
           .add(
-            { type: 'prepend', operand: uint8ArrayConcat([(subOp2 as { operand: Uint8Array }).operand, op.operand]) },
+            { type: 'prepend', operand: uint8ArrayConcat((subOp2 as { operand: Uint8Array }).operand, op.operand) },
             subSubTree2,
           );
       } else if (
@@ -184,11 +184,11 @@ export function decoalesceOperations(tree: Tree): Tree {
         tree.edges
           .remove(op)
           .add(
-            { type: 'append', operand: uint8ArrayConcat([op.operand, (subOp1 as { operand: Uint8Array }).operand]) },
+            { type: 'append', operand: uint8ArrayConcat(op.operand, (subOp1 as { operand: Uint8Array }).operand) },
             subSubTree1,
           )
           .add(
-            { type: 'append', operand: uint8ArrayConcat([op.operand, (subOp2 as { operand: Uint8Array }).operand]) },
+            { type: 'append', operand: uint8ArrayConcat(op.operand, (subOp2 as { operand: Uint8Array }).operand) },
             subSubTree2,
           );
       }
@@ -208,11 +208,9 @@ export function coalesceOperations(tree: Tree): Tree {
       if ('prepend' === op.type && 'prepend' === subOp.type) {
         tree.edges
           .remove(op)
-          .add({ type: 'prepend', operand: uint8ArrayConcat([subOp.operand, op.operand]) }, subSubTree);
+          .add({ type: 'prepend', operand: uint8ArrayConcat(subOp.operand, op.operand) }, subSubTree);
       } else if ('append' === op.type && 'append' === subOp.type) {
-        tree.edges
-          .remove(op)
-          .add({ type: 'append', operand: uint8ArrayConcat([op.operand, subOp.operand]) }, subSubTree);
+        tree.edges.remove(op).add({ type: 'append', operand: uint8ArrayConcat(op.operand, subOp.operand) }, subSubTree);
       }
     }
   });
@@ -249,17 +247,17 @@ export function normalizeOps(operations: Ops): Ops {
       case 'append':
         // append(reverse(x), s) --> reverse(prepend(x, reverse(s)))
         if (reverse) {
-          prefix = uint8ArrayConcat([uint8ArrayReversed(thisOp.operand), prefix]);
+          prefix = uint8ArrayConcat(uint8ArrayReversed(thisOp.operand), prefix);
         } else {
-          suffix = uint8ArrayConcat([suffix, thisOp.operand]);
+          suffix = uint8ArrayConcat(suffix, thisOp.operand);
         }
         break;
       case 'prepend':
         // prepend(reverse(x), s) --> reverse(append(x, reverse(s)))
         if (reverse) {
-          suffix = uint8ArrayConcat([suffix, uint8ArrayReversed(thisOp.operand)]);
+          suffix = uint8ArrayConcat(suffix, uint8ArrayReversed(thisOp.operand));
         } else {
-          prefix = uint8ArrayConcat([thisOp.operand, prefix]);
+          prefix = uint8ArrayConcat(thisOp.operand, prefix);
         }
         break;
       default:

@@ -205,7 +205,7 @@ describe('Utils', (): void => {
         name: 'should treat empty arrays as non-existing',
       },
     ])('$name', ({ arrays, expected }: { arrays: Uint8Array[]; expected: Uint8Array }): void => {
-      expect(uint8ArrayConcat(arrays)).toEqual(expected);
+      expect(uint8ArrayConcat(...arrays)).toEqual(expected);
     });
   });
 
