@@ -427,9 +427,8 @@ describe('Utils', (): void => {
   });
 
   describe('MergeMap<K, V>', (): void => {
-    const theToKey: (key: number) => string = (key: number): string => key.toString();
-    const theCombine: (left: string, right: string) => string = (left: string, right: string): string =>
-      `(${left}:${right})`;
+    const theToKey: MergeMap.ToKey<number> = (key: number): string => key.toString();
+    const theCombine: MergeMap.Combine<string> = (left: string, right: string): string => `(${left}:${right})`;
 
     const theEmptyMergeMap: MergeMap<number, string> = new MergeMap<number, string>(theToKey, theCombine);
 

@@ -138,14 +138,24 @@ export class MergeSet<V> {
   }
 }
 
-export class MergeMap<K, V> {
-  private readonly keySet: Record<string, K> = {};
-  private readonly mapping: Record<string, V> = {};
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace MergeMap {
+  export type ToKey<K> = (key: K) => string;
+  export type Combine<V> = (left: V, right: V) => V;
+}
 
-  constructor(
-    private readonly toKey: (key: K) => string,
-    private readonly combine: (left: V, right: V) => V,
-  ) {}
+export class MergeMap<K, V> {
+  private readonly keySet: Record<string, K>;
+  private readonly mapping: Record<string, V>;
+  private readonly toKey: MergeMap.ToKey<K>;
+  private readonly combine: MergeMap.Combine<V>;
+
+  constructor(toKey: MergeMap.ToKey<K>, combine: MergeMap.Combine<V>) {
+    this.keySet = {};
+    this.mapping = {};
+    this.toKey = toKey;
+    this.combine = combine;
+  }
 
   private doAdd(key: K, value: V): this {
     const sKey: string = this.toKey(key);
