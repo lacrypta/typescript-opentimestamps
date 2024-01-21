@@ -180,8 +180,8 @@ export class MergeMap<K, V> {
     return this.keys().map((key: K): [K, V] => [key, this.mapping[this.toKey(key)]!]);
   }
 
-  public remove(value: K): this {
-    const sKey: string = this.toKey(value);
+  public remove(key: K): this {
+    const sKey: string = this.toKey(key);
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete this.mapping[sKey];
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -201,9 +201,9 @@ export class MergeMap<K, V> {
   }
 }
 
-export async function fetchBody(input: URL, init?: RequestInit): Promise<Uint8Array> {
+export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Array> {
   try {
-    const response: Response = await fetch(input, init);
+    const response: Response = await fetch(url, init);
     if (!response.ok || null === response.body) {
       throw new Error('Error retrieving response body');
     }
