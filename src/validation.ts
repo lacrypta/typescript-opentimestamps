@@ -61,7 +61,7 @@ export function validateNonNegativeInteger(num: unknown): number {
     throw new Error('Expected safe-integer');
   }
   if (num < 0) {
-    throw new Error('Expected positive integer');
+    throw new Error('Expected non-negative integer');
   }
   return num;
 }
@@ -153,7 +153,7 @@ export function validateObjectHasEdgesKey(obj: object): { edges: MergeMap<Op, Tr
   return obj as { edges: MergeMap<Op, Tree> };
 }
 
-export function validateObjectHashAlgorithmKey(obj: object): { algorithm: string } {
+export function validateObjectHasAlgorithmKey(obj: object): { algorithm: string } {
   if (!('algorithm' in obj)) {
     throw new Error('Expected key .algorithm');
   }
@@ -165,7 +165,7 @@ export function validateObjectHashAlgorithmKey(obj: object): { algorithm: string
   return obj as { algorithm: string };
 }
 
-export function validateObjectHashValueKey(obj: object): { value: Uint8Array } {
+export function validateObjectHasValueKey(obj: object): { value: Uint8Array } {
   if (!('value' in obj)) {
     throw new Error('Expected key .value');
   }
@@ -268,7 +268,7 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
 
 export function validateFileHash(fileHash: unknown): FileHash {
   const obj: object = validateNonNullObject(fileHash);
-  validateFileHashValue(validateObjectHashAlgorithmKey(obj).algorithm, validateObjectHashValueKey(obj).value);
+  validateFileHashValue(validateObjectHasAlgorithmKey(obj).algorithm, validateObjectHasValueKey(obj).value);
   return fileHash as FileHash;
 }
 

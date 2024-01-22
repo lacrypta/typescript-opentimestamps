@@ -36,8 +36,8 @@ import {
   validateObjectHasPayloadKey,
   validateObjectHasTypeKey,
   validateObjectHasUrlKey,
-  validateObjectHashAlgorithmKey,
-  validateObjectHashValueKey,
+  validateObjectHasAlgorithmKey,
+  validateObjectHasValueKey,
   validateOneOfStrings,
   validateOp,
   validateTimestamp,
@@ -194,7 +194,7 @@ describe('Validation', (): void => {
       },
       {
         obj: -5,
-        error: new Error('Expected positive integer'),
+        error: new Error('Expected non-negative integer'),
         name: 'should fail for negative number',
       },
       {
@@ -488,7 +488,7 @@ describe('Validation', (): void => {
     });
   });
 
-  describe('validateObjectHashAlgorithmKey()', (): void => {
+  describe('validateObjectHasAlgorithmKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -527,16 +527,16 @@ describe('Validation', (): void => {
       },
     ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
-        expect(validateObjectHashAlgorithmKey(obj)).toBe(obj);
+        expect(validateObjectHasAlgorithmKey(obj)).toBe(obj);
       } else {
         expect((): void => {
-          validateObjectHashAlgorithmKey(obj);
+          validateObjectHasAlgorithmKey(obj);
         }).toThrow(error);
       }
     });
   });
 
-  describe('validateObjectHashValueKey()', (): void => {
+  describe('validateObjectHasValueKey()', (): void => {
     it.each([
       {
         obj: {},
@@ -560,10 +560,10 @@ describe('Validation', (): void => {
       },
     ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
-        expect(validateObjectHashValueKey(obj)).toBe(obj);
+        expect(validateObjectHasValueKey(obj)).toBe(obj);
       } else {
         expect((): void => {
-          validateObjectHashValueKey(obj);
+          validateObjectHasValueKey(obj);
         }).toThrow(error);
       }
     });
