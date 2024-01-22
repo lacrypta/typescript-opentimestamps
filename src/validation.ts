@@ -303,7 +303,7 @@ export function validateTimestamp(timestamp: unknown): Timestamp {
 
 export function isTimestamp(timestamp: unknown): timestamp is Timestamp {
   try {
-    validateTimestamp(timestamp);
+    assertTimestamp(timestamp);
     return true;
   } catch {
     return false;
