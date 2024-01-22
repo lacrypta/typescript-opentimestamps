@@ -50,8 +50,8 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayFromHex('10203040506')));  // Uncaught Error: Hex value should be of even length, found 11
- * console.log(uint8ArrayFromHex('102030405x')));   // Uncaught Error: Malformed hex string
+ * console.log(uint8ArrayFromHex('102030405')));   // Uncaught Error: Hex value should be of even length, found 9
+ * console.log(uint8ArrayFromHex('102030405x')));  // Uncaught Error: Malformed hex string
  * ```
  *
  * @param hex - Hex string to deserialize.
@@ -205,6 +205,29 @@ export namespace MergeSet {
  * - **{@link combine}:** takes two elements and returns the result of _combining_ them into a single element (this is used to store a single
  *   copy of every element in the `MergeSet`)
  *
+ * @example
+ * ```typescript
+ * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+ * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+ *
+ * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+ *
+ * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+ * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
+ * aMergeSet.remove('a');
+ * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
+ * console.log(aMergeSet.size());    // 3
+ *
+ * const anotherMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+ * anotherMergeSet.add('w').add('x').add('y').add('z');
+ *
+ * aMergeSet.incorporate(anotherMergeSet);
+ * console.log(aMergeSet.values());  // [ 'b', 'c', 'd', 'w', 'x', 'y', 'z' ]
+ * console.log(aMergeSet.size());    // 7
+ * ```
+ *
  * @typeParam V - The type of the contained elements.
  */
 export class MergeSet<V> {
@@ -235,11 +258,12 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * const theMergeSet: MergeSet<number> = new MergeSet<number>(
-   *     (key: number): string => key.toString(),
-   *     (left: number, right: number): number => (left % 100) * 100 + right,
-   * );  // this MergeSet will take two numbers as equal if they're indeed equal, and
-   *     // merge them by keeping the 2 least significant digits and concatenating them.
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    * ```
    *
    * @typeParam V - The type of the contained elements.
@@ -269,8 +293,15 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * console.log(anEmptyMergeSet.size());         // 0
-   * console.log(aMergeSetWith6Elements.size());  // 6
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   *
+   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+   * console.log(aMergeSet.size());    // 4
    * ```
    *
    * @returns The number of elements in the {@link MergeSet}.
@@ -284,7 +315,15 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeSet.values());  // [ 1, 2, 3 ]
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   *
+   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
    * ```
    *
    * @returns The list of values in the {@link MergeSet}.
@@ -298,7 +337,18 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeSet.remove(1).values());  // [ 2, 3 ]
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   *
+   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
+   *
+   * aMergeSet.remove('a');
+   * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
    * ```
    *
    * @param value - The value to remove.
@@ -315,7 +365,18 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeSet.add(4).values());  // [ 1, 2, 3, 4 ]
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   *
+   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
+   *
+   * aMergeSet.add('d');
+   * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
    * ```
    *
    * @param value - The value to add to the {@link MergeSet}.
@@ -330,7 +391,19 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeSet.incorporate(someOtherMergeSet).values());  // [ 1, 2, 3, 4, 5, 6 ]
+   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
+   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   *
+   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
+   *
+   * const anotherMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
+   * anotherMergeSet.add('w').add('x').add('y').add('z');
+   *
+   * aMergeSet.incorporate(anotherMergeSet);
+   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd', 'w', 'x', 'y', 'z' ]
    * ```
    *
    * @param other - The {@link MergeSet} to incorporate into this one.
@@ -383,6 +456,41 @@ export namespace MergeMap {
  * - **{@link combine}:** takes two values and returns the result of _combining_ them into a single value (this is used to store a single
  *   copy of every key / value pair in the `MergeMap`)
  *
+ * @example
+ * ```typescript
+ * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+ * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+ *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+ *
+ * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+ *
+ * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+ * aMergeMap.add(4, 'd');
+ *
+ * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
+ * console.log(aMergeMap.keys());     // [ 1, 2, 3, 4 ]
+ * console.log(aMergeMap.values());   // [ '(a:aa)', 'b', 'c', 'd' ]
+ * console.log(aMergeMap.size());     // 4
+ *
+ * aMergeMap.remove(4);
+ *
+ * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
+ * console.log(aMergeMap.keys());     // [ 1, 2, 3 ]
+ * console.log(aMergeMap.values());   // [ '(a:aa)', 'b', 'c' ]
+ * console.log(aMergeMap.size());     // 3
+ *
+ * const anotherMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+ * anotherMergeMap.add(1, 'w').add(2, 'x').add(3, 'y').add(4, 'z');
+ * aMergeMap.incorporate(anotherMergeMap);
+ *
+ * console.log(aMergeMap.entries());  // [ [ 1, '((a:aa):w)' ], [ 2, '(b:x)' ], [ 3, '(c:y)' ], [ 4, 'z' ] ]
+ * console.log(aMergeMap.keys());     // [ 1, 2, 3, 4 ]
+ * console.log(aMergeMap.values());   // [ '((a:aa):w)', '(b:x)', '(c:y)', 'z' ]
+ * console.log(aMergeMap.size());     // 4
+ * ```
+ *
  * @typeParam K - The type of the contained keys.
  * @typeParam V - The type of the contained values.
  */
@@ -422,11 +530,13 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * const theMergeMap: MergeMap<number> = new MergeMap<number>(
-   *     (key: number): string => key.toString(),
-   *     (left: string, right: string): string => `(${left}:${right})`,
-   * );  // this MergeMap will take two numbers as equal if they're indeed equal, and
-   *     // merge their associated values by parenthesizing them.
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
    * ```
    *
    * @typeParam K - The type of the contained keys.
@@ -460,8 +570,17 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(anEmptyMergeMap.size());         // 0
-   * console.log(aMergeMapWith6Elements.size());  // 6
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   *
+   * console.log(aMergeMap.size());  // 3
    * ```
    *
    * @returns The number of elements in the {@link MergeMap}.
@@ -475,7 +594,17 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.keys());  // [ 1, 2, 3 ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   *
+   * console.log(aMergeMap.keys());  // [ 1, 2, 3 ]
    * ```
    *
    * @returns The list of keys in the {@link MergeMap}.
@@ -489,7 +618,17 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.values());  // [ 'a', 'b', 'c' ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   *
+   * console.log(aMergeMap.values());  // [ '(a:aa)', 'b', 'c' ]
    * ```
    *
    * @returns The list of values in the {@link MergeMap}.
@@ -503,7 +642,17 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.entries());  // [ [ 1, 'a' ], [ 2, 'b' ], [ 3, 'c' ] ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   *
+   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
    * ```
    *
    * @returns The list of entries in the {@link MergeMap}.
@@ -517,7 +666,19 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.remove(1).entries());  // [ [ 2, 'b' ], [ 3, 'c' ] ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c').add(4, 'd');
+   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
+   *
+   * aMergeMap.remove(4);
+   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
    * ```
    *
    * @param key - The key to remove.
@@ -537,7 +698,19 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.add(4, 'd').entries());  // [ [ 1, 'a' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   *
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
+   *
+   * aMergeMap.add(4, 'd');
+   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
    * ```
    *
    * @param key - The key to add to the {@link MergeMap}.
@@ -553,7 +726,20 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * console.log(someMergeMap.incorporate(someOtherMergeMap).entries());  // [ [ 1, 'a' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ], [ 5, 'e' ], [ 6, 'f' ] ]
+   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   *
+   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
+   *
+   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
+   *
+   * const anotherMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
+   * anotherMergeMap.add(1, 'w').add(2, 'x').add(3, 'y').add(4, 'z');
+   *
+   * aMergeMap.incorporate(anotherMergeMap);
+   * console.log(aMergeMap.entries());  // [ [ 1, '((a:aa):w)' ], [ 2, '(b:x)' ], [ 3, '(c:y)' ], [ 4, 'z' ] ]
    * ```
    *
    * @param other - The {@link MergeMap} to incorporate into this one.
@@ -570,8 +756,25 @@ export class MergeMap<K, V> {
 /**
  * Perform a {@link !fetch} request with the given parameters, and return the response body as a {@link !Uint8Array}.
  *
+ * @example
+ * ```typescript
+ * fetchBody(new URL('http://example.org')).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * fetchBody(new URL('something://else')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * fetchBody(new URL('http://example.com')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
+ *
  * @param url - The {@link !URL} to fetch.
- * @param init - The {@link !fetch} options to pass use.
+ * @param init - The {@link !fetch} options to use.
  * @returns The response body as a {@link Uint8Array}.
  * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
  */
@@ -595,6 +798,23 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
 /**
  * Perform a `GET` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
  *
+ * @example
+ * ```typescript
+ * retrieveGetBody(new URL('http://example.org')).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * retrieveGetBody(new URL('something://else')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * retrieveGetBody(new URL('http://example.com')).catch((e: unknown) => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
+ *
  * @param url - The {@link !URL} to fetch.
  * @returns The response body as a {@link Uint8Array}.
  * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
@@ -611,6 +831,23 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
 
 /**
  * Perform a `POST` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * retrievePostBody(new URL('http://example.org'), Uint8Array.of()).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * retrievePostBody(new URL('something://else'), Uint8Array.of()).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * retrievePostBody(new URL('http://example.com'), Uint8Array.of()).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
  *
  * @param url - The {@link !URL} to fetch.
  * @param body - The `POST` body to send, as a {@link !Uint8Array}.
@@ -631,11 +868,19 @@ export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint
 /**
  * A single {@link !TextEncoder} instance to avoid re-instantiating it each time.
  *
+ * @example
+ * ```typescript
+ * console.log(textEncoder);  // { encoding: 'utf-8' }
+ * ```
  */
 export const textEncoder: TextEncoder = new TextEncoder();
 
 /**
  * A single {@link !TextDecoder} instance to avoid re-instantiating it each time.
  *
+ * @example
+ * ```typescript
+ * console.log(textDecoder);  // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
+ * ```
  */
 export const textDecoder: TextDecoder = new TextDecoder();
