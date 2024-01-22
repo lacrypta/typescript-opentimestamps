@@ -16,7 +16,7 @@
 
 'use strict';
 
-export type { MergeSet, MergeMap } from './utils';
+export { MergeSet, MergeMap } from './utils';
 export type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
 
 export { infoTimestamp as info } from './info';
