@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * This module exposes functions related to the human-readable output of Timestamps.
+ *
+ * @packageDocumentation
+ * @module
+ */
+
 'use strict';
 
 import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
@@ -21,11 +28,57 @@ import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
 import { callOp, compareEdges, compareLeaves } from './internals';
 import { uint8ArrayToHex } from './utils';
 
+/**
+ * Indent the given string, line by line, prepending the first line with a marker (ie. `" -> "`).
+ *
+ * @example
+ * ```typescript
+ * console.log(indent(''));
+ *   // ->
+ * console.log(indent('something'));
+ *   // -> something
+ * console.log(indent('something\nelse'));
+ *   // -> something
+ *   //    else
+ * console.log(indent('something\nelse\nentirely'));
+ *   // -> something
+ *   //    else
+ *   //    entirely
+ *```
+ *
+ * @param text - Text to indent.
+ * @returns The indented text.
+ */
 export function indent(text: string): string {
   const [first, ...rest]: string[] = text.split('\n');
   return [` -> ${first}`].concat(rest.map((line: string): string => `    ${line}`)).join('\n');
 }
 
+/**
+ * Generate a human-readable string form the given {@link Leaf}.
+ *
+ * Human readable strings are generated as (possibly _"faux generic"_) function calls, the names of these functions depending on the {@link Leaf}'s `type`:
+ *
+ * - **`pending`:** simply `pendingVerify`.
+ * - **`unknown`:** the _"faux generic"_ `unknownVerify<HEADER_AS_HEX>`.
+ * - **`bitcoin`, `litecoin`, or `ethereum`:** simply `bitcoinVerify`, `litecoinVerify`, or `ethereumVerify`.
+ *
+ * @example
+ * ```typescript
+ * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
+ * console.log(infoLeaf({ type: 'litecoin', height: 456 }));  // litecoinVerify(msg, 456)
+ * console.log(infoLeaf({ type: 'ethereum', height: 789 }));  // ethereumVerify(msg, 789)
+ * console.log(
+ *   infoLeaf({ type: 'pending', url: new URL('https://www.example.com') })
+ * );                                                         // pendingVerify(msg, https://www.example.com/)
+ * console.log(
+ *   infoLeaf({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) }),
+ * );                                                         // unknownVerify<0102030405060708>(msg, 010203)
+ *```
+ *
+ * @param leaf - Leaf to generate human-readable string for.
+ * @returns Human-readable string generated.
+ */
 export function infoLeaf(leaf: Leaf): string {
   switch (leaf.type) {
     case 'pending':
@@ -37,6 +90,38 @@ export function infoLeaf(leaf: Leaf): string {
   }
 }
 
+/**
+ * Generate a human-readable string form the given {@link Edge}.
+ *
+ * Human readable strings are generated as simple function calls, their names being given by the {@link Op | operation}'s `type`.
+ *
+ * If the optional `msg` parameter is given, it is used to generate verbose output (aligned to the function's `=` sign), showing the result of applying the operation in question to the given {@link !Uint8Array} value.
+ *
+ * @example
+ * ```typescript
+ * console.log(infoEdge(
+ *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *   ],
+ *   undefined,
+ * ));
+ *   // msg = append(msg, 070809)
+ *   // bitcoinVerify(msg, 123)
+ * console.log(infoEdge(
+ *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *   ],
+ *   Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+ * ));
+ *   // msg = append(msg, 070809)
+ *   //     = 0102030405060708090a070809
+ *   // bitcoinVerify(msg, 123)
+ *```
+ *
+ * @param edge - Edge to generate human-readable string for.
+ * @param msg - Optional message to use as {@link Op | operation} input for verbose output.
+ * @returns Human-readable string generated.
+ */
 export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
   const resultParts: string[] = [];
   const [op, tree]: [Op, Tree] = edge;
@@ -59,6 +144,39 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
   return resultParts.join('\n');
 }
 
+/**
+ * Generate a human-readable string form the given {@link Tree}.
+ *
+ * Human-readable strings are generated as lists of {@link Op | operation}s whenever possible, only reverting to {@link indent | indentation} when a given {@link Tree} node has more than one successor (ie. either a {@link Leaf} or an {@link Edge}).
+ *
+ * If the optional `msg` parameter is given, it is passed to {@link infoEdge} to show verbose output.
+ *
+ * @example
+ * ```typescript
+ * console.log(infoTree(tree, undefined));
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(infoTree(tree, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a
+ *   //  -> msg = reverse(msg)
+ *   //         = 0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //         = 0405060102030102030405060708090a
+ *   //     bitcoinVerify(msg, 456)
+ *```
+ *
+ * @param tree - Tree to generate human-readable string for.
+ * @param msg - Optional message to use for verbose output.
+ * @returns Human-readable string generated.
+ */
 export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
   const leaves: Leaf[] = tree.leaves.values();
   const edges: Edge[] = tree.edges.entries();
@@ -76,6 +194,29 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
   return resultParts.join('\n');
 }
 
+/**
+ * Generate a human-readable string form the given {@link FileHash}.
+ *
+ * Human-readable strings are generated as simple function calls, using the {@link FileHash}'s `algorithm` as name and the `FILE` pseudo-variable.
+ *
+ * If the `verbose` parameter is true, the {@link FileHash}'s `value` is also shown, (aligned to the function's `=` sign).
+ *
+ * @example
+ * ```typescript
+ * const fileHash: FileHash = {
+ *   algorithm: 'sha1',
+ *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * };
+ *
+ * console.log(infoFileHash(fileHash, false));  // msg = sha1(FILE)
+ * console.log(infoFileHash(fileHash, true));   // msg = sha1(FILE)
+ *                                              //     = 0102030405060708090a0b0c0d0e0f1011121314
+ *```
+ *
+ * @param fileHash - File hash to generate human-readable string for.
+ * @param verbose - Whether to include the `value` field in the output or not.
+ * @returns Human-readable string generated.
+ */
 export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
   const resultParts: string[] = [];
   resultParts.push(`msg = ${fileHash.algorithm}(FILE)`);
@@ -85,6 +226,141 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
   return resultParts.join('\n');
 }
 
+/**
+ * Generate a human-readable string form the given {@link Timestamp}.
+ *
+ * Human-readable strings are generated as a concatenation of:
+ *
+ * - The {@link Timestamp}'s `version` (as a _"faux comment"_, and only if the `verbose` parameter is true).
+ * - The {@link Timestamp}'s `fileHash` as a simple function call.
+ * - Function call trees for the main {@link Timestamp} `tree`.
+ *
+ * @whenInternalExample
+ * ```typescript
+ * const timestamp: Timestamp = {
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * };
+ *
+ * console.log(infoTimestamp(timestamp));
+ *   // msg = sha1(FILE)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(infoTimestamp(timestamp, true));
+ *   // # version: 1
+ *   // msg = sha1(FILE)
+ *   //     = 0102030405060708090a0b0c0d0e0f1011121314
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
+ *   //  -> msg = reverse(msg)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
+ *   //     bitcoinVerify(msg, 456)
+ * ```
+ *
+ * @whenApiExample
+ * ```typescript
+ * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const timestamp: Timestamp = {
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * };
+ *
+ * console.log(info(timestamp));
+ *   // msg = sha1(FILE)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(info(timestamp, true));
+ *   // # version: 1
+ *   // msg = sha1(FILE)
+ *   //     = 0102030405060708090a0b0c0d0e0f1011121314
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
+ *   //  -> msg = reverse(msg)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
+ *   //     bitcoinVerify(msg, 456)
+ *```
+ *
+ * @param timestamp - File hash to generate human-readable string for.
+ * @param verbose - Whether to include the `value` field in the output or not.
+ * @returns Human-readable string generated.
+ */
 export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): string {
   const resultParts: string[] = [];
   if (verbose) {
