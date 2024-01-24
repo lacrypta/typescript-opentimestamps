@@ -8,6 +8,22 @@
     "typedoc-plugin-mermaid",
     "typedoc-plugin-remove-references"
   ],
+  "katex": {
+    "options": {
+      "delimiters": [
+        {
+          "left": "$$",
+          "right": "$$",
+          "display": true
+        },
+        {
+          "left": "$",
+          "right": "$",
+          "display": false
+        }
+      ]
+    }
+  },
   "keywords": ["OpenTimestamps", "library"],
   "markedOptions": {
     "gfm": true
