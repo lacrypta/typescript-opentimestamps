@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * This module exposes internal organizational functions.
+ *
+ * @packageDocumentation
+ * @module
+ */
+
 'use strict';
 
 import { ripemd160 } from '@noble/hashes/ripemd160';
