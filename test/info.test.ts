@@ -280,8 +280,7 @@ describe('Info', (): void => {
           },
         } as Timestamp,
         verbose: false,
-        expected:
-          'msg = sha1(FILE)\n ->  -> bitcoinVerify(msg, 123)\n     -> msg = sha1(msg)\n        bitcoinVerify(msg, 456)',
+        expected: 'msg = sha1(FILE)\n -> bitcoinVerify(msg, 123)\n -> msg = sha1(msg)\n    bitcoinVerify(msg, 456)',
         name: 'should show non-empty timestamp',
       },
       {
@@ -301,7 +300,7 @@ describe('Info', (): void => {
         } as Timestamp,
         verbose: true,
         expected:
-          '# version: 1\nmsg = sha1(FILE)\n    = 0123456789abcdef0123456789abcdef01234567\n ->  -> bitcoinVerify(msg, 123)\n     -> msg = sha1(msg)\n            = ef473bbc24024ac1d66b318ac96bb31a95fd9a7d\n        bitcoinVerify(msg, 456)',
+          '# version: 1\nmsg = sha1(FILE)\n    = 0123456789abcdef0123456789abcdef01234567\n -> bitcoinVerify(msg, 123)\n -> msg = sha1(msg)\n        = ef473bbc24024ac1d66b318ac96bb31a95fd9a7d\n    bitcoinVerify(msg, 456)',
         name: 'should show non-empty timestamp (verbose)',
       },
     ])(

@@ -93,7 +93,7 @@ export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): s
   resultParts.push(infoFileHash(timestamp.fileHash, verbose));
   const treeInfo: string = infoTree(timestamp.tree, verbose ? timestamp.fileHash.value : undefined);
   if ('' !== treeInfo) {
-    resultParts.push(indent(treeInfo));
+    resultParts.push(treeInfo);
   }
   return resultParts.join('\n');
 }
