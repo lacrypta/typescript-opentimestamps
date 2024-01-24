@@ -35,6 +35,36 @@ import {
   uint8ArrayToHex,
 } from './utils';
 
+/**
+ * Execute the given {@link Op} on the given message, and return the result.
+ *
+ * Operation execution proceeds according to `op.type`:
+ *
+ * - If `sha1`: the `SHA1` hash of `msg` is returned.
+ * - If `ripemd160`: the `RIPEMD160` hash of `msg` is returned.
+ * - If `sha256`: the `SHA256` hash of `msg` is returned.
+ * - If `keccak256`: the `KECCAK256` hash of `msg` is returned.
+ * - If `append`: `msg` is returned, with `op.operand` tucked at the end.
+ * - If `prepend`: `op.operand` is returned, with `msg` tucked at the end.
+ * - If `reverse`: `msg` is returned, but reversed byte-to-byte.
+ * - If `hexlify`: the ASCII hex representation of `msg`'s content is returned (nb. this will have double the length, as each byte in `msg` will be converted to _two_ hex digits).
+ *
+ * @example
+ * ```typescript
+ * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));                                      // Uint8Array(20) [ 112, 55, ..., 207 ]
+ * console.log(callOp({ type: 'ripemd160' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(20) [ 121, 249, ..., 87 ]
+ * console.log(callOp({ type: 'sha256' }, Uint8Array.of(1, 2, 3)));                                    // Uint8Array(32) [ 3, 144, ..., 129 ]
+ * console.log(callOp({ type: 'keccak256' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(32) [ 241, 136, ..., 57 ]
+ * console.log(callOp({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * console.log(callOp({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));  // Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ]
+ * console.log(callOp({ type: 'reverse' }, Uint8Array.of(1, 2, 3)));                                   // Uint8Array(3) [ 3, 2, 1 ]
+ * console.log(callOp({ type: 'hexlify' }, Uint8Array.of(1, 2, 3)));                                   // Uint8Array(6) [ 48, 49, 48, 50, 48, 51 ]
+ * ```
+ *
+ * @param op - The operation to execute.
+ * @param msg - The message to execute it on.
+ * @returns The resulting message.
+ */
 export function callOp(op: Op, msg: Uint8Array): Uint8Array {
   switch (op.type) {
     case 'sha1':
@@ -56,10 +86,76 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
   }
 }
 
+/**
+ * Execute the given sequence of {@link Ops | operations}, in order, on the given message, and return the result.
+ *
+ * @example
+ * ```typescript
+ * console.log(callOps([], Uint8Array.of()));  // Uint8Array(0) []
+ * console.log(callOps([
+ *   { type: 'sha1' },
+ *   { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
+ * ], Uint8Array.of()));                       // Uint8Array(26) [ 1, 2, 3, 218, 57, ..., 9, 4, 5, 6 ]
+ * ```
+ *
+ * @param ops - The sequence of operations to execute.
+ * @param msg - The message to execute them on.
+ * @returns The resulting message.
+ */
 export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
   return ops.reduce((prevMsg: Uint8Array, op: Op): Uint8Array => callOp(op, prevMsg), msg);
 }
 
+/**
+ * Compare two {@link Leaf | Leaves}, and return the comparison result.
+ *
+ * {@link Leaf} comparison works as follows:
+ *
+ * 1. First, the {@link Leaf | Leaves}' _headers_ (cf. {@link LeafHeader}) are compared, if they're different, their difference is returned as the result.
+ * 2. If the headers are equal, we proceed according to the {@link Leaf}'s `type`:
+ *     - If `unknown`, the `payload`s are compared lexicographically (cf. {@link uint8ArrayCompare}), and that result returned.
+ *     - If {@link LeafHeader.pending}, their `url`s are compared lexicographically, and that result returned.
+ *     - If {@link LeafHeader.bitcoin}, {@link LeafHeader.litecoin}, or {@link LeafHeader.ethereum}, their `height`s are compared, and that result returned.
+ *
+ * @example
+ * ```typescript
+ * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 })); // -1
+ * console.log(compareLeaves({ type: 'litecoin', height: 123 }, { type: 'bitcoin', height: 123 })); //  1
+ * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 }));  // -333
+ * console.log(compareLeaves({ type: 'bitcoin', height: 456 }, { type: 'bitcoin', height: 123 }));  //  333
+ *
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com/a') },
+ *   { type: 'pending', url: new URL('https://example.com/b') },
+ * ));                                                                                              // -1
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com') },
+ *   { type: 'pending', url: new URL('https://example.com') },
+ * ));                                                                                              //  0
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com/b') },
+ *   { type: 'pending', url: new URL('https://example.com/a') },
+ * ));                                                                                              //  1
+ *
+ * console.log(compareLeaves(
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) },
+ * ));                                                                                              // -3
+ * console.log(compareLeaves(
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
+ * ));                                                                                              //  0
+ * console.log(compareLeaves(
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) },
+ *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
+ * ));                                                                                              //  3
+ * ```
+ *
+ * @param left - The first leaf to compare.
+ * @param right - The second leaf to compare.
+ * @returns `0` if both {@link Leaf | Leaves} are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
+ */
 export function compareLeaves(left: Leaf, right: Leaf): number {
   const headerCompare: number = uint8ArrayCompare(
     'unknown' == left.type ? left.header : uint8ArrayFromHex(LeafHeader[left.type as keyof typeof LeafHeader]),
@@ -81,6 +177,38 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
   return headerCompare;
 }
 
+/**
+ * Compare two {@link Op}s, and return the comparison result.
+ *
+ * {@link Op} comparison works as follows:
+ * 1. First the {@link Op}'s _tags_ are compared (cf. {@link Tag}), if they're different, their difference is returned as the result.
+ * 2. If the tags are equal, we proceed according to the {@link Op}'s `type`:
+ *     - If `append` or `prepend`, the `operand`s are compared lexicographically (cf. {@link uint8ArrayCompare}), and that result returned.
+ *     - Otherwise, the result from step **1** is returned.
+ *
+ * @example
+ * ```typescript
+ * console.log(compareOps({ type: 'sha1' }, { type: 'ripemd160' })); // -1
+ * console.log(compareOps({ type: 'sha1' }, { type: 'sha1' }));      //  0
+ * console.log(compareOps({ type: 'ripemd160' }, { type: 'sha1' })); //  1
+ * console.log(compareOps(
+ *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+ *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
+ * ));                                                               // -3
+ * console.log(compareOps(
+ *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+ *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+ * ));                                                               //  0
+ * console.log(compareOps(
+ *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
+ *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
+ * ));                                                               //  3
+ * ```
+ *
+ * @param left - The first operation to compare.
+ * @param right - The second operation to compare.
+ * @returns `0` if both {@link Op}s are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
+ */
 export function compareOps(left: Op, right: Op): number {
   const tagCompare: number = Tag[left.type] - Tag[right.type];
   if (0 === tagCompare && ('append' === left.type || 'prepend' === left.type)) {
@@ -89,17 +217,109 @@ export function compareOps(left: Op, right: Op): number {
   return tagCompare;
 }
 
+/**
+ * Compare two {@link Edge}s, and return the comparison result.
+ *
+ * {@link Edge} comparison merely entails comparing their corresponding {@link Op}s.
+ *
+ * @example
+ * ```typescript
+ * console.log(compareEdges(
+ *   [{ type: 'sha1' }, newTree()], [{ type: 'ripemd160' }, newTree()],
+ * ));  // -1
+ * console.log(compareEdges(
+ *   [{ type: 'sha1' }, newTree()], [{ type: 'sha1' }, newTree()],
+ * ));  //  0
+ * console.log(compareEdges(
+ *   [{ type: 'ripemd160' }, newTree()], [{ type: 'sha1' }, newTree()],
+ * ));  //  1
+ * console.log(compareEdges(
+ *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
+ *   [{ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()],
+ * ));  // -3
+ * console.log(compareEdges(
+ *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
+ *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
+ * ));  //  0
+ * console.log(compareEdges(
+ *   [{ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()],
+ *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
+ * ));  //  3
+ * ```
+ *
+ * @param left - The first edge to compare.
+ * @param right - The second edge to compare.
+ * @returns `0` if both {@link Edge}s are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
+ */
 export function compareEdges(left: Edge, right: Edge): number {
   const [[leftOp], [rightOp]]: [Edge, Edge] = [left, right];
   return compareOps(leftOp, rightOp);
 }
 
+/**
+ * Incorporate _all_ {@link Leaf | Leaves} and {@link Edge}s from the `right` {@link Tree} into the `left` {@link Tree}.
+ *
+ * This function will effectively take all {@link Leaf | Leaves} from the `right` {@link Tree} and add them to the `left` {@link Tree}.
+ * Likewise, it will take all {@link Edge}s from the `right` {@link Tree} and add them to the `left` {@link Tree}.
+ * This effectively makes the `left` {@link Tree} contain all of the data in the `right` {@link Tree} in addition to its own.
+ *
+ * @example
+ * ```typescript
+ * const left: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
+ * const right: Tree = {
+ *   leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *   edges: newEdges().add(
+ *     { type: 'sha1' },
+ *     {
+ *       leaves: newLeaves().add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *       edges: newEdges(),
+ *     },
+ *   ),
+ * };
+ *
+ * incorporateTreeToTree(left, right);
+ *
+ * console.log(left.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
+ * console.log(left.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
+ * ```
+ *
+ * @param left - The tree to incorporate data _into_.
+ * @param right - The tree to incorporate data _from_.
+ * @returns The `left` tree, for chaining.
+ */
 export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
   left.leaves.incorporate(right.leaves);
   left.edges.incorporate(right.edges);
   return left;
 }
 
+/**
+ * Incorporate the given {@link Edge} or {@link Leaf} the given {@link Tree}.
+ *
+ * If the given parameter is indeed an {@link Edge}, this function will add it to the given {@link Tree}'s edges {@link MergeMap}.
+ * If, on the other hand, the given parameter is a {@link Leaf}, this function will add it to the {@link Tree}'s leaves {@link MergeSet}.
+ *
+ * @example
+ * ```typescript
+ * const tree: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
+ *
+ * incorporateToTree(tree, { type: 'bitcoin', height: 456 });
+ * incorporateToTree(tree, [
+ *   { type: 'sha1' },
+ *   {
+ *     leaves: newLeaves().add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *     edges: newEdges(),
+ *   },
+ * ]);
+ *
+ * console.log(tree.leaves.values()); // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
+ * console.log(tree.edges.entries()); // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
+ * ```
+ *
+ * @param tree - The tree to incorporate the given parameter _into_.
+ * @param edgeOrLeaf - The element to incorporate.
+ * @returns The `tree`, for chaining.
+ */
 export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
   if (Array.isArray(edgeOrLeaf)) {
     tree.edges.add(...edgeOrLeaf);
@@ -109,6 +329,22 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
   return tree;
 }
 
+/**
+ * Construct an empty {@link MergeMap} suitable for usage to hold {@link Edge} maps in a {@link Tree}.
+ *
+ * A {@link MergeMap} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
+ * In the case of {@link Edge} mappings these are:
+ *
+ * - **`toKey`:** use the {@link Edge}'s {@link Op}'s `type`; if this happens to be `append` or `prepend`, append a `:` followed by their `operand` to the constructed key.
+ * - **`combine`:** simply call {@link incorporateTreeToTree} to combine two {@link Tree}s.
+ *
+ * @example
+ * ```typescript
+ * console.log(newEdges());  // MergeMap { ... }
+ * ```
+ *
+ * @returns The empty {@link Edge}s mapping.
+ */
 export function newEdges(): MergeMap<Op, Tree> {
   return new MergeMap<Op, Tree>(
     (op: Op): string => {
@@ -124,6 +360,25 @@ export function newEdges(): MergeMap<Op, Tree> {
   );
 }
 
+/**
+ * Construct an empty {@link MergeSet} suitable for usage to hold {@link Leaf} sets in a {@link Tree}.
+ *
+ * A {@link MergeSet} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
+ * In the case of {@link Leaf} mappings these are:
+ *
+ * - **`toKey`:** return the {@link Leaf}'s `type` with a `:` at the, and, depending on the `type` itself, concatenate this with:
+ *     - **`pending`:** the {@link Leaf}'s `url`;
+ *     - **`unknown`:** the {@link Leaf}'s `header` as a hex string, a `:`, and its payload as a hex string;
+ *     - **`bitcoin`, `litecoin`, or `ethereum`:** the {@link Leaf}'s height as a decimal string.
+ * - **`combine`:** simply return the first of the two {@link Leaf | Leaves} (there's no point in holding more than one of each {@link Leaf} type).
+ *
+ * @example
+ * ```typescript
+ * console.log(newLeaves());  // MergeSet { ... }
+ * ```
+ *
+ * @returns The empty {@link Leaf | Leaves} set.
+ */
 export function newLeaves(): MergeSet<Leaf> {
   return new MergeSet<Leaf>(
     (leaf: Leaf): string => {
@@ -142,10 +397,183 @@ export function newLeaves(): MergeSet<Leaf> {
   );
 }
 
+/**
+ * Construct an empty {@link Tree}.
+ *
+ * This function merely calls {@link newLeaves} and {@link newEdges} to construct an empty {@link Tree}.
+ *
+ * @example
+ * ```typescript
+ * console.log(newTree());  // { edges: MergeMap { ... }, leaves: MergeSet { ... } }
+ * ```
+ *
+ * @returns The empty tree constructed.
+ */
 export function newTree(): Tree {
   return { edges: newEdges(), leaves: newLeaves() };
 }
 
+/**
+ * Turn single-byte-operand binary {@link Op | Operations} (ie. `append` and `prepend` that append or prepend a single byte value), followed by _two {@link Op | Operations} of the same type_ into two {@link Op | Operations} the have the single-byte-operand pre-computed within them.
+ *
+ * This is a strange function to have, and it serves a very "niche" case required in order to obtain the minimum possible length for serialized timestamps.
+ *
+ * The {@link coalesceOperations} function will try to factor out common `operand` suffixes for `append`, and common `operand` prefixes for `prepend` operations happening on sibling edges.
+ * That is to say:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((<i>first</i>))
+ *     B((T<sub>1</sub>))
+ *     C((T<sub>2</sub>))
+ *     D((T<sub>3</sub>))
+ *     E1([<code>append:abc</code>])
+ *     E2([<code>append:abd</code>])
+ *     E3([<code>append:abe</code>])
+ *     A --> E1 --> B
+ *     A --> E2 --> C
+ *     A --> E3 --> D
+ * ```
+ *
+ * Will be transformed to:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((<i>second</i>))
+ *     B((&nbsp;&nbsp;&nbsp;))
+ *     C((T<sub>1</sub>))
+ *     D((T<sub>2</sub>))
+ *     E((T<sub>3</sub>))
+ *     E1([<code>append:ab</code>])
+ *     E2([<code>append:c</code>])
+ *     E3([<code>append:d</code>])
+ *     E4([<code>append:e</code>])
+ *     A --> E1 --> B
+ *     B --> E2 --> C
+ *     B --> E3 --> D
+ *     B --> E4 --> E
+ * ```
+ *
+ * This is advantageous because the common `ab` part of the operand will only appear once in the serialized output.
+ * To see this, consider the size of the first form (where **`NF`** stands for the _non-final marker_):
+ *
+ * $$
+ *   \\begin\{align*\}
+ *     s_\\text\{first\} &= \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append abc\}\} \\right| + \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append abd\}\} \\right| + \\left| \\text\{\\tt\{append abe\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\\\
+ *                       &= 1 + 2 + \\left| \\text\{\\tt\{abc\}\} \\right| + 1 + 2 + \\left| \\text\{\\tt\{abd\}\} \\right| + 2 + \\left| \\text\{\\tt\{abe\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\\\
+ *                       &= 1 + 2 + 3 + 1 + 2 + 3 + 2 + 3 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\\\
+ *                       &= 17 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right|
+ *   \\end\{align*\}
+ * $$
+ *
+ * And contrast it with the size of the second form:
+ *
+ * $$
+ *   \\begin\{align*\}
+ *     s_\\text\{second\} &= \\left| \\text\{\\tt\{append ab\}\} \\right| + \\left( \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append c\}\} \\right| + \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append d\}\} \\right| + \\left| \\text\{\\tt\{append e\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\right) \\\\
+ *                        &= 2 + \\left| \\text\{\\tt\{ab\}\} \\right| + \\left( 1 + 2 + \\left| \\text\{\\tt\{c\}\} \\right| + 1 + 2 + \\left| \\text\{\\tt\{d\}\} \\right| + 2 + \\left| \\text\{\\tt\{e\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\right) \\\\
+ *                        &= 2 + 2 + \\left( 1 + 2 + 1 + 1 + 2 + 1 + 2 + 1 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\right) \\\\
+ *                        &= 15 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right|
+ *   \\end\{align*\}
+ * $$
+ *
+ * Note how, if the common operand would have had length 2, these two sizes would have been equal.
+ *
+ * But what would happen if `ab` above would be just `a`, and we were to have only two siblings?
+ * Like so:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((<i>third</i>))
+ *     B((T<sub>1</sub>))
+ *     C((T<sub>2</sub>))
+ *     E1([<code>append:ac</code>])
+ *     E2([<code>append:ad</code>])
+ *     A --> E1 --> B
+ *     A --> E2 --> C
+ * ```
+ *
+ * This would get transformed to:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((<i>fourth</i>))
+ *     B((&nbsp;&nbsp;&nbsp;))
+ *     C((T<sub>1</sub>))
+ *     D((T<sub>2</sub>))
+ *     E1([<code>append:a</code>])
+ *     E2([<code>append:c</code>])
+ *     E3([<code>append:d</code>])
+ *     A --> E1 --> B
+ *     B --> E2 --> C
+ *     B --> E3 --> D
+ * ```
+ *
+ * Calculating the new sizes in this case gives:
+ *
+ * $$
+ *   \\begin\{align\*\}
+ *     s_\\text\{third\} &= \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append ac\}\} \\right| + \\left| \\text\{\\tt\{append ad\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| \\\\
+ *                       &= 1 + 2 + \\left| \\text\{\\tt\{ac\}\} \\right| + 2 + \\left| \\text\{\\tt\{ad\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\\\
+ *                       &= 1 + 2 + 2 + 2 + 2 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\\\
+ *                       &= 9 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right|
+ *   \\end\{align\*\}
+ * $$
+ *
+ * And:
+ *
+ * $$
+ *   \\begin\{align\*\}
+ *     s_\\text\{fourth\} &= \\left| \\text\{\\tt\{append a\}\} \\right| + \\left( \\left| \\text\{\\tt\{NF\}\} \\right| + \\left| \\text\{\\tt\{append c\}\} \\right| + \\left| \\text\{\\tt\{append d\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| \\right) \\\\
+ *                        &= 2 + \\left| \\text\{\\tt\{a\}\} \\right| + \\left( 1 + 2 + \\left| \\text\{\\tt\{c\}\} \\right| + 2 + \\left| \\text\{\\tt\{d\}\} \\right| + \\left| T_1 \\right| + \\left| T_2 \\right| \\right) \\\\
+ *                        &= 2 + 1 + \\left( 1 + 2 + 1 + 2 + 1 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right| \\right) \\\\
+ *                        &= 10 + \\left| T_1 \\right| + \\left| T_2 \\right| + \\left| T_3 \\right|
+ *   \\end\{align\*\}
+ * $$
+ *
+ * As can be seen, $s_\\text\{third\} < s_\\text\{fourth\}$, and we've ended up using one more byte by aggressively coalescing.
+ * Needless to say, the same would happen if we were to use `prepend` operations instead of `append` ones.
+ *
+ * What this function does is identify this specific scenario:
+ *
+ * 1. The current tree node has only a single edge exiting from it.
+ * 2. Said edge leads to another tree node with _no_ leaves, and _exactly two_ edges.
+ * 3. Said two edges have _the same_ operation associated to them.
+ * 4. Both operations of step **3** and that associated to the edge identified in step **1** are _of the same type_, and said type is either `append` or `prepend`.
+ * 5. The operation associated to the edge in step **1** consists of a single byte.
+ *
+ * It the eliminates the edge in step **1** and replaces it with the result of pre-computing the removed operation on the edges of step **2** and attaching the resulting trees there.
+ *
+ * In other words: it replaces the substructure found in the _fourth_ graph above, with the one found in the _third_ one.
+ *
+ * @example
+ * ```typescript
+ * const tree: Tree = {
+ *   leaves: newLeaves(),
+ *   edges: newEdges().add(
+ *     { type: 'append', operand: Uint8Array.of(1) },
+ *     {
+ *       leaves: newLeaves(),
+ *       edges: newEdges()
+ *         .add({ type: 'append', operand: Uint8Array.of(2, 3) }, newTree())
+ *         .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
+ *     },
+ *   ),
+ * };
+ *
+ * console.log(tree.edges.keys());                     // [ { type: 'append', operand: Uint8Array(1) [ 1 ] } ]
+ * console.log(tree.edges.values()[0]?.edges.keys());  // [ { type: 'append', operand: Uint8Array(2) [ 2, 3 ] },
+ *                                                     //   { type: 'append', operand: Uint8Array(2) [ 4, 5 ] } ]
+ *
+ * decoalesceOperations(tree);
+ *
+ * console.log(tree.edges.keys());                     // [ { type: 'append', operand: Uint8Array(3) [ 1, 2, 3 ] },
+ *                                                     //   { type: 'append', operand: Uint8Array(3) [ 1, 4, 5 ] } ]
+ * ```
+ *
+ * @param tree - The tree to decoalesce operations from.
+ * @returns The processed tree.
+ */
 export function decoalesceOperations(tree: Tree): Tree {
   tree.edges.values().forEach((subTree: Tree): Tree => decoalesceOperations(subTree));
   if (1 === tree.edges.size()) {
@@ -197,6 +625,68 @@ export function decoalesceOperations(tree: Tree): Tree {
   return tree;
 }
 
+/**
+ * Merge equal consecutive binary operations on single-{@link Edge} nodes.
+ *
+ * This function will turn strings of equal _binary_ operations (ie. `append`s or `prepend`s) into a single such operation with their operands correctly concatenated.
+ *
+ * By way of example, consider the following tree:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((&nbsp;&nbsp;&nbsp;))
+ *     B((&nbsp;&nbsp;&nbsp;))
+ *     C((&nbsp;&nbsp;&nbsp;))
+ *     D((&nbsp;&nbsp;&nbsp;))
+ *     E((&nbsp;&nbsp;&nbsp;))
+ *     E1([<code>prepend:a</code>])
+ *     E2([<code>prepend:b</code>])
+ *     E3([<code>prepend:c</code>])
+ *     E4([<code>prepend:d</code>])
+ *     A --> E1 --> B --> E2 --> C --> E3 --> D --> E4 --> E
+ * ```
+ *
+ * This function will merge all these `prepend` operations into:
+ *
+ * ```mermaid
+ * flowchart TD
+ *     A((&nbsp;&nbsp;&nbsp;))
+ *     B((&nbsp;&nbsp;&nbsp;))
+ *     E1([<code>prepend:dcba</code>])
+ *     A --> E1 --> B
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const tree: Tree = {
+ *   leaves: newLeaves(),
+ *   edges: newEdges().add(
+ *     { type: 'append', operand: Uint8Array.of(1) },
+ *     {
+ *       leaves: newLeaves(),
+ *       edges: newEdges().add(
+ *         { type: 'append', operand: Uint8Array.of(2) },
+ *         {
+ *           leaves: newLeaves(),
+ *           edges: newEdges().add({ type: 'append', operand: Uint8Array.of(3) }, newTree()),
+ *         },
+ *       ),
+ *     },
+ *   ),
+ * };
+ *
+ * console.log(tree.edges.keys());                                        // [ { type: 'append', operand: Uint8Array(1) [ 1 ] } ]
+ * console.log(tree.edges.values()[0]?.edges.keys());                     // [ { type: 'append', operand: Uint8Array(1) [ 2 ] } ]
+ * console.log(tree.edges.values()[0]?.edges.values()[0]?.edges.keys());  // [ { type: 'append', operand: Uint8Array(1) [ 3 ] } ]
+ *
+ * coalesceOperations(tree);
+ *
+ * console.log(tree.edges.keys());  // [ { type: 'append', operand: Uint8Array(3) [ 1, 2, 3 ] } ]
+ * ```
+ *
+ * @param tree - The tree to coalesce operations on.
+ * @returns The processed tree.
+ */
 export function coalesceOperations(tree: Tree): Tree {
   tree.edges.values().forEach(coalesceOperations);
   if (0 !== tree.leaves.size()) {
@@ -217,6 +707,21 @@ export function coalesceOperations(tree: Tree): Tree {
   return tree;
 }
 
+/**
+ * Transform a `prepend` operand into a list of `prepend` {@link Ops | operations} where each of them prepends a _single_ byte.
+ *
+ * @example
+ * ```typescript
+ * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));  // [
+ *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
+ *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 2 ] },
+ *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 1 ] }
+ *                                                         // ]
+ * ```
+ *
+ * @param prefix - The operand to atomize.
+ * @returns The list of `prepend` operations.
+ */
 export function atomizePrependOp(prefix: Uint8Array): Ops {
   const ops: Ops = [];
   uint8ArrayReversed(prefix).forEach((value: number): void => {
@@ -225,6 +730,21 @@ export function atomizePrependOp(prefix: Uint8Array): Ops {
   return ops;
 }
 
+/**
+ * Transform an `append` operand into a list of `append` {@link Ops | operations} where each of them appends a _single_ byte.
+ *
+ * @example
+ * ```typescript
+ * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));  // [
+ *                                                        //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
+ *                                                        //   { type: 'append', operand: Uint8Array(1) [ 2 ] },
+ *                                                        //   { type: 'append', operand: Uint8Array(1) [ 3 ] }
+ *                                                        // ]
+ * ```
+ *
+ * @param suffix - The operand to atomize.
+ * @returns The list of `append` operations.
+ */
 export function atomizeAppendOp(suffix: Uint8Array): Ops {
   const ops: Ops = [];
   suffix.forEach((value: number): void => {
@@ -233,6 +753,40 @@ export function atomizeAppendOp(suffix: Uint8Array): Ops {
   return ops;
 }
 
+/**
+ * Transform a series of {@link Op | operations} such that consecutive `reverse`, `prepend`, and `append` operations are turned into an equivalent series of operations in a standard order.
+ *
+ * The normalization process takes blocks of consecutive operations, each of which is either `reverse`, `prepend`, or `append`, and calculates the resulting prefix, suffix, and whether the result should be reversed itself.
+ * Upon encountering any other operation type, the result is written in order: first the prefix, then the suffix, and lastly any `reverse` operations required.
+ *
+ * The individual normalization rules used are:
+ *
+ * $$
+ *   \\begin\{align\*\}
+ *     \\text\{reverse\} \\left( \\text\{reverse\} \\left( x \\right) \\right) &\\to x \\\\
+ *     \\text\{append\} \\left( \\text\{reverse\} \\left( x \\right), s \\right) &\\to \\text\{reverse\} \\left( \\text\{prepend\} \\left( x, s^\{-1\} \\right) \\right) \\\\
+ *     \\text\{prepend\} \\left( \\text\{reverse\} \\left( x \\right), p \\right) &\\to \\text\{reverse\} \\left( \\text\{append\} \\left( x, p^\{-1\} \\right) \\right)
+ *   \\end\{align\*\}
+ * $$
+ *
+ * Where $s^\{-1\}$ and $p^\{-1\}$ represents the reversal of the suffix or prefix respectively, and can be precomputed.
+ *
+ * @example
+ * ```typescript
+ * console.log(normalizeOps([
+ *   { type: 'append', operand: Uint8Array.of(1, 2) },
+ *   { type: 'prepend', operand: Uint8Array.of(3, 4) },
+ * ]));  // [
+ *       //   { type: 'prepend', operand: Uint8Array(1) [ 4 ] },
+ *       //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
+ *       //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
+ *       //   { type: 'append', operand: Uint8Array(1) [ 2 ] }
+ *       // ]
+ * ```
+ *
+ * @param operations - Operations to normalize.
+ * @returns The normalized operations.
+ */
 export function normalizeOps(operations: Ops): Ops {
   let prefix: Uint8Array = Uint8Array.of();
   let suffix: Uint8Array = Uint8Array.of();
@@ -288,6 +842,26 @@ export function normalizeOps(operations: Ops): Ops {
   return ops;
 }
 
+/**
+ * Given a set of {@link Path}s, transform them into a {@link Tree}, by repeatedly incorporating each of them to an empty one.
+ *
+ * @example
+ * ```typescript
+ * const path1: Path = { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } };
+ * const path2: Path = { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } };
+ *
+ * const tree: Tree = pathsToTree([path1, path2]);
+ *
+ * console.log(tree.edges.keys());  // [ { type: 'sha1' }, { type: 'sha256' } ]
+ * tree.edges.entries().forEach(([, subTree]: [Op, Tree]): void => {
+ *   console.log(subTree.leaves.values());
+ * });                              // [ { type: 'bitcoin', height: 123 } ]
+ *                                  // [ { type: 'bitcoin', height: 456 } ]
+ * ```
+ *
+ * @param paths - The paths to transform.
+ * @returns The resulting tree.
+ */
 export function pathsToTree(paths: Paths): Tree {
   return paths
     .map((path: Path): Tree => {
@@ -303,6 +877,31 @@ export function pathsToTree(paths: Paths): Tree {
     .reduce(incorporateTreeToTree, newTree());
 }
 
+/**
+ * Transform a {@link Tree} into a set of {@link Path}s, by extracting each path from the tree's root to a {@link Leaf}.
+ *
+ * @example
+ * ```typescript
+ * const tree: Tree = {
+ *   leaves: newLeaves(),
+ *   edges: newEdges()
+ *     .add({ type: 'sha1' }, { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() })
+ *     .add({ type: 'sha256' }, { leaves: newLeaves().add({ type: 'bitcoin', height: 456 }), edges: newEdges() }),
+ * };
+ *
+ * treeToPaths(tree).forEach((path: Path): void => {
+ *   console.log(path.operations);
+ *   console.log(path.leaf);
+ * });  // [ { type: 'sha1' } ]
+ *      // { type: 'bitcoin', height: 123 }
+ *      // [ { type: 'sha256' } ]
+ *      // { type: 'bitcoin', height: 456 }
+ * ```
+ *
+ * @param tree - The tree to transform.
+ * @param path - A list of {@link Op | operations} representing the current path from the root to the given tree.
+ * @returns The extracted paths.
+ */
 export function treeToPaths(tree: Tree, path: Ops = []): Paths {
   const result: Paths = [];
   tree.leaves.values().forEach((leaf: Leaf): void => {
@@ -316,6 +915,78 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
   return result;
 }
 
+/**
+ * Normalize the given {@link Timestamp}, so as to have it have standardized `tree` component.
+ *
+ * This function will perform the following steps in order:
+ *
+ * 1. Transform the given {@link Timestamp}'s `tree` component into a set of {@link Path}s (via {@link treeToPaths}).
+ * 2. Normalize each of these {@link Path}s individually (via {@link normalizeOps}).
+ * 3. Re-build a {@link Tree} from these normalized {@link Path}s (via {@link pathsToTree}).
+ * 4. Coalesce these {@link Op | operation}s in this resulting {@link Tree} (via {@link coalesceOperations}).
+ * 5. Finally, decoalesce them (via {@link decoalesceOperations}) to deal with edge cases.
+ *
+ * If the normalization operation would yield an empty {@link Tree}, `undefined` is returned (since "empty" {@link Timestamp}s are not allowed).
+ *
+ * @example
+ * ```typescript
+ * const timestamp: Timestamp = normalizeTimestamp({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * })!;
+ *
+ * console.log(timestamp.tree.leaves.values());                                                        // []
+ * console.log(timestamp.tree.edges.keys());
+ *   // [
+ *   //   { type: 'prepend', operand: Uint8Array(3) [ 9, 8, 7 ] },
+ *   //   { type: 'prepend', operand: Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ] }
+ *   // ]
+ * console.log(timestamp.tree.edges.values()[0]?.leaves.values());                                     // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.keys());
+ *   // [ { type: 'append', operand: Uint8Array(3) [ 3, 2, 1 ] } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.leaves.values());                  // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.keys());
+ *   // [ { type: 'reverse' } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.leaves.values());
+ *   // [ { type: 'bitcoin', height: 123 } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.edges.keys());  // []
+ * console.log(timestamp.tree.edges.values()[1]?.leaves.values());
+ *   // [ { type: 'bitcoin', height: 456 } ]
+ * console.log(timestamp.tree.edges.values()[1]?.edges.keys());                                        // []
+ * ```
+ *
+ * @param timestamp - The timestamp to normalize.
+ * @returns The normalized timestamp.
+ */
 export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined {
   const tree: Tree = decoalesceOperations(
     coalesceOperations(
