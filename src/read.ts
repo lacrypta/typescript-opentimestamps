@@ -24,11 +24,10 @@ import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';
 
 export function getBytes(length: number, data: Uint8Array, index: number): [Uint8Array, number] {
-  const result: Uint8Array = data.slice(index, index + length);
-  if (data.length < index + length || result.length !== length) {
+  if (data.length < index + length) {
     throw new Error(`Unexpected EOF reading bytes at position ${index}`);
   }
-  return [result, index + length];
+  return [data.slice(index, index + length), index + length];
 }
 
 export function getByte(data: Uint8Array, index: number): [number, number] {
