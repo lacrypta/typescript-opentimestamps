@@ -48,22 +48,22 @@ export function load(application: Readonly<Application>) {
       const comment: Comment | undefined = context.project.reflections[key]?.comment;
       if (undefined !== comment) {
         const newBlockTags: CommentTag[] = [];
-        for (const tag of comment.blockTags) {
+        for (const blockTag of comment.blockTags) {
           const matches: RegExpExecArray | null = /^@when(?<conditionName>[A-Z][a-z0-9]*)(?<tagName>[A-Z].*)$/.exec(
-            tag.tag,
+            blockTag.tag,
           );
           if (null !== matches) {
             const conditionName: string = lowercaseFirst(matches.groups!.conditionName!);
             const tagName: string = lowercaseFirst(matches.groups!.tagName!);
             if (-1 !== config.indexOf(conditionName)) {
-              const newTag = new CommentTag(`@${tagName}`, tag.content);
-              if (undefined !== tag.name) {
-                newTag.name = tag.name;
+              const newTag: CommentTag = new CommentTag(`@${tagName}`, blockTag.content);
+              if (undefined !== blockTag.name) {
+                newTag.name = blockTag.name;
               }
               newBlockTags.push(newTag);
             }
           } else {
-            newBlockTags.push(tag);
+            newBlockTags.push(blockTag);
           }
         }
         comment.blockTags = newBlockTags;
