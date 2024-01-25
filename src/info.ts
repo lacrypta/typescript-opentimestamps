@@ -153,6 +153,31 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
+ * const tree: Tree = {
+ *   leaves: newLeaves(),
+ *   edges: newEdges().add(
+ *     { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *     {
+ *       leaves: newLeaves(),
+ *       edges: newEdges()
+ *         .add(
+ *           { type: 'reverse' },
+ *           {
+ *             leaves: newLeaves(),
+ *             edges: newEdges().add(
+ *               { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *               { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *             ),
+ *           },
+ *         )
+ *         .add(
+ *           { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *           { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+ *         ),
+ *     },
+ *   ),
+ * };
+ *
  * console.log(infoTree(tree, undefined));
  *   // msg = prepend(msg, 010203)
  *   //  -> msg = reverse(msg)
