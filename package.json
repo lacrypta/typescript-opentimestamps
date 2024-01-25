@@ -55,9 +55,8 @@
     "build:esm": "esbuild $(find ./src -type f -name '*.ts' | xargs) --outdir=./dist/esm --format=esm --sourcemap=linked --sources-content=false --platform=neutral --analyze",
     "build:cjs": "esbuild $(find ./src -type f -name '*.ts' | xargs) --outdir=./dist/cjs --format=cjs --sourcemap=linked --sources-content=false --platform=node --analyze",
     "doc": "pnpm doc:api && pnpm run doc:internal",
-    "doc:pre": "[ './etc/when.mts' -ot './.local/when.mjs' ] || tsc --esModuleInterop --target esnext --moduleResolution nodenext --module nodenext --outdir .local ./etc/when.mts",
-    "doc:api": "pnpm doc:pre && typedoc --options ./etc/typedoc.doc-api.json",
-    "doc:internal": "pnpm doc:pre && typedoc --options ./etc/typedoc.doc-internal.json",
+    "doc:api": "typedoc --options ./etc/typedoc.doc-api.json",
+    "doc:internal": "typedoc --options ./etc/typedoc.doc-internal.json",
     "clean": "rm -rf dist",
     "test": "jest --runInBand --config=./etc/jest.config.js",
     "reset": "pnpm clean && rm -rf node_modules && rm -f pnpm-lock.yaml"

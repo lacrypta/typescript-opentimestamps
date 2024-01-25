@@ -260,67 +260,7 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  * - The {@link Timestamp}'s `fileHash` as a simple function call.
  * - Function call trees for the main {@link Timestamp} `tree`.
  *
- * @whenInternalExample
- * ```typescript
- * const timestamp: Timestamp = {
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
- *     ),
- *   },
- * };
- *
- * console.log(infoTimestamp(timestamp));
- *   // msg = sha1(FILE)
- *   // msg = prepend(msg, 010203)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //     bitcoinVerify(msg, 456)
- * console.log(infoTimestamp(timestamp, true));
- *   // # version: 1
- *   // msg = sha1(FILE)
- *   //     = 0102030405060708090a0b0c0d0e0f1011121314
- *   // msg = prepend(msg, 010203)
- *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
- *   //  -> msg = reverse(msg)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
- *   //     msg = append(msg, 070809)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
- *   //     bitcoinVerify(msg, 456)
- * ```
- *
- * @whenApiExample
+ * @example
  * ```typescript
  * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
  *
@@ -380,7 +320,67 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *   //  -> msg = prepend(msg, 040506)
  *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
  *   //     bitcoinVerify(msg, 456)
- *```
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const timestamp: Timestamp = {
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * };
+ *
+ * console.log(infoTimestamp(timestamp));
+ *   // msg = sha1(FILE)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(infoTimestamp(timestamp, true));
+ *   // # version: 1
+ *   // msg = sha1(FILE)
+ *   //     = 0102030405060708090a0b0c0d0e0f1011121314
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
+ *   //  -> msg = reverse(msg)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
+ *   //     bitcoinVerify(msg, 456)
+ * ```
  *
  * @param timestamp - File hash to generate human-readable string for.
  * @param verbose - Whether to include the `value` field in the output or not.

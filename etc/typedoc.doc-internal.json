@@ -6,10 +6,8 @@
     "typedoc-plugin-katex",
     "typedoc-plugin-mdn-links",
     "typedoc-plugin-mermaid",
-    "typedoc-plugin-remove-references",
-    "../.local/when.mjs"
+    "typedoc-plugin-remove-references"
   ],
-  "conditions": ["internal"],
   "katex": {
     "options": {
       "delimiters": [
