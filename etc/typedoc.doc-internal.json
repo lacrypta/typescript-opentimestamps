@@ -52,6 +52,11 @@
     "invalidLink": true,
     "notDocumented": false
   },
+  "externalSymbolLinkMappings": {
+    "typescript": {
+      "RequestInit": "https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options"
+    }
+  },
   "treatWarningsAsErrors": false,
   "treatValidationWarningsAsErrors": false,
   "logLevel": "Verbose",
