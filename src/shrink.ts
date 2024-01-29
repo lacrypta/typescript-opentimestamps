@@ -20,6 +20,10 @@ import type { Leaf, Path, Timestamp } from './types';
 
 import { treeToPaths, pathsToTree, normalizeTimestamp } from './internals';
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API ---------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
 export function shrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
     .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)

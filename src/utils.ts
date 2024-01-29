@@ -167,6 +167,142 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
 }
 
 /**
+ * Perform a {@link !fetch} request with the given parameters, and return the response body as a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * fetchBody(new URL('http://example.org')).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * fetchBody(new URL('something://else')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * fetchBody(new URL('http://example.com')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
+ *
+ * @param url - The {@link !URL} to fetch.
+ * @param init - The {@link !fetch} options to use.
+ * @returns The response body as a {@link Uint8Array}.
+ * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
+ */
+export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Array> {
+  try {
+    const response: Response = await fetch(url, init);
+    if (!response.ok || null === response.body) {
+      throw new Error('Error retrieving response body');
+    }
+    // ref: https://stackoverflow.com/a/72718732
+    return new Uint8Array(await new Response(response.body).arrayBuffer());
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      throw e;
+    } else {
+      throw new Error('Unknown fetch() error');
+    }
+  }
+}
+
+/**
+ * Perform a `GET` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * retrieveGetBody(new URL('http://example.org')).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * retrieveGetBody(new URL('something://else')).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * retrieveGetBody(new URL('http://example.com')).catch((e: unknown) => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
+ *
+ * @param url - The {@link !URL} to fetch.
+ * @returns The response body as a {@link Uint8Array}.
+ * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
+ */
+export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
+  return await fetchBody(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/vnd.opentimestamps.v1',
+      'User-Agent': 'typescript-opentimestamps',
+    },
+  });
+}
+
+/**
+ * Perform a `POST` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * retrievePostBody(new URL('http://example.org'), Uint8Array.of()).then((body: Uint8Array): void => {
+ *   console.log(...body);
+ * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * ```
+ *
+ * @example
+ * ```typescript
+ * retrievePostBody(new URL('something://else'), Uint8Array.of()).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * retrievePostBody(new URL('http://example.com'), Uint8Array.of()).catch((e: unknown): void => {
+ *   console.log(e);
+ * });  // TypeError: fetch failed ...
+ * ```
+ *
+ * @param url - The {@link !URL} to fetch.
+ * @param body - The `POST` body to send, as a {@link !Uint8Array}.
+ * @returns The response body as a {@link Uint8Array}.
+ * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
+ */
+export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint8Array> {
+  return await fetchBody(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/vnd.opentimestamps.v1',
+      'User-Agent': 'typescript-opentimestamps',
+    },
+    body,
+  });
+}
+
+/**
+ * A single {@link !TextEncoder} instance to avoid re-instantiating it each time.
+ *
+ * @example
+ * ```typescript
+ * console.log(textEncoder);  // { encoding: 'utf-8' }
+ * ```
+ */
+export const textEncoder: TextEncoder = new TextEncoder();
+
+/**
+ * A single {@link !TextDecoder} instance to avoid re-instantiating it each time.
+ *
+ * @example
+ * ```typescript
+ * console.log(textDecoder);  // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
+ * ```
+ */
+export const textDecoder: TextDecoder = new TextDecoder();
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API ---------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  * A namespace to collect type declarations for {@link MergeSet} and {@link MergeMap} usage.
  *
  */
@@ -726,135 +862,3 @@ export class MergeMap<K, V> {
     return this;
   }
 }
-
-/**
- * Perform a {@link !fetch} request with the given parameters, and return the response body as a {@link !Uint8Array}.
- *
- * @example
- * ```typescript
- * fetchBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
- * ```
- *
- * @example
- * ```typescript
- * fetchBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * fetchBody(new URL('http://example.com')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * ```
- *
- * @param url - The {@link !URL} to fetch.
- * @param init - The {@link !fetch} options to use.
- * @returns The response body as a {@link Uint8Array}.
- * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
- */
-export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Array> {
-  try {
-    const response: Response = await fetch(url, init);
-    if (!response.ok || null === response.body) {
-      throw new Error('Error retrieving response body');
-    }
-    // ref: https://stackoverflow.com/a/72718732
-    return new Uint8Array(await new Response(response.body).arrayBuffer());
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      throw e;
-    } else {
-      throw new Error('Unknown fetch() error');
-    }
-  }
-}
-
-/**
- * Perform a `GET` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
- *
- * @example
- * ```typescript
- * retrieveGetBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
- * ```
- *
- * @example
- * ```typescript
- * retrieveGetBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrieveGetBody(new URL('http://example.com')).catch((e: unknown) => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * ```
- *
- * @param url - The {@link !URL} to fetch.
- * @returns The response body as a {@link Uint8Array}.
- * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
- */
-export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
-  return await fetchBody(url, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/vnd.opentimestamps.v1',
-      'User-Agent': 'typescript-opentimestamps',
-    },
-  });
-}
-
-/**
- * Perform a `POST` request with the standard `opentimestamps` headers and retrieve the response body as a {@link !Uint8Array}.
- *
- * @example
- * ```typescript
- * retrievePostBody(new URL('http://example.org'), Uint8Array.of()).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
- * ```
- *
- * @example
- * ```typescript
- * retrievePostBody(new URL('something://else'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrievePostBody(new URL('http://example.com'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * ```
- *
- * @param url - The {@link !URL} to fetch.
- * @param body - The `POST` body to send, as a {@link !Uint8Array}.
- * @returns The response body as a {@link Uint8Array}.
- * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
- */
-export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint8Array> {
-  return await fetchBody(url, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/vnd.opentimestamps.v1',
-      'User-Agent': 'typescript-opentimestamps',
-    },
-    body,
-  });
-}
-
-/**
- * A single {@link !TextEncoder} instance to avoid re-instantiating it each time.
- *
- * @example
- * ```typescript
- * console.log(textEncoder);  // { encoding: 'utf-8' }
- * ```
- */
-export const textEncoder: TextEncoder = new TextEncoder();
-
-/**
- * A single {@link !TextDecoder} instance to avoid re-instantiating it each time.
- *
- * @example
- * ```typescript
- * console.log(textDecoder);  // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
- * ```
- */
-export const textDecoder: TextDecoder = new TextDecoder();

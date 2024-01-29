@@ -21,4 +21,8 @@ import type { Verifier } from '../types';
 import { default as verifyViaBlockchainInfo } from './blockchain.info';
 import { default as verifyViaBlockstream } from './blockstream';
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API ---------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
 export default { verifyViaBlockchainInfo, verifyViaBlockstream } satisfies Record<string, Verifier>;

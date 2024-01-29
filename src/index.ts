@@ -16,22 +16,52 @@
 
 'use strict';
 
-export { MergeSet, MergeMap } from './utils';
-export type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
+import type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
 
-export { infoTimestamp as info } from './info';
-export { normalizeTimestamp as normalize } from './internals';
-export {
-  canShrinkTimestamp as canShrink,
-  canUpgradeTimestamp as canUpgrade,
-  canVerifyTimestamp as canVerify,
-} from './predicates';
-export { readTimestamp as read } from './read';
-export { shrinkTimestamp as shrink } from './shrink';
-export { submitTimestamp as submit } from './submit';
-export { upgradeTimestamp as upgrade } from './upgrade';
-export { isTimestamp, assertTimestamp, validateTimestamp as validate } from './validation';
-export { writeTimestamp as write } from './write';
+import { Merge, MergeSet, MergeMap } from './utils';
 
-export { verifyTimestamp as verify } from './verify';
-export { default as verifiers } from './verifiers';
+import { infoTimestamp } from './info';
+import { normalizeTimestamp } from './internals';
+import { canShrinkTimestamp, canUpgradeTimestamp, canVerifyTimestamp } from './predicates';
+import { readTimestamp } from './read';
+import { shrinkTimestamp } from './shrink';
+import { submitTimestamp } from './submit';
+import { upgradeTimestamp } from './upgrade';
+import { isTimestamp, assertTimestamp, validateTimestamp } from './validation';
+import { writeTimestamp } from './write';
+
+import { verifyTimestamp } from './verify';
+import { default as verifiers } from './verifiers';
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API ---------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
+export type { Timestamp };
+export type { FileHash };
+export type { Tree };
+export type { Leaf };
+export type { Op };
+export type { Verifier };
+
+export type { Merge };
+
+export { MergeSet };
+export { MergeMap };
+
+export const info = infoTimestamp;
+export const normalize = normalizeTimestamp;
+export const canShrink = canShrinkTimestamp;
+export const canUpgrade = canUpgradeTimestamp;
+export const canVerify = canVerifyTimestamp;
+export const read = readTimestamp;
+export const shrink = shrinkTimestamp;
+export const submit = submitTimestamp;
+export const upgrade = upgradeTimestamp;
+export const is = isTimestamp;
+export const assert = assertTimestamp;
+export const validate = validateTimestamp;
+export const write = writeTimestamp;
+export const verify = verifyTimestamp;
+
+export { verifiers };
