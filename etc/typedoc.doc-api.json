@@ -32,6 +32,7 @@
   "pretty": true,
   "sourceLinkExternal": true,
   "hideParameterTypesInTitle": false,
+  "excludePrivate": true,
   "cleanOutputDir": true,
   "out": "../dist/docs/api",
   "entryPoints": ["../src/index.ts"],
