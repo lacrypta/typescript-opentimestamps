@@ -167,29 +167,29 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
 }
 
 /**
- * A namespace to collect type declarations for {@link MergeSet} usage.
+ * A namespace to collect type declarations for {@link MergeSet} and {@link MergeMap} usage.
  *
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace MergeSet {
+export namespace Merge {
   /**
-   * The type of the callback that will transform an element into a string (implicitly defining what "equality" between elements means) in a {@link MergeSet}.
+   * The type of the callback that will transform an element into a string (implicitly defining what "equality" between elements means) in a {@link MergeSet} or equivalent keys for {@link MergeMap}s.
    *
-   * @typeParam V - The type of the {@link MergeSet} contained elements.
+   * @typeParam T - The type of the {@link MergeSet} contained elements or {@link MergeMap} keys.
    * @param key - The element to transform into a string for mapping purposes.
    * @returns The string representation of the given element.
    */
-  export type ToKey<V> = (key: V) => string;
+  export type ToKey<T> = (key: T) => string;
 
   /**
-   * The type of the callback that will be used to combine two equivalent elements within the {@link MergeSet}.
+   * The type of the callback that will be used to combine two equivalent elements within the {@link MergeSet} or equivalent values in a {@link MergeMap}.
    *
-   * @typeParam V - The type of the {@link MergeSet} contained elements.
-   * @param left - The element already existing in the {@link MergeSet}.
-   * @param right - The element one seeks to add to the {@link MergeSet}.
-   * @returns The combined element to replace the already existing element.
+   * @typeParam T - The type of the {@link MergeSet} contained elements or {@link MergeMap} values.
+   * @param left - The already existing element in the {@link MergeSet} or value in the {@link MergeMap}.
+   * @param right - The element one seeks to add to the {@link MergeSet} or the value one seeks to add to the {@link MergeMap}.
+   * @returns The combined element to replace the already existing element or value.
    */
-  export type Combine<V> = (left: V, right: V) => V;
+  export type Combine<T> = (left: T, right: T) => T;
 }
 
 /**
@@ -207,10 +207,10 @@ export namespace MergeSet {
  *
  * @example
  * ```typescript
- * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+ * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
  *
- * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
- * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+ * const toKey: Merge.ToKey<string> = (key: string): string => key;
+ * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
  *
  * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
  *
@@ -243,13 +243,13 @@ export class MergeSet<V> {
    * The callback that will transform an element into a `string` (implicitly defining what "equality" between elements means).
    *
    */
-  private readonly toKey: MergeSet.ToKey<V>;
+  private readonly toKey: Merge.ToKey<V>;
 
   /**
    * The callback that will be used to combine two equivalent elements within the {@link MergeSet}.
    *
    */
-  private readonly combine: MergeSet.Combine<V>;
+  private readonly combine: Merge.Combine<V>;
 
   /**
    * The {@link MergeSet} constructor.
@@ -258,10 +258,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    * ```
@@ -270,7 +270,7 @@ export class MergeSet<V> {
    * @param toKey - The callback that will transform an element into a string (implicitly defining what "equality" between elements means).
    * @param combine - The callback that will be used to combine two equivalent elements within the {@link MergeSet}.
    */
-  constructor(toKey: MergeSet.ToKey<V>, combine: MergeSet.Combine<V>) {
+  constructor(toKey: Merge.ToKey<V>, combine: Merge.Combine<V>) {
     this.mapping = {};
     this.toKey = toKey;
     this.combine = combine;
@@ -293,10 +293,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    *
@@ -315,10 +315,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    *
@@ -337,10 +337,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    *
@@ -365,10 +365,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    *
@@ -391,10 +391,10 @@ export class MergeSet<V> {
    *
    * @example
    * ```typescript
-   * import { MergeSet } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeSet.ToKey<string> = (key: string): string => key;
-   * const combine: MergeSet.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
+   * const toKey: Merge.ToKey<string> = (key: string): string => key;
+   * const combine: Merge.Combine<string> = (left: string, right: string): string => `${left}:${right}`;
    *
    * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
    * aMergeSet.add('a').add('a').add('b').add('c').add('d');
@@ -418,32 +418,6 @@ export class MergeSet<V> {
 }
 
 /**
- * A namespace to collect type declarations for {@link MergeMap} usage.
- *
- */
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace MergeMap {
-  /**
-   * The type of the callback that will transform a key into a string (implicitly defining what "equality" between keys means) in a {@link MergeMap}.
-   *
-   * @typeParam K - The type of the {@link MergeMap} keys.
-   * @param key - The key to transform into a string for mapping purposes.
-   * @returns The string representation of the given key.
-   */
-  export type ToKey<K> = (key: K) => string;
-
-  /**
-   * The type of the callback that will be used to combine two equivalent values within the {@link MergeMap}.
-   *
-   * @typeParam V - The type of the {@link MergeMap} values.
-   * @param left - The value already existing in the {@link MergeMap}.
-   * @param right - The value one seeks to add to the {@link MergeMap}.
-   * @returns The combined value to replace the already existing value.
-   */
-  export type Combine<V> = (left: V, right: V) => V;
-}
-
-/**
  * An iteration over the standard {@link !Map} generic class, that allows for identical keys to be identified and their associated values be merged together.
  *
  * A `MergeMap` allows the user to specify _how_ two keys should be compared for equality, and _what_ to do with the corresponding values when equal
@@ -458,10 +432,10 @@ export namespace MergeMap {
  *
  * @example
  * ```typescript
- * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+ * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
  *
- * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
- * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+ * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+ * const combine: Merge.Combine<string> = (left: string, right: string): string =>
  *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
  *
  * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -515,13 +489,13 @@ export class MergeMap<K, V> {
    * The callback that will transform a key into a `string` (implicitly defining what "equality" between keys means).
    *
    */
-  private readonly toKey: MergeMap.ToKey<K>;
+  private readonly toKey: Merge.ToKey<K>;
 
   /**
    * The callback that will be used to combine two equivalent values within the {@link MergeMap}.
    *
    */
-  private readonly combine: MergeMap.Combine<V>;
+  private readonly combine: Merge.Combine<V>;
 
   /**
    * The {@link MergeMap} constructor.
@@ -530,10 +504,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -544,7 +518,7 @@ export class MergeMap<K, V> {
    * @param toKey - The callback that will transform a key into a string (implicitly defining what "equality" between keys means).
    * @param combine - The callback that will be used to combine two equivalent values within the {@link MergeMap}.
    */
-  constructor(toKey: MergeMap.ToKey<K>, combine: MergeMap.Combine<V>) {
+  constructor(toKey: Merge.ToKey<K>, combine: Merge.Combine<V>) {
     this.keySet = {};
     this.mapping = {};
     this.toKey = toKey;
@@ -570,10 +544,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -594,10 +568,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -618,10 +592,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -642,10 +616,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -666,10 +640,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -698,10 +672,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
@@ -726,10 +700,10 @@ export class MergeMap<K, V> {
    *
    * @example
    * ```typescript
-   * import { MergeMap } from '@lacrypta/typescript-opentimestamps';
+   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
    *
-   * const toKey: MergeMap.ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: MergeMap.Combine<string> = (left: string, right: string): string =>
+   * const toKey: Merge.ToKey<number> = (key: number): string => (key % 10).toString();
+   * const combine: Merge.Combine<string> = (left: string, right: string): string =>
    *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
    *
    * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
