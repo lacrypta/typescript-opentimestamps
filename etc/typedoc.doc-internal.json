@@ -35,6 +35,7 @@
   "cleanOutputDir": true,
   "out": "../dist/docs/internal",
   "entryPoints": ["../src/**/*.ts"],
+  "exclude": ["../src/index.ts"],
   "hideGenerator": true,
   "searchInComments": true,
   "navigationLinks": {
