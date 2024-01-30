@@ -46,17 +46,17 @@ Once installed the library can be directly imported:
 ```typescript
 import {
   type Timestamp,
-  read as readTimestamp,
-  verify as verifyTimestamp,
+  read as read,
+  verify as verify,
   //
   verifyViaBlockchainInfo,
   verifyViaBlockstream,
 } from '@lacrypta/typescript-opentimestamps';
 
 const rawTimestamp: Uint8Array = Uint8Array.from(someTimestampBytes);
-const timestamp: Timestamp = readTimestamp(rawTimestamp);
+const timestamp: Timestamp = read(rawTimestamp);
 
-verifyTimestamp(
+verify(
   timestamp,
   {
     'blockchain.info': verifyViaBlockchainInfo,
@@ -94,7 +94,7 @@ It exports the following functions:
 - **`shrink`:** eliminate all but the _oldest_ attestation found in the given `Timestamp` for the given chain.
 - **`submit`:** submit the given `Timestamp` to a Calendar for eventual inclusion in a blockchain.
 - **`upgrade`:** upgrade the given `Timestamp` via a Calendar so as to make it independently verifiable.
-- **`isTimestamp`:** a [TypeScript type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) that simply applies validation to the given `Timestamp`.
+- **`is`:** a [TypeScript type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) that simply applies validation to the given `Timestamp`.
 - **`validate`:** validate the given parameter and determine whether it is indeed a `Timestamp` object.
 - **`verify`:** verify the given `Timestamp` against the blockchain(s).
 - **_verifiers_:** a set of predefined lambda functions that will query the blockchain via explorer-provider APIs to check for the presence of a given Merkle root on-chain.
