@@ -197,11 +197,11 @@ export const info = _info;
  *
  * This function will perform the following steps in order:
  *
- * 1. Transform the given {@link Timestamp}'s `tree` component into a set of {@link Path}s (via {@link treeToPaths}).
- * 2. Normalize each of these {@link Path}s individually (via {@link normalizeOps}).
- * 3. Re-build a {@link Tree} from these normalized {@link Path}s (via {@link pathsToTree}).
- * 4. Coalesce these {@link Op | operation}s in this resulting {@link Tree} (via {@link coalesceOperations}).
- * 5. Finally, decoalesce them (via {@link decoalesceOperations}) to deal with edge cases.
+ * 1. Transform the given {@link Timestamp}'s `tree` component into a set of paths.
+ * 2. Normalize each of these paths individually.
+ * 3. Re-build a {@link Tree} from these normalized paths.
+ * 4. Coalesce these {@link Op | operation}s in this resulting {@link Tree}.
+ * 5. Finally, decoalesce them to deal with edge cases.
  *
  * If the normalization operation would yield an empty {@link Tree}, `undefined` is returned (since "empty" {@link Timestamp}s are not allowed).
  *
@@ -281,20 +281,12 @@ export const canVerify = _canVerify;
  *
  * {@link Timestamp}s are stored as a sequence of "parts":
  *
- * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream (cf. {@link magicHeader}).
+ * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream.
  * 2. The serialization format `version`, as a `UINT`.
  * 3. The serialized {@link FileHash}.
  * 4. The serialized {@link Tree}.
  *
  * This function will read the given data stream, and normalize the resulting {@link Timestamp} value.
- *
- * > This function internally calls {@link readLiteral}.
- * >
- * > This function internally calls {@link readVersion}.
- * >
- * > This function internally calls {@link readFileHash}.
- * >
- * > This function internally calls {@link readTree}.
  *
  * @example
  * ```typescript
