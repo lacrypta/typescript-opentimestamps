@@ -16,7 +16,8 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { Edge } from '../src/internals';
 
 import { newEdges, newLeaves } from '../src/internals';
 import {
@@ -29,7 +30,7 @@ import {
   readLeaf,
   readLiteral,
   readPendingLeafPayload,
-  readTimestamp,
+  read,
   readTree,
   readUint,
   readUrl,
@@ -664,7 +665,7 @@ describe('Read', (): void => {
     );
   });
 
-  describe('readTimestamp()', (): void => {
+  describe('read()', (): void => {
     it.each([
       {
         data: Uint8Array.of(
@@ -716,10 +717,10 @@ describe('Read', (): void => {
         | { data: Uint8Array; expected: Timestamp; error: null }
         | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
-          expect(timestampToString(readTimestamp(data))).toStrictEqual(timestampToString(expected));
+          expect(timestampToString(read(data))).toStrictEqual(timestampToString(expected));
         } else {
           expect((): void => {
-            readTimestamp(data);
+            read(data);
           }).toThrow(error);
         }
       },

@@ -16,9 +16,10 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { Edge } from '../src/internals';
 
-import { indent, infoEdge, infoFileHash, infoLeaf, infoTimestamp, infoTree } from '../src/info';
+import { indent, infoEdge, infoFileHash, infoLeaf, info, infoTree } from '../src/info';
 import { newEdges, newLeaves, newTree } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 
@@ -236,7 +237,7 @@ describe('Info', (): void => {
     });
   });
 
-  describe('infoTimestamp()', (): void => {
+  describe('info()', (): void => {
     it.each([
       {
         timestamp: {
@@ -306,13 +307,13 @@ describe('Info', (): void => {
     ])(
       '$name',
       ({ timestamp, verbose, expected }: { timestamp: Timestamp; verbose: boolean; expected: string }): void => {
-        expect(infoTimestamp(timestamp, verbose)).toStrictEqual(expected);
+        expect(info(timestamp, verbose)).toStrictEqual(expected);
       },
     );
 
     test('should default to non-verbose', (): void => {
       expect(
-        infoTimestamp({
+        info({
           version: 1,
           fileHash: {
             algorithm: 'sha1',

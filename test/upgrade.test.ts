@@ -19,7 +19,7 @@
 import type { Timestamp, Tree } from '../src/types';
 
 import { newEdges, newLeaves } from '../src/internals';
-import { upgradeFromCalendar, upgradeTimestamp, upgradeTree } from '../src/upgrade';
+import { upgradeFromCalendar, upgrade, upgradeTree } from '../src/upgrade';
 import { uint8ArrayFromHex } from '../src/utils';
 
 import { timestampToString, treeToString } from './helpers';
@@ -143,7 +143,7 @@ describe('Upgrade', (): void => {
     );
   });
 
-  describe('upgradeTimestamp()', (): void => {
+  describe('upgrade()', (): void => {
     it.each([
       {
         timestamp: {
@@ -247,7 +247,7 @@ describe('Upgrade', (): void => {
           });
 
         void expect(
-          upgradeTimestamp(timestamp).then(
+          upgrade(timestamp).then(
             ({
               timestamp: resultTimestamp,
               errors: resultErrors,

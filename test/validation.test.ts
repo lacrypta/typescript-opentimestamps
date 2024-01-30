@@ -20,8 +20,8 @@ import { incorporateTreeToTree } from '../src/internals';
 import { FileHash, Leaf, Op, Tree } from '../src/types';
 import { MergeMap, MergeSet, uint8ArrayFromHex } from '../src/utils';
 import {
-  assertTimestamp,
-  isTimestamp,
+  assert,
+  is,
   validateCalendarUrl,
   validateFileHash,
   validateFileHashValue,
@@ -40,7 +40,7 @@ import {
   validateObjectHasValueKey,
   validateOneOfStrings,
   validateOp,
-  validateTimestamp,
+  validate,
   validateTree,
   validateURL,
   validateUint8Array,
@@ -1065,7 +1065,7 @@ describe('Validation', (): void => {
     });
   });
 
-  describe('validateTimestamp()', (): void => {
+  describe('validate()', (): void => {
     it.each([
       {
         obj: 123,
@@ -1136,16 +1136,16 @@ describe('Validation', (): void => {
       },
     ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
-        expect(validateTimestamp(obj)).toBe(obj);
+        expect(validate(obj)).toBe(obj);
       } else {
         expect((): void => {
-          validateTimestamp(obj);
+          validate(obj);
         }).toThrow(error);
       }
     });
   });
 
-  describe('assertTimestamp()', (): void => {
+  describe('assert()', (): void => {
     it.each([
       {
         obj: 123,
@@ -1217,17 +1217,17 @@ describe('Validation', (): void => {
     ])('$name', ({ obj, error }: { obj: unknown; error: Error | null }): void => {
       if (null === error) {
         expect((): void => {
-          assertTimestamp(obj);
+          assert(obj);
         }).not.toThrow();
       } else {
         expect((): void => {
-          assertTimestamp(obj);
+          assert(obj);
         }).toThrow(error);
       }
     });
   });
 
-  describe('isTimestamp()', (): void => {
+  describe('is()', (): void => {
     it.each([
       {
         obj: 123,
@@ -1297,7 +1297,7 @@ describe('Validation', (): void => {
         name: 'should pass for well-formed timestamp',
       },
     ])('$name', ({ obj, expected }: { obj: unknown; expected: boolean }): void => {
-      expect(isTimestamp(obj)).toStrictEqual(expected);
+      expect(is(obj)).toStrictEqual(expected);
     });
   });
 });

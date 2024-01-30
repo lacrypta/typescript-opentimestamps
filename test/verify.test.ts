@@ -20,10 +20,10 @@ import type { Leaf } from '../src/types';
 
 import { newEdges, newLeaves } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
-import { verifyTimestamp } from '../src/verify';
+import { verify } from '../src/verify';
 
 describe('Verify', (): void => {
-  describe('verifyTimestamp()', (): void => {
+  describe('verify()', (): void => {
     it.each([
       {
         bitcoinVerifierResponse: null,
@@ -91,7 +91,7 @@ describe('Verify', (): void => {
             expected: { attestations: Record<number, string[]>; errors: Record<string, Error[]> };
           }): void => {
         void expect(
-          verifyTimestamp(
+          verify(
             {
               version: 1,
               fileHash: {

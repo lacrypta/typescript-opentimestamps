@@ -16,7 +16,7 @@
 
 'use strict';
 
-import type { Merge } from '../src/utils';
+import type { Combine, ToKey } from '../src/utils';
 
 import {
   uint8ArrayToHex,
@@ -229,8 +229,8 @@ describe('Utils', (): void => {
   });
 
   describe('MergeSet<V>', (): void => {
-    const theToKey: Merge.ToKey<number> = (key: number): string => key.toString();
-    const theCombine: Merge.Combine<number> = (left: number, right: number): number => (left % 100) * 100 + right;
+    const theToKey: ToKey<number> = (key: number): string => key.toString();
+    const theCombine: Combine<number> = (left: number, right: number): number => (left % 100) * 100 + right;
 
     const theEmptyMergeSet: MergeSet<number> = new MergeSet<number>(theToKey, theCombine);
 
@@ -429,8 +429,8 @@ describe('Utils', (): void => {
   });
 
   describe('MergeMap<K, V>', (): void => {
-    const theToKey: Merge.ToKey<number> = (key: number): string => key.toString();
-    const theCombine: Merge.Combine<string> = (left: string, right: string): string => `(${left}:${right})`;
+    const theToKey: ToKey<number> = (key: number): string => key.toString();
+    const theCombine: Combine<string> = (left: string, right: string): string => `(${left}:${right})`;
 
     const theEmptyMergeMap: MergeMap<number, string> = new MergeMap<number, string>(theToKey, theCombine);
 

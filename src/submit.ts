@@ -21,7 +21,7 @@ import { randomBytes } from '@noble/hashes/utils';
 
 import type { FileHash, Timestamp, Tree } from './types';
 
-import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalizeTimestamp } from './internals';
+import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalize } from './internals';
 import { readTree } from './read';
 import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
@@ -37,7 +37,7 @@ export const defaultCalendarUrls: URL[] = [
 // -- API ---------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-export async function submitTimestamp(
+export async function submit(
   algorithm: string,
   value: Uint8Array,
   fudge?: Uint8Array,
@@ -87,7 +87,7 @@ export async function submitTimestamp(
       : { leaves: newLeaves(), edges: newEdges().add({ type: 'append', operand: fudge }, resultTree) };
 
   return {
-    timestamp: normalizeTimestamp({
+    timestamp: normalize({
       version: 1,
       fileHash,
       tree: fudgedTree,

@@ -16,7 +16,8 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Op, Ops, Paths, Timestamp, Tree } from '../src/types';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from '../src/types';
+import type { Edge, Ops, Paths } from '../src/internals';
 
 import {
   atomizeAppendOp,
@@ -34,15 +35,112 @@ import {
   newLeaves,
   newTree,
   normalizeOps,
-  normalizeTimestamp,
+  normalize,
   pathsToTree,
   treeToPaths,
+  LeafHeader,
+  Tag,
+  magicHeader,
+  nonFinal,
 } from '../src/internals';
 import { MergeMap, MergeSet, uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
 
 import { mergeMapToString, mergeSetToString, timestampToString, treeToString } from './helpers';
 
 describe('Internals', (): void => {
+  describe('Tag', (): void => {
+    it.each([
+      {
+        element: 'attestation',
+        expected: 0x00,
+        name: 'should have correct attestation value',
+      },
+      {
+        element: 'sha1',
+        expected: 0x02,
+        name: 'should have correct sha1 value',
+      },
+      {
+        element: 'ripemd160',
+        expected: 0x03,
+        name: 'should have correct ripemd160 value',
+      },
+      {
+        element: 'sha256',
+        expected: 0x08,
+        name: 'should have correct sha256 value',
+      },
+      {
+        element: 'keccak256',
+        expected: 0x67,
+        name: 'should have correct keccak256 value',
+      },
+      {
+        element: 'append',
+        expected: 0xf0,
+        name: 'should have correct append value',
+      },
+      {
+        element: 'prepend',
+        expected: 0xf1,
+        name: 'should have correct prepend value',
+      },
+      {
+        element: 'reverse',
+        expected: 0xf2,
+        name: 'should have correct reverse value',
+      },
+      {
+        element: 'hexlify',
+        expected: 0xf3,
+        name: 'should have correct hexlify value',
+      },
+    ])('$name', ({ element, expected }: { element: string; expected: number }): void => {
+      expect(Tag[element as keyof typeof Tag]).toStrictEqual(expected);
+    });
+  });
+
+  describe('LeafHeader', (): void => {
+    it.each([
+      {
+        element: 'bitcoin',
+        expected: '0588960d73d71901',
+        name: 'should have correct bitcoin value',
+      },
+      {
+        element: 'litecoin',
+        expected: '06869a0d73d71b45',
+        name: 'should have correct litecoin value',
+      },
+      {
+        element: 'ethereum',
+        expected: '30fe8087b5c7ead7',
+        name: 'should have correct ethereum value',
+      },
+      {
+        element: 'pending',
+        expected: '83dfe30d2ef90c8e',
+        name: 'should have correct pending value',
+      },
+    ])('$name', ({ element, expected }: { element: string; expected: string }): void => {
+      expect(LeafHeader[element as keyof typeof LeafHeader]).toStrictEqual(expected);
+    });
+  });
+
+  describe('magicHeader', (): void => {
+    test('should have correct value', (): void => {
+      expect(uint8ArrayToHex(magicHeader)).toStrictEqual(
+        '004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294',
+      );
+    });
+  });
+
+  describe('nonFinal', (): void => {
+    test('should have correct value', (): void => {
+      expect(nonFinal).toStrictEqual(255);
+    });
+  });
+
   describe('callOp()', (): void => {
     it.each([
       {
@@ -1404,7 +1502,7 @@ describe('Internals', (): void => {
     });
   });
 
-  describe('normalizeTimestamp()', (): void => {
+  describe('normalize()', (): void => {
     const version: number = 1;
     const fileHash: FileHash = {
       algorithm: 'sha256',
@@ -1447,9 +1545,9 @@ describe('Internals', (): void => {
       },
     ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp | undefined }): void => {
       if (undefined === expected) {
-        expect(normalizeTimestamp(timestamp)).toBeUndefined();
+        expect(normalize(timestamp)).toBeUndefined();
       } else {
-        const result: Timestamp | undefined = normalizeTimestamp(timestamp);
+        const result: Timestamp | undefined = normalize(timestamp);
         expect(result).not.toBeUndefined();
         expect(timestampToString(result as Timestamp)).toStrictEqual(timestampToString(expected));
       }

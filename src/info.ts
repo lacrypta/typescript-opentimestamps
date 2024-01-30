@@ -23,7 +23,8 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
+import type { Edge } from './internals';
 
 import { callOp, compareEdges, compareLeaves } from './internals';
 import { uint8ArrayToHex } from './utils';
@@ -362,7 +363,7 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *   },
  * };
  *
- * console.log(infoTimestamp(timestamp));
+ * console.log(info(timestamp));
  *   // msg = sha1(FILE)
  *   // msg = prepend(msg, 010203)
  *   //  -> msg = reverse(msg)
@@ -370,7 +371,7 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *   //     bitcoinVerify(msg, 123)
  *   //  -> msg = prepend(msg, 040506)
  *   //     bitcoinVerify(msg, 456)
- * console.log(infoTimestamp(timestamp, true));
+ * console.log(info(timestamp, true));
  *   // # version: 1
  *   // msg = sha1(FILE)
  *   //     = 0102030405060708090a0b0c0d0e0f1011121314
@@ -390,7 +391,7 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  * @param verbose - Whether to include the `value` field in the output or not.
  * @returns Human-readable string generated.
  */
-export function infoTimestamp(timestamp: Timestamp, verbose: boolean = false): string {
+export function info(timestamp: Timestamp, verbose: boolean = false): string {
   const resultParts: string[] = [];
   if (verbose) {
     resultParts.push(`# version: ${timestamp.version}`);

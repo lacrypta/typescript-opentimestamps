@@ -19,12 +19,12 @@
 import type { Timestamp } from '../src';
 
 import { newEdges, newLeaves } from '../src/internals';
-import { shrinkTimestamp } from '../src/shrink';
+import { shrink } from '../src/shrink';
 import { uint8ArrayFromHex } from '../src/utils';
 import { timestampToString } from './helpers';
 
 describe('Shrink', (): void => {
-  describe('shrinkTimestamp()', (): void => {
+  describe('shrink()', (): void => {
     it.each([
       {
         timestamp: {
@@ -88,7 +88,7 @@ describe('Shrink', (): void => {
         name: 'should return timestamp unchanged if no shrinking possible',
       },
     ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp }): void => {
-      expect(timestampToString(shrinkTimestamp(timestamp, 'bitcoin'))).toStrictEqual(timestampToString(expected));
+      expect(timestampToString(shrink(timestamp, 'bitcoin'))).toStrictEqual(timestampToString(expected));
     });
   });
 });

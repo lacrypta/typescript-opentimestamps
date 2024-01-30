@@ -16,9 +16,10 @@
 
 'use strict';
 
-import type { Path, Paths, Timestamp, Tree } from './types';
+import type { Timestamp, Tree } from './types';
+import type { Path, Paths } from './internals';
 
-import { callOps, normalizeTimestamp, pathsToTree, treeToPaths } from './internals';
+import { callOps, normalize, pathsToTree, treeToPaths } from './internals';
 import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
@@ -79,10 +80,10 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
 // -- API ---------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-export async function upgradeTimestamp(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
+export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
   return {
-    timestamp: normalizeTimestamp({
+    timestamp: normalize({
       version: timestamp.version,
       fileHash: timestamp.fileHash,
       tree,

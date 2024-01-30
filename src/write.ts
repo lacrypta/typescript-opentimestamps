@@ -23,10 +23,10 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
+import type { FileHash, Leaf, Timestamp, Tree } from './types';
+import type { Edge } from './internals';
 
-import { compareEdges, compareLeaves } from './internals';
-import { LeafHeader, Tag, magicHeader, nonFinal } from './types';
+import { compareEdges, compareLeaves, LeafHeader, Tag, magicHeader, nonFinal } from './internals';
 import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 /**
@@ -343,7 +343,7 @@ export function writeTree(tree: Tree): Uint8Array {
  *
  * @example
  * ```typescript
- * console.log(writeTimestamp({
+ * console.log(write({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -361,7 +361,7 @@ export function writeTree(tree: Tree): Uint8Array {
  * @param timestamp - The value to write.
  * @returns The written value.
  */
-export function writeTimestamp(timestamp: Timestamp): Uint8Array {
+export function write(timestamp: Timestamp): Uint8Array {
   return uint8ArrayConcat(
     magicHeader,
     writeUint(timestamp.version),

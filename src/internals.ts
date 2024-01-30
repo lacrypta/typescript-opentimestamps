@@ -28,9 +28,8 @@ import { sha1 } from '@noble/hashes/sha1';
 import { sha256 } from '@noble/hashes/sha256';
 import { keccak_256 } from '@noble/hashes/sha3';
 
-import type { Edge, Leaf, Op, Ops, Path, Paths, Timestamp, Tree } from './types';
+import type { Leaf, Op, Timestamp, Tree } from './types';
 
-import { LeafHeader, Tag } from './types';
 import {
   MergeMap,
   MergeSet,
@@ -41,6 +40,160 @@ import {
   uint8ArrayReversed,
   uint8ArrayToHex,
 } from './utils';
+
+/**
+ * A simple type alias to refer to a list of {@link Op | operations}.
+ *
+ */
+export type Ops = Op[];
+
+/**
+ * A "Path" consists of a list of {@link Ops | operations} with a corresponding {@link Leaf}, representing a full path
+ * from the message to attest to an attestation proper.
+ *
+ */
+export type Path = {
+  /**
+   * The {@link Ops} in this {@link Path}.
+   *
+   */
+  operations: Ops;
+
+  /**
+   * The {@link Leaf} in this {@link Path}.
+   *
+   */
+  leaf: Leaf;
+};
+
+/**
+ * A simple type alias to refer to a list of {@link Path}s.
+ *
+ */
+export type Paths = Path[];
+
+/**
+ * A simple type alias to refer to a {@link Tree}'s edges.
+ *
+ */
+export type Edge = [Op, Tree];
+
+/**
+ * Tags are single-byte values used to indicate the structural components found in an `ots` file.
+ *
+ */
+export enum Tag {
+  /**
+   * Tag indicating that the next element in the `ots` file is an attestation.
+   *
+   */
+  attestation = 0x00,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a SHA1 {@link Op}.
+   *
+   */
+  sha1 = 0x02,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a RIPEMD160 {@link Op}.
+   *
+   */
+  ripemd160 = 0x03,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a SHA256 {@link Op}.
+   *
+   */
+  sha256 = 0x08,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a KECCAK256 {@link Op}.
+   *
+   */
+  keccak256 = 0x67,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is an append {@link Op}.
+   *
+   */
+  append = 0xf0,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a prepend {@link Op}.
+   *
+   */
+  prepend = 0xf1,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a reverse {@link Op}.
+   *
+   */
+  reverse = 0xf2,
+
+  /**
+   * Tag indicating that the next element in the `ots` file is a "hexlify" {@link Op}.
+   *
+   */
+  hexlify = 0xf3,
+}
+
+/**
+ * Headers are used to identify {@link Leaf} types in an `ots` file.
+ *
+ * Headers are 8-byte sequences, and each {@link Leaf} type has an associated one.
+ * Unknown {@link Leaf | leaves} carry their `header` with them.
+ *
+ */
+export enum LeafHeader {
+  /**
+   * 8-byte header describing a Bitcoin {@link Leaf}.
+   *
+   * This header consists of bytes `05:88:96:0d:73:d7:19:01`.
+   *
+   */
+  bitcoin = '0588960d73d71901',
+
+  /**
+   * 8-byte header describing a Litecoin {@link Leaf}.
+   *
+   * This header consists of bytes `06:86:9a:0d:73:d7:1b:45`.
+   *
+   */
+  litecoin = '06869a0d73d71b45',
+
+  /**
+   * 8-byte header describing an Ethereum {@link Leaf}.
+   *
+   * This header consists of bytes `30:fe:80:87:b5:c7:ea:d7`.
+   *
+   */
+  ethereum = '30fe8087b5c7ead7',
+
+  /**
+   * 8-byte header describing a pending {@link Leaf}.
+   *
+   * This header consists of bytes `83:df:e3:0d:2e:f9:0c:8e`.
+   *
+   */
+  pending = '83dfe30d2ef90c8e',
+}
+
+/**
+ * This 31-byte header is used to identify `ots` files, it is simply a magic constant.
+ *
+ * The header consists of bytes `00:4f:70:65:6e:54:69:6d:65:73:74:61:6d:70:73:00:00:50:72:6f:6f:66:00:bf:89:e2:e8:84:e8:92:94`.
+ *
+ */
+export const magicHeader: Uint8Array = uint8ArrayFromHex(
+  '004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294',
+);
+
+/**
+ * This constant is used to indicate that the next element in an `ots` file is _not_ the last one.
+ *
+ */
+export const nonFinal: number = 0xff;
 
 /**
  * Execute the given {@link Op} on the given message, and return the result.
@@ -941,7 +1094,7 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  *
  * @example
  * ```typescript
- * const timestamp: Timestamp = normalizeTimestamp({
+ * const timestamp: Timestamp = normalize({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -998,7 +1151,7 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  * @param timestamp - The timestamp to normalize.
  * @returns The normalized timestamp.
  */
-export function normalizeTimestamp(timestamp: Timestamp): Timestamp | undefined {
+export function normalize(timestamp: Timestamp): Timestamp | undefined {
   const tree: Tree = decoalesceOperations(
     coalesceOperations(
       pathsToTree(

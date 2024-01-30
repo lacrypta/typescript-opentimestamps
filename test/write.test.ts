@@ -16,11 +16,12 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { Edge } from '../src/internals';
 
 import { newEdges, newLeaves, newTree } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
-import { writeBytes, writeEdge, writeFileHash, writeLeaf, writeTimestamp, writeTree, writeUint } from '../src/write';
+import { writeBytes, writeEdge, writeFileHash, writeLeaf, write, writeTree, writeUint } from '../src/write';
 
 const textEncoder: TextEncoder = new TextEncoder();
 
@@ -262,7 +263,7 @@ describe('Write', (): void => {
     });
   });
 
-  describe('writeTimestamp()', (): void => {
+  describe('write()', (): void => {
     it.each([
       {
         timestamp: {
@@ -303,7 +304,7 @@ describe('Write', (): void => {
         name: 'should write non-empty timestamp',
       },
     ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Uint8Array }): void => {
-      expect(writeTimestamp(timestamp)).toStrictEqual(expected);
+      expect(write(timestamp)).toStrictEqual(expected);
     });
   });
 });

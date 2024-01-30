@@ -16,7 +16,8 @@
 
 'use strict';
 
-import type { Edge, Leaf, Op, Timestamp, Tree } from '../src/types';
+import type { Leaf, Op, Timestamp, Tree } from '../src/types';
+import type { Edge } from '../src/internals';
 
 import { MergeMap, MergeSet, uint8ArrayToHex } from '../src/utils';
 

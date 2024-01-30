@@ -16,7 +16,8 @@
 
 'use strict';
 
-import type { Path, Timestamp, Verifier } from './types';
+import type { Timestamp, Verifier } from './types';
+import type { Path } from './internals';
 
 import { treeToPaths, callOps } from './internals';
 
@@ -24,7 +25,7 @@ import { treeToPaths, callOps } from './internals';
 // -- API ---------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-export async function verifyTimestamp(
+export async function verify(
   timestamp: Timestamp,
   verifiers: Record<string, Verifier>,
 ): Promise<{ attestations: Record<number, string[]>; errors: Record<string, Error[]> }> {

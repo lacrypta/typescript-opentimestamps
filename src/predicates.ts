@@ -16,22 +16,24 @@
 
 'use strict';
 
+import type { Path, Paths } from './internals';
+
 import { treeToPaths } from './internals';
-import { Path, Paths, Timestamp } from './types';
+import { Timestamp } from './types';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // -- API ---------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-export function canShrinkTimestamp(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {
+export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {
   const paths: Paths = treeToPaths(timestamp.tree);
   return 1 < paths.length && paths.some(({ leaf }: Path): boolean => chain === leaf.type);
 }
 
-export function canUpgradeTimestamp(timestamp: Timestamp): boolean {
+export function canUpgrade(timestamp: Timestamp): boolean {
   return treeToPaths(timestamp.tree).some(({ leaf }: Path): boolean => 'pending' === leaf.type);
 }
 
-export function canVerifyTimestamp(timestamp: Timestamp): boolean {
+export function canVerify(timestamp: Timestamp): boolean {
   return treeToPaths(timestamp.tree).some(({ leaf }: Path): boolean => 'pending' !== leaf.type);
 }

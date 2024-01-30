@@ -23,10 +23,10 @@
 
 'use strict';
 
-import type { Edge, FileHash, Leaf, Timestamp, Tree } from './types';
+import type { FileHash, Leaf, Timestamp, Tree } from './types';
+import type { Edge } from './internals';
 
-import { incorporateToTree, newTree, normalizeTimestamp } from './internals';
-import { Tag, magicHeader, nonFinal } from './types';
+import { incorporateToTree, magicHeader, newTree, nonFinal, normalize, Tag } from './internals';
 import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';
 
@@ -600,7 +600,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * console.log(readTimestamp(Uint8Array.of(
+ * console.log(read(Uint8Array.of(
  *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
  *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
  *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
@@ -625,7 +625,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * console.log(readTimestamp(Uint8Array.of(
+ * console.log(read(Uint8Array.of(
  *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
  *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
  *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
@@ -650,7 +650,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  * @returns The read and normalized Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */
-export function readTimestamp(data: Uint8Array): Timestamp {
+export function read(data: Uint8Array): Timestamp {
   const idx: number = readLiteral(data, 0, magicHeader)[1];
   const [version, idx2]: [number, number] = readVersion(data, idx);
   const [fileHash, idx3]: [FileHash, number] = readFileHash(data, idx2);
@@ -660,5 +660,5 @@ export function readTimestamp(data: Uint8Array): Timestamp {
     throw new Error('Garbage at EOF');
   }
 
-  return normalizeTimestamp({ version, fileHash, tree })!;
+  return normalize({ version, fileHash, tree })!;
 }

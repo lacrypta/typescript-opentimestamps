@@ -855,7 +855,7 @@ export function validateVersion(version: unknown): number {
  * ```typescript
  * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(validateTimestamp({
+ * console.log(validate({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -876,10 +876,10 @@ export function validateVersion(version: unknown): number {
  *
  * @example
  * ```typescript
- * console.log(validateTimestamp(123));             // Error: Expected non-null object
- * console.log(validateTimestamp({}));              // Error: Expected key .version
- * console.log(validateTimestamp({ version: 1 }));  // Error: Expected key .fileHash
- * console.log(validateTimestamp({
+ * console.log(validate(123));             // Error: Expected non-null object
+ * console.log(validate({}));              // Error: Expected key .version
+ * console.log(validate({ version: 1 }));  // Error: Expected key .fileHash
+ * console.log(validate({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -894,7 +894,7 @@ export function validateVersion(version: unknown): number {
  * @throws {@link !Error} If the given datum has no `.fileHash` key.
  * @throws {@link !Error} If the given datum has no `.tree` key.
  */
-export function validateTimestamp(timestamp: unknown): Timestamp {
+export function validate(timestamp: unknown): Timestamp {
   const obj: object = validateNonNullObject(timestamp);
 
   if (!('version' in obj)) {
@@ -917,13 +917,13 @@ export function validateTimestamp(timestamp: unknown): Timestamp {
 /**
  * {@link Timestamp} Assertion-function.
  *
- * > This function internally calls {@link validateTimestamp}.
+ * > This function internally calls {@link validate}.
  *
  * @example
  * ```typescript
  * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
  *
- * assertTimestamp({
+ * assert({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -944,10 +944,10 @@ export function validateTimestamp(timestamp: unknown): Timestamp {
  *
  * @example
  * ```typescript
- * assertTimestamp(123);             // Error: Expected non-null object
- * assertTimestamp({});              // Error: Expected key .version
- * assertTimestamp({ version: 1 });  // Error: Expected key .fileHash
- * assertTimestamp({
+ * assert(123);             // Error: Expected non-null object
+ * assert({});              // Error: Expected key .version
+ * assert({ version: 1 });  // Error: Expected key .fileHash
+ * assert({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -959,8 +959,8 @@ export function validateTimestamp(timestamp: unknown): Timestamp {
  * @param timestamp - Datum to assert.
  * @see [Assertion Functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions)
  */
-export function assertTimestamp(timestamp: unknown): asserts timestamp is Timestamp {
-  void validateTimestamp(timestamp);
+export function assert(timestamp: unknown): asserts timestamp is Timestamp {
+  void validate(timestamp);
 }
 
 /**
@@ -970,17 +970,17 @@ export function assertTimestamp(timestamp: unknown): asserts timestamp is Timest
  * ```typescript
  * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(isTimestamp(123));             // false
- * console.log(isTimestamp({}));              // false
- * console.log(isTimestamp({ version: 1 }));  // false
- * console.log(isTimestamp({
+ * console.log(is(123));             // false
+ * console.log(is({}));              // false
+ * console.log(is({ version: 1 }));  // false
+ * console.log(is({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
  *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
  *   },
  * }));                                       // false
- * console.log(isTimestamp({
+ * console.log(is({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
@@ -1003,9 +1003,9 @@ export function assertTimestamp(timestamp: unknown): asserts timestamp is Timest
  * @returns `true` if the given datum is indeed a {@link Timestamp}, `false` otherwise.
  * @see [Using type predicates](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
  */
-export function isTimestamp(timestamp: unknown): timestamp is Timestamp {
+export function is(timestamp: unknown): timestamp is Timestamp {
   try {
-    assertTimestamp(timestamp);
+    assert(timestamp);
     return true;
   } catch {
     return false;

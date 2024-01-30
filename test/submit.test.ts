@@ -19,7 +19,7 @@
 import type { Timestamp } from '../src/types';
 
 import { newEdges, newLeaves } from '../src/internals';
-import { defaultCalendarUrls, submitTimestamp } from '../src/submit';
+import { defaultCalendarUrls, submit } from '../src/submit';
 import { uint8ArrayFromHex } from '../src/utils';
 
 import { timestampToString } from './helpers';
@@ -53,7 +53,7 @@ describe('Submit', (): void => {
     });
   });
 
-  describe('submitTimestamp()', (): void => {
+  describe('submit()', (): void => {
     it.each([
       {
         responseBody: null,
@@ -133,7 +133,7 @@ describe('Submit', (): void => {
           });
 
         void expect(
-          submitTimestamp('sha1', uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'), Uint8Array.of(), [
+          submit('sha1', uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'), Uint8Array.of(), [
             new URL('https://www.example.com'),
           ]).then(
             ({
@@ -242,7 +242,7 @@ describe('Submit', (): void => {
           });
 
         void expect(
-          submitTimestamp(
+          submit(
             'sha1',
             uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             Uint8Array.of(1, 2, 3, 4, 5, 6),

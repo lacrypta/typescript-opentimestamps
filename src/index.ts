@@ -14,54 +14,49 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 'use strict';
 
-import type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API (type-likes) --------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
 
-import { Merge, MergeSet, MergeMap } from './utils';
+export type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
+export type { Combine, ToKey } from './utils';
 
-import { infoTimestamp } from './info';
-import { normalizeTimestamp } from './internals';
-import { canShrinkTimestamp, canUpgradeTimestamp, canVerifyTimestamp } from './predicates';
-import { readTimestamp } from './read';
-import { shrinkTimestamp } from './shrink';
-import { submitTimestamp } from './submit';
-import { upgradeTimestamp } from './upgrade';
-import { isTimestamp, assertTimestamp, validateTimestamp } from './validation';
-import { writeTimestamp } from './write';
+export { MergeMap, MergeSet } from './utils';
 
-import { verifyTimestamp } from './verify';
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// -- API (function-likes) ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------
+
+import { info as _info } from './info';
+import { normalize as _normalize } from './internals';
+import { canShrink as _canShrink, canUpgrade as _canUpgrade, canVerify as _canVerify } from './predicates';
+import { read as _read } from './read';
+import { shrink as _shrink } from './shrink';
+import { submit as _submit } from './submit';
+import { upgrade as _upgrade } from './upgrade';
+import { is as _is, assert as _assert, validate as _validate } from './validation';
+import { write as _write } from './write';
+
+import { verify as _verify } from './verify';
 import { default as verifiers } from './verifiers';
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
+export const info = _info;
+export const normalize = _normalize;
+export const canShrink = _canShrink;
+export const canUpgrade = _canUpgrade;
+export const canVerify = _canVerify;
+export const read = _read;
+export const shrink = _shrink;
+export const submit = _submit;
+export const upgrade = _upgrade;
+export const is = _is;
 
-export type { Timestamp };
-export type { FileHash };
-export type { Tree };
-export type { Leaf };
-export type { Op };
-export type { Verifier };
-
-export type { Merge };
-
-export { MergeSet };
-export { MergeMap };
-
-export const info = infoTimestamp;
-export const normalize = normalizeTimestamp;
-export const canShrink = canShrinkTimestamp;
-export const canUpgrade = canUpgradeTimestamp;
-export const canVerify = canVerifyTimestamp;
-export const read = readTimestamp;
-export const shrink = shrinkTimestamp;
-export const submit = submitTimestamp;
-export const upgrade = upgradeTimestamp;
-export const is = isTimestamp;
-export const assert = assertTimestamp;
-export const validate = validateTimestamp;
-export const write = writeTimestamp;
-export const verify = verifyTimestamp;
+export const assert = _assert;
+export const validate = _validate;
+export const write = _write;
+export const verify = _verify;
 
 export { verifiers };
