@@ -113,7 +113,83 @@ export const newLeaves = _newLeaves;
  */
 export const newTree = _newTree;
 
+/**
+ * Generate a human-readable string form the given {@link Timestamp}.
+ *
+ * Human-readable strings are generated as a concatenation of:
+ *
+ * - The {@link Timestamp}'s `version` (as a _"faux comment"_, and only if the `verbose` parameter is true).
+ * - The {@link Timestamp}'s `fileHash` as a simple function call.
+ * - Function call trees for the main {@link Timestamp} `tree`.
+ *
+ * @example
+ * ```typescript
+ * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const timestamp: Timestamp = {
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * };
+ *
+ * console.log(info(timestamp));
+ *   // msg = sha1(FILE)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(info(timestamp, true));
+ *   // # version: 1
+ *   // msg = sha1(FILE)
+ *   //     = 0102030405060708090a0b0c0d0e0f1011121314
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
+ *   //  -> msg = reverse(msg)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
+ *   //     bitcoinVerify(msg, 456)
+ * ```
+ *
+ * @param timestamp - File hash to generate human-readable string for.
+ * @param verbose - Whether to include the `value` field in the output or not.
+ * @returns Human-readable string generated.
+ */
 export const info = _info;
+
 export const normalize = _normalize;
 export const canShrink = _canShrink;
 export const canUpgrade = _canUpgrade;
@@ -123,7 +199,6 @@ export const shrink = _shrink;
 export const submit = _submit;
 export const upgrade = _upgrade;
 export const is = _is;
-
 export const assert = _assert;
 export const validate = _validate;
 export const write = _write;

@@ -34,6 +34,10 @@ import { uint8ArrayToHex } from './utils';
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { indent } from "./src/info";
+ *
  * console.log(indent(''));
  *   // ->
  * console.log(indent('something'));
@@ -66,6 +70,10 @@ export function indent(text: string): string {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { infoLeaf } from "./src/info";
+ *
  * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
  * console.log(infoLeaf({ type: 'litecoin', height: 456 }));  // litecoinVerify(msg, 456)
  * console.log(infoLeaf({ type: 'ethereum', height: 789 }));  // ethereumVerify(msg, 789)
@@ -100,6 +108,11 @@ export function infoLeaf(leaf: Leaf): string {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { infoEdge } from "./src/info";
+ * import { newEdges, newLeaves } from "./src/internals";
+ *
  * console.log(infoEdge(
  *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
  *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
@@ -154,6 +167,13 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Tree } from "./src/types";
+ *
+ * import { infoTree } from "./src/info";
+ * import { newEdges, newLeaves } from "./src/internals";
+ *
  * const tree: Tree = {
  *   leaves: newLeaves(),
  *   edges: newEdges().add(
@@ -229,6 +249,12 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { FileHash } from "./src/types";
+ *
+ * import { infoFileHash } from "./src/info";
+ *
  * const fileHash: FileHash = {
  *   algorithm: 'sha1',
  *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
@@ -267,68 +293,13 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *
  * @example
  * ```typescript
- * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ * 'use strict';
  *
- * const timestamp: Timestamp = {
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
- *     ),
- *   },
- * };
+ * import type { Timestamp } from "./src/types";
  *
- * console.log(info(timestamp));
- *   // msg = sha1(FILE)
- *   // msg = prepend(msg, 010203)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //     bitcoinVerify(msg, 456)
- * console.log(info(timestamp, true));
- *   // # version: 1
- *   // msg = sha1(FILE)
- *   //     = 0102030405060708090a0b0c0d0e0f1011121314
- *   // msg = prepend(msg, 010203)
- *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
- *   //  -> msg = reverse(msg)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
- *   //     msg = append(msg, 070809)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
- *   //     bitcoinVerify(msg, 456)
- * ```
+ * import { info } from "./src/info";
+ * import { newEdges, newLeaves } from "./src/internals";
  *
- * @example
- * ```typescript
  * const timestamp: Timestamp = {
  *   version: 1,
  *   fileHash: {
