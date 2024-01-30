@@ -28,14 +28,11 @@
   "markedOptions": {
     "gfm": true
   },
-  "json": "../dist/docs/api.json",
   "pretty": true,
   "sourceLinkExternal": true,
   "hideParameterTypesInTitle": false,
   "excludePrivate": true,
   "cleanOutputDir": true,
-  "out": "../dist/docs/api",
-  "entryPoints": ["../src/index.ts"],
   "hideGenerator": true,
   "searchInComments": true,
   "navigationLinks": {
@@ -46,6 +43,11 @@
     "notExported": true,
     "invalidLink": true,
     "notDocumented": false
+  },
+  "externalSymbolLinkMappings": {
+    "typescript": {
+      "RequestInit": "https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options"
+    }
   },
   "treatWarningsAsErrors": false,
   "treatValidationWarningsAsErrors": false,

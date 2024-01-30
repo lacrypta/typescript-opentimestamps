@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "extends": ["./typedoc.json"],
+  "json": "../dist/docs/internal.json",
+  "excludePrivate": false,
+  "out": "../dist/docs/internal",
+  "entryPoints": ["../src/**/*.ts"],
+  "exclude": ["../src/index.ts"],
+  "visibilityFilters": {
+    "protected": true,
+    "private": true,
+    "inherited": true,
+    "external": true
+  }
+}
