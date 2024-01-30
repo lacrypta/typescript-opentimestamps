@@ -124,7 +124,9 @@ export const newTree = _newTree;
  *
  * @example
  * ```typescript
- * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
+ *
+ * import { info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
  *
  * const timestamp: Timestamp = {
  *   version: 1,
