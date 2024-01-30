@@ -298,10 +298,6 @@ export const textEncoder: TextEncoder = new TextEncoder();
  */
 export const textDecoder: TextDecoder = new TextDecoder();
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
 /**
  * The type of the callback that will transform an element into a string (implicitly defining what "equality" between elements means) in a {@link MergeSet} or equivalent keys for {@link MergeMap}s.
  *

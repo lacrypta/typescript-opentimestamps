@@ -76,10 +76,6 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
   return [pathsToTree(paths), errors];
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
 export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
   return {
