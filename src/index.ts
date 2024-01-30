@@ -192,10 +192,170 @@ export const newTree = _newTree;
  */
 export const info = _info;
 
+/**
+ * Normalize the given {@link Timestamp}, so as to have it have standardized `tree` component.
+ *
+ * This function will perform the following steps in order:
+ *
+ * 1. Transform the given {@link Timestamp}'s `tree` component into a set of {@link Path}s (via {@link treeToPaths}).
+ * 2. Normalize each of these {@link Path}s individually (via {@link normalizeOps}).
+ * 3. Re-build a {@link Tree} from these normalized {@link Path}s (via {@link pathsToTree}).
+ * 4. Coalesce these {@link Op | operation}s in this resulting {@link Tree} (via {@link coalesceOperations}).
+ * 5. Finally, decoalesce them (via {@link decoalesceOperations}) to deal with edge cases.
+ *
+ * If the normalization operation would yield an empty {@link Tree}, `undefined` is returned (since "empty" {@link Timestamp}s are not allowed).
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
+ *
+ * import { normalize, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const timestamp: Timestamp = normalize({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: newLeaves(),
+ *     edges: newEdges().add(
+ *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *       { leaves: newLeaves(),
+ *         edges: newEdges()
+ *           .add(
+ *             { type: 'reverse' },
+ *             { leaves: newLeaves(),
+ *               edges: newEdges().add(
+ *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                 { edges: newEdges(),
+ *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 },
+ *               ),
+ *             },
+ *           )
+ *           .add(
+ *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *             { edges: newEdges(),
+ *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             },
+ *           ),
+ *       },
+ *     ),
+ *   },
+ * })!;
+ *
+ * console.log(timestamp.tree.leaves.values());                                                        // []
+ * console.log(timestamp.tree.edges.keys());
+ *   // [
+ *   //   { type: 'prepend', operand: Uint8Array(3) [ 9, 8, 7 ] },
+ *   //   { type: 'prepend', operand: Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ] }
+ *   // ]
+ * console.log(timestamp.tree.edges.values()[0]?.leaves.values());                                     // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.keys());
+ *   // [ { type: 'append', operand: Uint8Array(3) [ 3, 2, 1 ] } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.leaves.values());                  // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.keys());
+ *   // [ { type: 'reverse' } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.leaves.values());
+ *   // [ { type: 'bitcoin', height: 123 } ]
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.edges.keys());  // []
+ * console.log(timestamp.tree.edges.values()[1]?.leaves.values());
+ *   // [ { type: 'bitcoin', height: 456 } ]
+ * console.log(timestamp.tree.edges.values()[1]?.edges.keys());                                        // []
+ * ```
+ *
+ * @param timestamp - The timestamp to normalize.
+ * @returns The normalized timestamp.
+ */
 export const normalize = _normalize;
+
 export const canShrink = _canShrink;
 export const canUpgrade = _canUpgrade;
 export const canVerify = _canVerify;
+
+/**
+ * Read a {@link Timestamp} from the given data substrate.
+ *
+ * {@link Timestamp}s are stored as a sequence of "parts":
+ *
+ * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream (cf. {@link magicHeader}).
+ * 2. The serialization format `version`, as a `UINT`.
+ * 3. The serialized {@link FileHash}.
+ * 4. The serialized {@link Tree}.
+ *
+ * This function will read the given data stream, and normalize the resulting {@link Timestamp} value.
+ *
+ * > This function internally calls {@link readLiteral}.
+ * >
+ * > This function internally calls {@link readVersion}.
+ * >
+ * > This function internally calls {@link readFileHash}.
+ * >
+ * > This function internally calls {@link readTree}.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { read } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(read(Uint8Array.of(
+ *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+ *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
+ *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
+ *   1,
+ *   0x02,
+ *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   0x00,
+ *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *   1,
+ *   123,
+ * )));
+ *   // {
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
+ *   //   version: 1,
+ *   //   tree: {
+ *   //     edges: MergeMap { },
+ *   //     leaves: MergeSet { ... }
+ *   //   }
+ *   // }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { read } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(read(Uint8Array.of(
+ *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+ *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
+ *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
+ *   1,
+ *   0x02,
+ *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   0x00,
+ *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *   1,
+ *   123,
+ *   4,
+ *   5,
+ *   6,
+ *   7,
+ *   8,
+ *   9,
+ * )));  // Error: Garbage at EOF
+ * ```
+ *
+ * @param data - The data substrate to use.
+ * @returns The read and normalized Timestamp.
+ * @throws {@link !Error} when there's additional data past the Timestamp's value.
+ */
 export const read = _read;
 export const shrink = _shrink;
 export const submit = _submit;
