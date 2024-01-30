@@ -352,8 +352,162 @@ export const read = _read;
 export const shrink = _shrink;
 export const submit = _submit;
 export const upgrade = _upgrade;
+
+/**
+ * {@link Timestamp} type-predicate.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { Leaf, Op, Tree, MergeMap, MergeSet, is } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(is(123));             // false
+ * console.log(is({}));              // false
+ * console.log(is({ version: 1 }));  // false
+ * console.log(is({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ * }));                              // false
+ * console.log(is({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: new MergeSet<Leaf>(
+ *       (_key: Leaf): string => '',
+ *       (left: Leaf, _right: Leaf): Leaf => left
+ *     ),
+ *     edges: new MergeMap<Op, Tree>(
+ *       (_key: Op): string => '',
+ *       (left: Tree, _right: Tree): Tree => left
+ *     ),
+ *   },
+ * }));                              // true
+ * ```
+ *
+ * @param timestamp - Datum to check.
+ * @returns `true` if the given datum is indeed a {@link Timestamp}, `false` otherwise.
+ * @see [Using type predicates](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
+ */
 export const is = _is;
+
+/**
+ * {@link Timestamp} Assertion-function.
+ *
+ * > This function internally calls {@link validate}.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { Leaf, Op, Tree, MergeMap, MergeSet, assert } from '@lacrypta/typescript-opentimestamps';
+ *
+ * assert({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: new MergeSet<Leaf>(
+ *       (_key: Leaf): string => '',
+ *       (left: Leaf, _right: Leaf): Leaf => left
+ *     ),
+ *     edges: new MergeMap<Op, Tree>(
+ *       (_key: Op): string => '',
+ *       (left: Tree, _right: Tree): Tree => left
+ *     ),
+ *   },
+ * });  // OK
+ * ```
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { assert } from '@lacrypta/typescript-opentimestamps';
+ *
+ * assert(123);             // Error: Expected non-null object
+ * assert({});              // Error: Expected key .version
+ * assert({ version: 1 });  // Error: Expected key .fileHash
+ * assert({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ * });                               // Error: Expected key .tree
+ * ```
+ *
+ * @param timestamp - Datum to assert.
+ * @see [Assertion Functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions)
+ */
 export const assert = _assert;
+
+/**
+ * Validate that the given datum is a well-formed {@link Timestamp}.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { Leaf, Op, Tree, MergeMap, MergeSet, validate } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(validate({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     leaves: new MergeSet<Leaf>(
+ *       (_key: Leaf): string => '',
+ *       (left: Leaf, _right: Leaf): Leaf => left
+ *     ),
+ *     edges: new MergeMap<Op, Tree>(
+ *       (_key: Op): string => '',
+ *       (left: Tree, _right: Tree): Tree => left
+ *     ),
+ *   },
+ * }));  // { version: 1, fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, tree: { leaves: MergeSet { ... }, edges: MergeMap { ... } } }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { validate } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(validate(123));             // Error: Expected non-null object
+ * console.log(validate({}));              // Error: Expected key .version
+ * console.log(validate({ version: 1 }));  // Error: Expected key .fileHash
+ * console.log(validate({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ * }));                                    // Error: Expected key .tree
+ * ```
+ *
+ * @param timestamp - Data to validate.
+ * @returns The validated {@link Timestamp}.
+ * @throws {@link !Error} If the given datum has no `.version` key.
+ * @throws {@link !Error} If the given datum has no `.fileHash` key.
+ * @throws {@link !Error} If the given datum has no `.tree` key.
+ */
 export const validate = _validate;
 export const write = _write;
 export const verify = _verify;
