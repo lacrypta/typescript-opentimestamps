@@ -31,7 +31,12 @@ export { MergeMap, MergeSet } from './utils';
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
 import { info as _info } from './info';
-import { normalize as _normalize } from './internals';
+import {
+  normalize as _normalize,
+  newEdges as _newEdges,
+  newLeaves as _newLeaves,
+  newTree as _newTree,
+} from './internals';
 import { canShrink as _canShrink, canUpgrade as _canUpgrade, canVerify as _canVerify } from './predicates';
 import { read as _read } from './read';
 import { shrink as _shrink } from './shrink';
@@ -42,6 +47,71 @@ import { write as _write } from './write';
 
 import { verify as _verify } from './verify';
 import { default as verifiers } from './verifiers';
+
+/**
+ * Construct an empty {@link MergeMap} suitable for usage to hold `<{@link Op}, {@link Tree}>` maps in a {@link Tree}.
+ *
+ * A {@link MergeMap} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
+ * In the case of `<{@link Op}, {@link Tree}>` mappings these are:
+ *
+ * - **`toKey`:** use the {@link Op}'s `type`; if this happens to be `append` or `prepend`, append a `:` followed by their `operand` to the constructed key.
+ * - **`combine`:** simply merge the two {@link Tree}s.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { newEdges } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(newEdges());  // MergeMap { ... }
+ * ```
+ *
+ * @returns The empty `<{@link Op}, {@link Tree}>` mapping.
+ */
+export const newEdges = _newEdges;
+
+/**
+ * Construct an empty {@link MergeSet} suitable for usage to hold {@link Leaf} sets in a {@link Tree}.
+ *
+ * A {@link MergeSet} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
+ * In the case of {@link Leaf} mappings these are:
+ *
+ * - **`toKey`:** return the {@link Leaf}'s `type` with a `:` at the, and, depending on the `type` itself, concatenate this with:
+ *     - **`pending`:** the {@link Leaf}'s `url`;
+ *     - **`unknown`:** the {@link Leaf}'s `header` as a hex string, a `:`, and its payload as a hex string;
+ *     - **`bitcoin`, `litecoin`, or `ethereum`:** the {@link Leaf}'s height as a decimal string.
+ * - **`combine`:** simply return the first of the two {@link Leaf | Leaves} (there's no point in holding more than one of each {@link Leaf} type).
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { newLeaves } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(newLeaves());  // MergeSet { ... }
+ * ```
+ *
+ * @returns The empty {@link Leaf | Leaves} set.
+ */
+export const newLeaves = _newLeaves;
+
+/**
+ * Construct an empty {@link Tree}.
+ *
+ * This function merely calls {@link newLeaves} and {@link newEdges} to construct an empty {@link Tree}.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { newTree } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(newTree());  // { edges: MergeMap { ... }, leaves: MergeSet { ... } }
+ * ```
+ *
+ * @returns The empty tree constructed.
+ */
+export const newTree = _newTree;
 
 export const info = _info;
 export const normalize = _normalize;

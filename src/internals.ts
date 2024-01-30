@@ -211,6 +211,10 @@ export const nonFinal: number = 0xff;
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { callOp } from "./src/internals";
+ *
  * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));                                      // Uint8Array(20) [ 112, 55, ..., 207 ]
  * console.log(callOp({ type: 'ripemd160' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(20) [ 121, 249, ..., 87 ]
  * console.log(callOp({ type: 'sha256' }, Uint8Array.of(1, 2, 3)));                                    // Uint8Array(32) [ 3, 144, ..., 129 ]
@@ -251,6 +255,10 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { callOps } from "./src/internals";
+ *
  * console.log(callOps([], Uint8Array.of()));  // Uint8Array(0) []
  * console.log(callOps([
  *   { type: 'sha1' },
@@ -280,6 +288,10 @@ export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { compareLeaves } from "./src/internals";
+ *
  * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 })); // -1
  * console.log(compareLeaves({ type: 'litecoin', height: 123 }, { type: 'bitcoin', height: 123 })); //  1
  * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 }));  // -333
@@ -348,6 +360,10 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { compareOps } from "./src/internals";
+ *
  * console.log(compareOps({ type: 'sha1' }, { type: 'ripemd160' })); // -1
  * console.log(compareOps({ type: 'sha1' }, { type: 'sha1' }));      //  0
  * console.log(compareOps({ type: 'ripemd160' }, { type: 'sha1' })); //  1
@@ -384,6 +400,10 @@ export function compareOps(left: Op, right: Op): number {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { compareEdges, newTree } from "./src/internals";
+ *
  * console.log(compareEdges(
  *   [{ type: 'sha1' }, newTree()], [{ type: 'ripemd160' }, newTree()],
  * ));  // -1
@@ -425,6 +445,12 @@ export function compareEdges(left: Edge, right: Edge): number {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Tree } from "./src/types";
+ *
+ * import { incorporateTreeToTree, newEdges, newLeaves } from "./src/internals";
+ *
  * const left: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
  * const right: Tree = {
  *   leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
@@ -461,6 +487,12 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { incorporateToTree, newEdges, newLeaves } from "./src/internals";
+ *
+ * import type { Tree } from "./src/types";
+ *
  * const tree: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
  *
  * incorporateToTree(tree, { type: 'bitcoin', height: 456 });
@@ -472,8 +504,8 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *   },
  * ]);
  *
- * console.log(tree.leaves.values()); // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
- * console.log(tree.edges.entries()); // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
+ * console.log(tree.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
+ * console.log(tree.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
  * ```
  *
  * @param tree - The tree to incorporate the given parameter _into_.
@@ -500,6 +532,10 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newEdges } from "./src/internals";
+ *
  * console.log(newEdges());  // MergeMap { ... }
  * ```
  *
@@ -534,6 +570,10 @@ export function newEdges(): MergeMap<Op, Tree> {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newLeaves } from "./src/internals";
+ *
  * console.log(newLeaves());  // MergeSet { ... }
  * ```
  *
@@ -564,6 +604,10 @@ export function newLeaves(): MergeSet<Leaf> {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newTree } from "./src/internals";
+ *
  * console.log(newTree());  // { edges: MergeMap { ... }, leaves: MergeSet { ... } }
  * ```
  *
@@ -708,6 +752,12 @@ export function newTree(): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Tree } from "./src/types";
+ *
+ * import { decoalesceOperations, newEdges, newLeaves, newTree } from "./src/internals";
+ *
  * const tree: Tree = {
  *   leaves: newLeaves(),
  *   edges: newEdges().add(
@@ -818,6 +868,12 @@ export function decoalesceOperations(tree: Tree): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Tree } from "./src/types";
+ *
+ * import { coalesceOperations, newEdges, newLeaves, newTree } from "./src/internals";
+ *
  * const tree: Tree = {
  *   leaves: newLeaves(),
  *   edges: newEdges().add(
@@ -872,6 +928,10 @@ export function coalesceOperations(tree: Tree): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { atomizePrependOp } from "./src/internals";
+ *
  * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));  // [
  *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
  *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 2 ] },
@@ -895,6 +955,10 @@ export function atomizePrependOp(prefix: Uint8Array): Ops {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { atomizeAppendOp } from "./src/internals";
+ *
  * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));  // [
  *                                                        //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
  *                                                        //   { type: 'append', operand: Uint8Array(1) [ 2 ] },
@@ -933,6 +997,10 @@ export function atomizeAppendOp(suffix: Uint8Array): Ops {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { normalizeOps } from "./src/internals";
+ *
  * console.log(normalizeOps([
  *   { type: 'append', operand: Uint8Array.of(1, 2) },
  *   { type: 'prepend', operand: Uint8Array.of(3, 4) },
@@ -1007,6 +1075,12 @@ export function normalizeOps(operations: Ops): Ops {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Op, Tree } from "./src/types";
+ * import type { Path } from "./src/internals";
+ * import { pathsToTree } from "./src/internals";
+ *
  * const path1: Path = { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } };
  * const path2: Path = { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } };
  *
@@ -1042,6 +1116,13 @@ export function pathsToTree(paths: Paths): Tree {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Tree } from "./src/types";
+ * import type { Path } from "./src/internals";
+ *
+ * import { newEdges, newLeaves, treeToPaths } from "./src/internals";
+ *
  * const tree: Tree = {
  *   leaves: newLeaves(),
  *   edges: newEdges()
@@ -1094,6 +1175,12 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import type { Timestamp } from "./src/types";
+ *
+ * import { newEdges, newLeaves, normalize } from "./src/internals";
+ *
  * const timestamp: Timestamp = normalize({
  *   version: 1,
  *   fileHash: {
