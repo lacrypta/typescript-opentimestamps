@@ -46,6 +46,10 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { writeUint } from "./src/write";
+ *
  * console.log(writeUint(0));         // Uint8Array(1) [ 0 ]
  * console.log(writeUint(1));         // Uint8Array(1) [ 1 ]
  * console.log(writeUint(1234));      // Uint8Array(2) [ 210, 9 ]
@@ -54,6 +58,10 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { writeUint } from "./src/write";
+ *
  * console.log(writeUint(-1));       // Error: Expected safe non-negative value
  * console.log(writeUint(NaN));      // Error: Expected safe non-negative value
  * console.log(writeUint(Math.PI));  // Error: Expected safe non-negative value
@@ -85,6 +93,10 @@ export function writeUint(value: number): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { writeBytes } from "./src/write";
+ *
  * console.log(writeBytes(Uint8Array.of()));            // Uint8Array(1) [ 0 ]
  * console.log(writeBytes(Uint8Array.of(1, 2, 3, 4)));  // Uint8Array(5) [ 4, 1, 2, 3, 4 ]
  * ```
@@ -104,6 +116,10 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { writeFileHash } from "./src/write";
+ *
  * console.log(writeFileHash({
  *   algorithm: 'sha1',
  *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
@@ -160,6 +176,10 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { writeLeaf } from "./src/write";
+ *
  * console.log(writeLeaf({ type: 'bitcoin', height: 123 }));
  *   // Uint8Array(11) [ 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123 ]
  * console.log(writeLeaf({ type: 'litecoin', height: 123 }));
@@ -216,6 +236,11 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newTree } from "./src/internals";
+ * import { writeEdge } from "./src/write";
+ *
  * console.log(writeEdge([{ type: 'sha1' }, newTree()]));
  *   // Uint8Array(1) [ 2 ]
  * console.log(writeEdge([{ type: 'ripemd160' }, newTree()]));
@@ -267,6 +292,11 @@ export function writeEdge(edge: Edge): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newEdges, newLeaves, newTree } from "./src/internals";
+ * import { writeTree } from "./src/write";
+ *
  * console.log(writeTree(newTree()));
  *   // Uint8Array(0) []
  * console.log(writeTree({ edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }));
@@ -343,6 +373,11 @@ export function writeTree(tree: Tree): Uint8Array {
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
+ * import { newTree } from "./src/internals";
+ * import { write } from "./src/write";
+ *
  * console.log(write({
  *   version: 1,
  *   fileHash: {

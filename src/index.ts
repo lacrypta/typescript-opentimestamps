@@ -509,6 +509,41 @@ export const assert = _assert;
  * @throws {@link !Error} If the given datum has no `.tree` key.
  */
 export const validate = _validate;
+
+/**
+ * Write a {@link Timestamp}'s value.
+ *
+ * A {@link Timestamp} is written by concatenating the following parts in order:
+ *
+ * 1. A "magic header" to indicate that this is an ots.
+ * 2. The `version` used to write the value.
+ * 3. The {@link Timestamp}'s {@link FileHash}.
+ * 4. The {@link Timestamp}'s {@link Tree}.
+ *
+ * @example
+ * ```typescript
+ * 'use strict';
+ *
+ * import { newTree, write, validate } from '@lacrypta/typescript-opentimestamps';
+ *
+ * console.log(write({
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: newTree(),
+ * }));
+ *   // Uint8Array(53) [
+ *   //    0,  79, 112, 101, 110,  84, 105, 109, 101, 115, 116,  97, 109, 112, 115,  0,  0, 80,
+ *   //  114, 111, 111, 102,   0, 191, 137, 226, 232, 132, 232, 146, 148,   1,   2,  1,  2,  3,
+ *   //    4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18, 19, 20
+ *   // ]
+ * ```
+ *
+ * @param timestamp - The value to write.
+ * @returns The written value.
+ */
 export const write = _write;
 export const verify = _verify;
 
