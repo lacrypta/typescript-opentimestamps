@@ -19,27 +19,27 @@
   },
   "contributors": [],
   "files": [
-    "dist"
+    "dist/types",
+    "dist/index.js",
+    "dist/index.min.js",
+    "dist/index.min.cjs"
   ],
   "sideEffects": false,
+  "type": "module",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "browser": {
-    "./dist/cjs/index.js": "./browser/index-cjs.js",
-    "./dist/esm/index.js": "./browser/index-esm.js"
-  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
   "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "browser": "./dist/browser/index-esm.js",
-      "node": "./dist/browser/index-cjs.js"
-    }
+    "require": "./dist/index.min.cjs",
+    "umd": "./dist/index.min.js",
+    "default": "./dist/index.js",
+    "types": "./dist/types/index.d.ts"
   },
   "scripts": {
     "prepare": "husky install",
+    "postinstall": "ln -sf ./dist/index.min.js ./dist/index.min.cjs",
     "mdlint": "markdownlint . .github -i node_modules -c ./etc/.markdownlint.jsonc",
     "mdlint:fix": "pnpm run mdlint --fix",
     "lint": "eslint src test --config ./etc/.eslintrc.json --no-error-on-unmatched-pattern",
@@ -47,13 +47,9 @@
     "prettier": "prettier etc src test --config ./etc/.prettierrc.json --no-error-on-unmatched-pattern --check",
     "prettier:fix": "pnpm run prettier --write",
     "format": "pnpm run prettier:fix && pnpm run lint:fix && pnpm run mdlint:fix",
-    "build": "pnpm run build:types && pnpm run build:browser && pnpm run build:esm && pnpm run build:cjs",
+    "build": "node ./etc/build && pnpm run build:types",
     "build:types": "tsc --build --verbose ./etc/tsconfig.build.json",
-    "build:browser": "pnpm run build:browser:cjs && pnpm run build:browser:esm",
-    "build:browser:cjs": "esbuild ./src/index.ts --outfile=./dist/browser/index.cjs.js --format=iife --bundle --packages=external --sourcemap=linked --sources-content=false --platform=node --global-name=opentimestamps --analyze",
-    "build:browser:esm": "esbuild ./src/index.ts --outfile=./dist/browser/index.mjs.js --format=iife --bundle --sourcemap=linked --sources-content=false --platform=browser --global-name=opentimestamps --analyze",
-    "build:esm": "esbuild $(find ./src -type f -name '*.ts' | xargs) --outdir=./dist/esm --format=esm --sourcemap=linked --sources-content=false --platform=neutral --analyze",
-    "build:cjs": "esbuild $(find ./src -type f -name '*.ts' | xargs) --outdir=./dist/cjs --format=cjs --sourcemap=linked --sources-content=false --platform=node --analyze",
+    "analyze": "node ./etc/analyze",
     "doc": "pnpm doc:api && pnpm run doc:internal",
     "doc:api": "typedoc --options ./etc/typedoc.api.json",
     "doc:internal": "typedoc --options ./etc/typedoc.internal.json",
@@ -66,6 +62,7 @@
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "esbuild": "^0.20.0",
+    "esbuild-plugin-umd-wrapper": "^2.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",

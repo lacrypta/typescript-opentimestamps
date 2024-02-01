@@ -123,6 +123,7 @@ We provide several `pnpm` commands for your convenience:
 
 - **`pnpm format`:** will run formatters and linters in all the codebase.
 - **`pnpm build`:** will build all targets (TypeScript type declarations included) in the `/dist` directory.
+- **`pnpm analyze`:** will analyze previous build.
 - **`pnpm doc`:** will generate _internal_ and _external_ documentation in the `/dist` directory.
 - **`pnpm clean`:** will remove the `/dist` directory entirely.
 - **`pnpm test`:** will run all tests and report coverage on the whole codebase.

@@ -22,6 +22,9 @@ devDependencies:
   esbuild:
     specifier: ^0.20.0
     version: 0.20.0
+  esbuild-plugin-umd-wrapper:
+    specifier: ^2.0.0
+    version: 2.0.0
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -1848,6 +1851,10 @@ packages:
       is-callable: 1.2.7
       is-date-object: 1.0.5
       is-symbol: 1.0.4
+    dev: true
+
+  /esbuild-plugin-umd-wrapper@2.0.0:
+    resolution: {integrity: sha512-pcu2/lcm29S85VCnSJuValrQ8FqeFJs5VWEwfp7vBRsOHjxZypcxgwXjxDIxDRo17uOcENZIbgz2szjln029eQ==, tarball: https://registry.npmjs.org/esbuild-plugin-umd-wrapper/-/esbuild-plugin-umd-wrapper-2.0.0.tgz}
     dev: true
 
   /esbuild@0.20.0:
