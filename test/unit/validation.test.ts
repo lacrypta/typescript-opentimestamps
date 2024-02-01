@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FileHash } from '../src/types';
+import type { FileHash } from '../../src/types';
 
-import { newTree, EdgeMap, LeafSet } from '../src/internals';
-import { uint8ArrayFromHex } from '../src/utils';
+import { newTree, EdgeMap, LeafSet } from '../../src/internals';
+import { uint8ArrayFromHex } from '../../src/utils';
 import {
   assert,
   is,
@@ -44,7 +44,7 @@ import {
   validateUint8Array,
   validateURL,
   validateVersion,
-} from '../src/validation';
+} from '../../src/validation';
 
 describe('Validation', (): void => {
   describe('validateNonNullObject()', (): void => {

@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Timestamp, Tree } from '../src/types';
+import type { Timestamp, Tree } from '../../src/types';
 
-import { EdgeMap, LeafSet } from '../src/internals';
-import { upgrade, upgradeFromCalendar, upgradeTree } from '../src/upgrade';
-import { uint8ArrayFromHex } from '../src/utils';
+import { EdgeMap, LeafSet } from '../../src/internals';
+import { upgrade, upgradeFromCalendar, upgradeTree } from '../../src/upgrade';
+import { uint8ArrayFromHex } from '../../src/utils';
 
-import { timestampToString, treeToString } from './helpers';
+import { timestampToString, treeToString } from '../helpers';
 
 describe('Upgrade', (): void => {
   describe('upgradeFromCalendar()', (): void => {

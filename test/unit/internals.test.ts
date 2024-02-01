@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Edge, Ops, Paths } from '../src/internals';
-import type { FileHash, Leaf, Op, Timestamp, Tree } from '../src/types';
+import type { Edge, Ops, Paths } from '../../src/internals';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from '../../src/types';
 
 import {
   atomizeAppendOp,
@@ -40,10 +40,10 @@ import {
   LeafHeader,
   LeafSet,
   Tag,
-} from '../src/internals';
-import { uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
+} from '../../src/internals';
+import { uint8ArrayFromHex, uint8ArrayToHex } from '../../src/utils';
 
-import { timestampToString, treeToString } from './helpers';
+import { timestampToString, treeToString } from '../helpers';
 
 describe('Internals', (): void => {
   describe('Tag', (): void => {
@@ -720,7 +720,10 @@ describe('Internals', (): void => {
         {
           edgeMap: new EdgeMap().add(
             { type: 'sha1' },
-            { leaves: new LeafSet().add({ type: 'pending', url: new URL('http://example.com') }), edges: new EdgeMap() },
+            {
+              leaves: new LeafSet().add({ type: 'pending', url: new URL('http://example.com') }),
+              edges: new EdgeMap(),
+            },
           ),
           expected: 1,
           name: 'should return 1 for singleton EdgeMap',

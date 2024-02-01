@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Leaf } from '../src/types';
+import type { Leaf } from '../../src/types';
 
-import { EdgeMap, LeafSet } from '../src/internals';
-import { uint8ArrayFromHex } from '../src/utils';
-import { verify } from '../src/verify';
+import { EdgeMap, LeafSet } from '../../src/internals';
+import { uint8ArrayFromHex } from '../../src/utils';
+import { verify } from '../../src/verify';
 
 describe('Verify', (): void => {
   describe('verify()', (): void => {

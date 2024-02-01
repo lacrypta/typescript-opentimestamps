@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Timestamp } from '../src/types';
+import type { Timestamp } from '../../src/types';
 
-import { EdgeMap, LeafSet } from '../src/internals';
-import { canShrink, canUpgrade, canVerify } from '../src/predicates';
-import { uint8ArrayFromHex } from '../src/utils';
+import { EdgeMap, LeafSet } from '../../src/internals';
+import { canShrink, canUpgrade, canVerify } from '../../src/predicates';
+import { uint8ArrayFromHex } from '../../src/utils';
 
 describe('Predicates', (): void => {
   describe('canShrink()', (): void => {

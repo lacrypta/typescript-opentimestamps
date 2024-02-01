@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Edge } from '../src/internals';
-import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
+import type { Edge } from '../../src/internals';
+import type { FileHash, Leaf, Timestamp, Tree } from '../../src/types';
 
-import { indent, info, infoEdge, infoFileHash, infoLeaf, infoTree } from '../src/info';
-import { newTree, EdgeMap, LeafSet } from '../src/internals';
-import { uint8ArrayFromHex } from '../src/utils';
+import { indent, info, infoEdge, infoFileHash, infoLeaf, infoTree } from '../../src/info';
+import { newTree, EdgeMap, LeafSet } from '../../src/internals';
+import { uint8ArrayFromHex } from '../../src/utils';
 
 describe('Info', (): void => {
   describe('indent()', (): void => {
