@@ -720,7 +720,7 @@ describe('Internals', (): void => {
         {
           edgeMap: new EdgeMap().add(
             { type: 'sha1' },
-            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            { leaves: new LeafSet().add({ type: 'pending', url: new URL('http://example.com') }), edges: new EdgeMap() },
           ),
           expected: 1,
           name: 'should return 1 for singleton EdgeMap',
