@@ -11,8 +11,8 @@ dependencies:
 
 devDependencies:
   '@types/jest':
-    specifier: ^29.5.11
-    version: 29.5.11
+    specifier: ^29.5.12
+    version: 29.5.12
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.20.0
     version: 6.20.0(@typescript-eslint/parser@6.20.0)(eslint@8.56.0)(typescript@5.3.3)
@@ -35,8 +35,8 @@ devDependencies:
     specifier: ^2.29.1
     version: 2.29.1(@typescript-eslint/parser@6.20.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
   husky:
-    specifier: ^9.0.9
-    version: 9.0.9
+    specifier: ^9.0.10
+    version: 9.0.10
   jest:
     specifier: ^29.7.0
     version: 29.7.0
@@ -1051,8 +1051,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.3
     dev: true
 
-  /@types/jest@29.5.11:
-    resolution: {integrity: sha512-S2mHmYIVe13vrm6q4kN6fLYYAka15ALQki/vgDC3mIukEOx8WJlv0kQPM+d4w8Gp6u0uSdKND04IlTXBv0rwnQ==, tarball: https://registry.npmjs.org/@types/jest/-/jest-29.5.11.tgz}
+  /@types/jest@29.5.12:
+    resolution: {integrity: sha512-eDC8bTvT/QhYdxJAulQikueigY5AsdBRH2yDKW3yveW7svY3+DzN84/2NUgkw10RTiJbWqZrTtoGVdYlvFJdLw==, tarball: https://registry.npmjs.org/@types/jest/-/jest-29.5.12.tgz}
     dependencies:
       expect: 29.7.0
       pretty-format: 29.7.0
@@ -1831,7 +1831,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       get-intrinsic: 1.2.2
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
       hasown: 2.0.0
     dev: true
 
@@ -2420,11 +2420,9 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /has-tostringtag@1.0.0:
-    resolution: {integrity: sha512-kFjcSNhnlGV1kyoGk7OXKSawH5JOb/LzUc5w9B02hOTO0dfFRjbHQKvg1d6cf3HbeUmtU9VbbV3qzZ2Teh97WQ==, tarball: https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.0.tgz}
+  /has-tostringtag@1.0.1:
+    resolution: {integrity: sha512-6J4rC9ROz0UkOpjn0BRtSSqlewDTDYJNQvy8N8RSrPCduUWId1o9BQPEVII/KKBqRk/ZIQff1YbRkUDCH2N5Sg==, tarball: https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.1.tgz}
     engines: {node: '>= 0.4'}
-    dependencies:
-      has-symbols: 1.0.3
     dev: true
 
   /hasown@2.0.0:
@@ -2447,8 +2445,8 @@ packages:
     engines: {node: '>=10.17.0'}
     dev: true
 
-  /husky@9.0.9:
-    resolution: {integrity: sha512-eW92PRr1XPKDWd7/iM2JvAl9gEKK3TF69yvbllQtKSYBw+Wtoi+P38NqH1Z7++sSd80FBkFagBFJkoQvMhCnGw==, tarball: https://registry.npmjs.org/husky/-/husky-9.0.9.tgz}
+  /husky@9.0.10:
+    resolution: {integrity: sha512-TQGNknoiy6bURzIO77pPRu+XHi6zI7T93rX+QnJsoYFf3xdjKOur+IlfqzJGMHIK/wXrLg+GsvMs8Op7vI2jVA==, tarball: https://registry.npmjs.org/husky/-/husky-9.0.10.tgz}
     engines: {node: '>=18'}
     hasBin: true
     dev: true
@@ -2528,7 +2526,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /is-callable@1.2.7:
@@ -2546,7 +2544,7 @@ packages:
     resolution: {integrity: sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ==, tarball: https://registry.npmjs.org/is-date-object/-/is-date-object-1.0.5.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /is-extglob@2.1.1:
@@ -2580,7 +2578,7 @@ packages:
     resolution: {integrity: sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==, tarball: https://registry.npmjs.org/is-number-object/-/is-number-object-1.0.7.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /is-number@7.0.0:
@@ -2598,7 +2596,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /is-shared-array-buffer@1.0.2:
@@ -2616,7 +2614,7 @@ packages:
     resolution: {integrity: sha512-tE2UXzivje6ofPW7l23cjDOMa09gb7xlAqG6jG5ej6uPV32TlWP3NKPigtaGeHNu9fohccRYvIiZMfOOnOYUtg==, tarball: https://registry.npmjs.org/is-string/-/is-string-1.0.7.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /is-symbol@1.0.4:
@@ -4215,7 +4213,7 @@ packages:
       call-bind: 1.0.5
       for-each: 0.3.3
       gopd: 1.0.1
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.1
     dev: true
 
   /which@2.0.2:
