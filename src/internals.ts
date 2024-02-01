@@ -1450,22 +1450,16 @@ export function normalizeOps(operations: Ops): Ops {
         [prefix, reverse, suffix] = [uint8ArrayReversed(suffix), !reverse, uint8ArrayReversed(prefix)];
         break;
       case 'append':
-        // append(reverse(x), s) --> reverse(prepend(x, reverse(s)))
-        if (reverse) {
-          prefix = uint8ArrayConcat(uint8ArrayReversed(thisOp.operand), prefix);
-        } else {
-          suffix = uint8ArrayConcat(suffix, thisOp.operand);
-        }
+        suffix = uint8ArrayConcat(suffix, thisOp.operand);
         break;
       case 'prepend':
-        // prepend(reverse(x), s) --> reverse(append(x, reverse(s)))
-        if (reverse) {
-          suffix = uint8ArrayConcat(suffix, uint8ArrayReversed(thisOp.operand));
-        } else {
-          prefix = uint8ArrayConcat(thisOp.operand, prefix);
-        }
+        prefix = uint8ArrayConcat(thisOp.operand, prefix);
         break;
       default:
+        if (reverse) {
+          ops.push({ type: 'reverse' });
+          reverse = false;
+        }
         if (0 !== prefix.length) {
           ops = ops.concat(atomizePrependOp(prefix));
           prefix = Uint8Array.of();
@@ -1474,21 +1468,17 @@ export function normalizeOps(operations: Ops): Ops {
           ops = ops.concat(atomizeAppendOp(suffix));
           suffix = Uint8Array.of();
         }
-        if (reverse) {
-          ops.push({ type: 'reverse' });
-          reverse = false;
-        }
         ops.push(thisOp);
     }
+  }
+  if (reverse) {
+    ops.push({ type: 'reverse' });
   }
   if (0 !== prefix.length) {
     ops = ops.concat(atomizePrependOp(prefix));
   }
   if (0 !== suffix.length) {
     ops = ops.concat(atomizeAppendOp(suffix));
-  }
-  if (reverse) {
-    ops.push({ type: 'reverse' });
   }
   return ops;
 }
