@@ -17,6 +17,8 @@
 
 'use strict';
 
+import type { Timestamp } from './types';
+
 export type { FileHash, Leaf, MergeMap, MergeSet, Op, Timestamp, Tree, Verifier } from './types';
 
 import { info as _info } from './info';
@@ -366,7 +368,7 @@ export const is = _is;
  * @param timestamp - Datum to assert.
  * @see [Assertion Functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions)
  */
-export const assert = _assert;
+export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _assert;
 
 /**
  * Validate that the given datum is a well-formed {@link Timestamp}.
