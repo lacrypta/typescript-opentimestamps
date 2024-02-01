@@ -1831,7 +1831,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       get-intrinsic: 1.2.2
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
       hasown: 2.0.0
     dev: true
 
@@ -2420,9 +2420,11 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /has-tostringtag@1.0.1:
-    resolution: {integrity: sha512-6J4rC9ROz0UkOpjn0BRtSSqlewDTDYJNQvy8N8RSrPCduUWId1o9BQPEVII/KKBqRk/ZIQff1YbRkUDCH2N5Sg==, tarball: https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.1.tgz}
+  /has-tostringtag@1.0.2:
+    resolution: {integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==, tarball: https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz}
     engines: {node: '>= 0.4'}
+    dependencies:
+      has-symbols: 1.0.3
     dev: true
 
   /hasown@2.0.0:
@@ -2526,7 +2528,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /is-callable@1.2.7:
@@ -2544,7 +2546,7 @@ packages:
     resolution: {integrity: sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ==, tarball: https://registry.npmjs.org/is-date-object/-/is-date-object-1.0.5.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /is-extglob@2.1.1:
@@ -2578,7 +2580,7 @@ packages:
     resolution: {integrity: sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==, tarball: https://registry.npmjs.org/is-number-object/-/is-number-object-1.0.7.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /is-number@7.0.0:
@@ -2596,7 +2598,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /is-shared-array-buffer@1.0.2:
@@ -2614,7 +2616,7 @@ packages:
     resolution: {integrity: sha512-tE2UXzivje6ofPW7l23cjDOMa09gb7xlAqG6jG5ej6uPV32TlWP3NKPigtaGeHNu9fohccRYvIiZMfOOnOYUtg==, tarball: https://registry.npmjs.org/is-string/-/is-string-1.0.7.tgz}
     engines: {node: '>= 0.4'}
     dependencies:
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /is-symbol@1.0.4:
@@ -4213,7 +4215,7 @@ packages:
       call-bind: 1.0.5
       for-each: 0.3.3
       gopd: 1.0.1
-      has-tostringtag: 1.0.1
+      has-tostringtag: 1.0.2
     dev: true
 
   /which@2.0.2:
