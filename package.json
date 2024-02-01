@@ -20,26 +20,26 @@
   "contributors": [],
   "files": [
     "dist/types",
-    "dist/index.js",
-    "dist/index.min.js",
-    "dist/index.min.cjs"
+    "dist/esm",
+    "dist/umd",
+    "dist/cjs"
   ],
   "sideEffects": false,
   "type": "module",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "unpkg": "./dist/index.min.js",
-  "jsdelivr": "./dist/index.min.js",
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
+  "unpkg": "./dist/umd/index.min.js",
+  "jsdelivr": "./dist/umd/index.min.js",
   "exports": {
-    "require": "./dist/index.min.cjs",
-    "umd": "./dist/index.min.js",
-    "default": "./dist/index.js",
+    "require": "./dist/cjs/index.cjs",
+    "umd": "./dist/umd/index.js",
+    "default": "./dist/esm/index.js",
     "types": "./dist/types/index.d.ts"
   },
   "scripts": {
     "prepare": "husky install",
-    "postinstall": "ln -sf ./dist/index.min.js ./dist/index.min.cjs",
+    "postinstall": "mkdir -p ./dist/cjs && ln -sf ./dist/umd/index.min.js ./dist/cjs/index.min.cjs && ln -sf ./dist/umd/index.js ./dist/cjs/index.cjs",
     "mdlint": "markdownlint . .github -i node_modules -c ./etc/.markdownlint.jsonc",
     "mdlint:fix": "pnpm run mdlint --fix",
     "lint": "eslint src test --config ./etc/.eslintrc.json --no-error-on-unmatched-pattern",

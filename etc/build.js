@@ -18,20 +18,33 @@ const buildOptions = {
   platform: 'neutral',
   sourcemap: 'linked',
   sourcesContent: false,
+  tsconfig: './etc/tsconfig.build.json',
 };
 
 const results = await Promise.all([
   build({
     ...buildOptions,
     format: 'esm',
-    outfile: './dist/index.js',
+    outfile: './dist/esm/index.js',
     packages: 'external',
+  }),
+  build({
+    ...buildOptions,
+    format: 'esm',
+    outfile: './dist/esm/index.min.js',
+    minify: true,
+  }),
+  build({
+    ...buildOptions,
+    format: 'umd',
+    outfile: './dist/umd/index.js',
+    plugins: [umdWrapper(umdWrapperOptions)],
   }),
   build({
     ...buildOptions,
     format: 'umd',
     minify: true,
-    outfile: './dist/index.min.js',
+    outfile: './dist/umd/index.min.js',
     plugins: [umdWrapper(umdWrapperOptions)],
   }),
 ]);
