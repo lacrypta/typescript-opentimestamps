@@ -16,13 +16,14 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
 import type { Edge } from '../src/internals';
+import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
 
-import { newEdges, newLeaves } from '../src/internals';
+import { EdgeMap, LeafSet } from '../src/internals';
 import {
   getByte,
   getBytes,
+  read,
   readBytes,
   readDoneLeafPayload,
   readEdgeOrLeaf,
@@ -30,7 +31,6 @@ import {
   readLeaf,
   readLiteral,
   readPendingLeafPayload,
-  read,
   readTree,
   readUint,
   readUrl,
@@ -458,7 +458,7 @@ describe('Read', (): void => {
       {
         data: Uint8Array.of(0x02, 0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
         expected: [
-          [{ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }],
+          [{ type: 'sha1' }, { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }],
           12,
         ] as [Edge, number],
         error: null,
@@ -469,7 +469,7 @@ describe('Read', (): void => {
         expected: [
           [
             { type: 'append', operand: Uint8Array.of(1, 2, 3) },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ],
           16,
         ] as [Edge, number],
@@ -503,7 +503,7 @@ describe('Read', (): void => {
     it.each([
       {
         data: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
-        expected: [{ edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }, 11] as [
+        expected: [{ edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }, 11] as [
           Tree,
           number,
         ],
@@ -524,8 +524,8 @@ describe('Read', (): void => {
         ),
         expected: [
           {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
           },
           23,
         ] as [Tree, number],
@@ -681,7 +681,7 @@ describe('Read', (): void => {
         expected: {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
-          tree: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         } as Timestamp,
         error: null,
         name: 'should read simple tree timestamp',

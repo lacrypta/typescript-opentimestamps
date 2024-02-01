@@ -18,8 +18,8 @@
 
 import type { Timestamp, Tree } from '../src/types';
 
-import { newEdges, newLeaves } from '../src/internals';
-import { upgradeFromCalendar, upgrade, upgradeTree } from '../src/upgrade';
+import { EdgeMap, LeafSet } from '../src/internals';
+import { upgrade, upgradeFromCalendar, upgradeTree } from '../src/upgrade';
 import { uint8ArrayFromHex } from '../src/utils';
 
 import { timestampToString, treeToString } from './helpers';
@@ -29,7 +29,7 @@ describe('Upgrade', (): void => {
     it.each([
       {
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
-        result: { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() },
+        result: { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
         error: null,
         name: 'should deal with simple tree',
       },
@@ -71,11 +71,11 @@ describe('Upgrade', (): void => {
     it.each([
       {
         tree: {
-          edges: newEdges(),
-          leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+          edges: new EdgeMap(),
+          leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
         },
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
-        expected: [{ leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() }, []] as [
+        expected: [{ leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() }, []] as [
           Tree,
           Error[],
         ],
@@ -83,14 +83,14 @@ describe('Upgrade', (): void => {
       },
       {
         tree: {
-          edges: newEdges(),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+          edges: new EdgeMap(),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
         },
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
         expected: [
           {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
           [],
         ] as [Tree, Error[]],
@@ -98,14 +98,14 @@ describe('Upgrade', (): void => {
       },
       {
         tree: {
-          edges: newEdges(),
-          leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+          edges: new EdgeMap(),
+          leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
         },
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b012345'),
         expected: [
           {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
           [new Error('Error (http://www.example.com/): Garbage at end of calendar response')],
         ] as [Tree, Error[]],
@@ -153,8 +153,8 @@ describe('Upgrade', (): void => {
             value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
           },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
         } as Timestamp,
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
@@ -165,7 +165,7 @@ describe('Upgrade', (): void => {
               algorithm: 'sha1',
               value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             },
-            tree: { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() },
+            tree: { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
           },
           errors: [],
         } as { timestamp: Timestamp; errors: Error[] },
@@ -179,8 +179,8 @@ describe('Upgrade', (): void => {
             value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
           },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
@@ -192,8 +192,8 @@ describe('Upgrade', (): void => {
               value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             },
             tree: {
-              edges: newEdges(),
-              leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+              edges: new EdgeMap(),
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
             },
           },
           errors: [],
@@ -208,8 +208,8 @@ describe('Upgrade', (): void => {
             value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
           },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
         } as Timestamp,
         calendarResponse: uint8ArrayFromHex('000588960d73d71901017b012345'),
@@ -221,8 +221,8 @@ describe('Upgrade', (): void => {
               value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             },
             tree: {
-              edges: newEdges(),
-              leaves: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com') }),
+              edges: new EdgeMap(),
+              leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
             },
           },
           errors: [new Error('Error (http://www.example.com/): Garbage at end of calendar response')],

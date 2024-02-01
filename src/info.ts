@@ -23,8 +23,8 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 import type { Edge } from './internals';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
 import { callOp, compareEdges, compareLeaves } from './internals';
 import { uint8ArrayToHex } from './utils';
@@ -36,7 +36,7 @@ import { uint8ArrayToHex } from './utils';
  * ```typescript
  * 'use strict';
  *
- * import { indent } from "./src/info";
+ * import { indent } from './src/info';
  *
  * console.log(indent(''));
  *   // ->
@@ -72,7 +72,7 @@ export function indent(text: string): string {
  * ```typescript
  * 'use strict';
  *
- * import { infoLeaf } from "./src/info";
+ * import { infoLeaf } from './src/info';
  *
  * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
  * console.log(infoLeaf({ type: 'litecoin', height: 456 }));  // litecoinVerify(msg, 456)
@@ -110,12 +110,12 @@ export function infoLeaf(leaf: Leaf): string {
  * ```typescript
  * 'use strict';
  *
- * import { infoEdge } from "./src/info";
- * import { newEdges, newLeaves } from "./src/internals";
+ * import { infoEdge } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
  *
  * console.log(infoEdge(
  *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *     { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *   ],
  *   undefined,
  * ));
@@ -123,7 +123,7 @@ export function infoLeaf(leaf: Leaf): string {
  *   // bitcoinVerify(msg, 123)
  * console.log(infoEdge(
  *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *     { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *   ],
  *   Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
  * ));
@@ -169,31 +169,31 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from "./src/types";
+ * import type { Tree } from './src/types';
  *
- * import { infoTree } from "./src/info";
- * import { newEdges, newLeaves } from "./src/internals";
+ * import { infoTree } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
  *
  * const tree: Tree = {
- *   leaves: newLeaves(),
- *   edges: newEdges().add(
+ *   leaves: new LeafSet(),
+ *   edges: new EdgeMap().add(
  *     { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
  *     {
- *       leaves: newLeaves(),
- *       edges: newEdges()
+ *       leaves: new LeafSet(),
+ *       edges: new EdgeMap()
  *         .add(
  *           { type: 'reverse' },
  *           {
- *             leaves: newLeaves(),
- *             edges: newEdges().add(
+ *             leaves: new LeafSet(),
+ *             edges: new EdgeMap().add(
  *               { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *               { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *               { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *             ),
  *           },
  *         )
  *         .add(
  *           { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *           { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+ *           { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
  *         ),
  *     },
  *   ),
@@ -251,9 +251,9 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  * ```typescript
  * 'use strict';
  *
- * import type { FileHash } from "./src/types";
+ * import type { FileHash } from './src/types';
  *
- * import { infoFileHash } from "./src/info";
+ * import { infoFileHash } from './src/info';
  *
  * const fileHash: FileHash = {
  *   algorithm: 'sha1',
@@ -291,10 +291,10 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  * ```typescript
  * 'use strict';
  *
- * import type { Timestamp } from "./src/types";
+ * import type { Timestamp } from './src/types';
  *
- * import { info } from "./src/info";
- * import { newEdges, newLeaves } from "./src/internals";
+ * import { info } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
  *
  * const timestamp: Timestamp = {
  *   version: 1,
@@ -303,26 +303,26 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
+ *     leaves: new LeafSet(),
+ *     edges: new EdgeMap().add(
  *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
+ *       { leaves: new LeafSet(),
+ *         edges: new EdgeMap()
  *           .add(
  *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
+ *             { leaves: new LeafSet(),
+ *               edges: new EdgeMap().add(
  *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 { edges: new EdgeMap(),
+ *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *                 },
  *               ),
  *             },
  *           )
  *           .add(
  *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             { edges: new EdgeMap(),
+ *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *             },
  *           ),
  *       },

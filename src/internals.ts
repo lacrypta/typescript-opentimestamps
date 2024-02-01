@@ -28,11 +28,9 @@ import { sha1 } from '@noble/hashes/sha1';
 import { sha256 } from '@noble/hashes/sha256';
 import { keccak_256 } from '@noble/hashes/sha3';
 
-import type { Leaf, Op, Timestamp, Tree } from './types';
+import type { Leaf, MergeMap, MergeSet, Op, Timestamp, Tree } from './types';
 
 import {
-  MergeMap,
-  MergeSet,
   textEncoder,
   uint8ArrayCompare,
   uint8ArrayConcat,
@@ -213,7 +211,7 @@ export const nonFinal: number = 0xff;
  * ```typescript
  * 'use strict';
  *
- * import { callOp } from "./src/internals";
+ * import { callOp } from './src/internals';
  *
  * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));                                      // Uint8Array(20) [ 112, 55, ..., 207 ]
  * console.log(callOp({ type: 'ripemd160' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(20) [ 121, 249, ..., 87 ]
@@ -257,7 +255,7 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { callOps } from "./src/internals";
+ * import { callOps } from './src/internals';
  *
  * console.log(callOps([], Uint8Array.of()));  // Uint8Array(0) []
  * console.log(callOps([
@@ -290,7 +288,7 @@ export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { compareLeaves } from "./src/internals";
+ * import { compareLeaves } from './src/internals';
  *
  * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 })); // -1
  * console.log(compareLeaves({ type: 'litecoin', height: 123 }, { type: 'bitcoin', height: 123 })); //  1
@@ -362,7 +360,7 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  * ```typescript
  * 'use strict';
  *
- * import { compareOps } from "./src/internals";
+ * import { compareOps } from ''./src/internals';
  *
  * console.log(compareOps({ type: 'sha1' }, { type: 'ripemd160' })); // -1
  * console.log(compareOps({ type: 'sha1' }, { type: 'sha1' }));      //  0
@@ -402,7 +400,7 @@ export function compareOps(left: Op, right: Op): number {
  * ```typescript
  * 'use strict';
  *
- * import { compareEdges, newTree } from "./src/internals";
+ * import { compareEdges, newTree } from './src/internals';
  *
  * console.log(compareEdges(
  *   [{ type: 'sha1' }, newTree()], [{ type: 'ripemd160' }, newTree()],
@@ -447,18 +445,18 @@ export function compareEdges(left: Edge, right: Edge): number {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from "./src/types";
+ * import type { Tree } from './src/types';
  *
- * import { incorporateTreeToTree, newEdges, newLeaves } from "./src/internals";
+ * import { incorporateTreeToTree, EdgeMap, LeafSet } from './src/internals';
  *
- * const left: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
+ * const left: Tree = { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() };
  * const right: Tree = {
- *   leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
- *   edges: newEdges().add(
+ *   leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
+ *   edges: new EdgeMap().add(
  *     { type: 'sha1' },
  *     {
- *       leaves: newLeaves().add({ type: 'pending', url: new URL('https://www.example.com') }),
- *       edges: newEdges(),
+ *       leaves: new LeafSet().add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *       edges: new EdgeMap(),
  *     },
  *   ),
  * };
@@ -466,7 +464,7 @@ export function compareEdges(left: Edge, right: Edge): number {
  * incorporateTreeToTree(left, right);
  *
  * console.log(left.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
- * console.log(left.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
+ * console.log(left.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ] ]
  * ```
  *
  * @param left - The tree to incorporate data _into_.
@@ -482,30 +480,30 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
 /**
  * Incorporate the given {@link Edge} or {@link Leaf} the given {@link Tree}.
  *
- * If the given parameter is indeed an {@link Edge}, this function will add it to the given {@link Tree}'s edges {@link MergeMap}.
- * If, on the other hand, the given parameter is a {@link Leaf}, this function will add it to the {@link Tree}'s leaves {@link MergeSet}.
+ * If the given parameter is indeed an {@link Edge}, this function will add it to the given {@link Tree}'s edges {@link EdgeMap}.
+ * If, on the other hand, the given parameter is a {@link Leaf}, this function will add it to the {@link Tree}'s leaves {@link LeafSet}.
  *
  * @example
  * ```typescript
  * 'use strict';
  *
- * import { incorporateToTree, newEdges, newLeaves } from "./src/internals";
+ * import type { Tree } from './src/types';
  *
- * import type { Tree } from "./src/types";
+ * import { incorporateToTree, EdgeMap, LeafSet } from './src/internals';
  *
- * const tree: Tree = { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() };
+ * const tree: Tree = { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() };
  *
  * incorporateToTree(tree, { type: 'bitcoin', height: 456 });
  * incorporateToTree(tree, [
  *   { type: 'sha1' },
  *   {
- *     leaves: newLeaves().add({ type: 'pending', url: new URL('https://www.example.com') }),
- *     edges: newEdges(),
+ *     leaves: new LeafSet().add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *     edges: new EdgeMap(),
  *   },
  * ]);
  *
  * console.log(tree.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
- * console.log(tree.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [MergeSet], edges: [MergeMap] } ] ]
+ * console.log(tree.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ] ]
  * ```
  *
  * @param tree - The tree to incorporate the given parameter _into_.
@@ -522,99 +520,524 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
 }
 
 /**
- * Construct an empty {@link MergeMap} suitable for usage to hold {@link Edge} maps in a {@link Tree}.
+ * A set of {@link Leaf | leaves} which are implicitly deduplicated.
  *
- * A {@link MergeMap} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
- * In the case of {@link Edge} mappings these are:
+ * A `LeafSet` needs to take two operations into account:
  *
- * - **`toKey`:** use the {@link Edge}'s {@link Op}'s `type`; if this happens to be `append` or `prepend`, append a `:` followed by their `operand` to the constructed key.
- * - **`combine`:** simply call {@link incorporateTreeToTree} to combine two {@link Tree}s.
+ * - **how to determine if two {@link Leaf | leaves} are equivalent:** takes a {@link Leaf} and return a `string` that represents it unequivocally (ie. two {@link Leaf | leaves} returning the same `string` will be taken to be equal themselves).
+ * - **how to combine two equivalent {@link Leaf | leaves}:** {@link Leaf | leaves} are not really combined, if two of them are equivalent, then they're _equal_, and only a single one is kept.
  *
  * @example
  * ```typescript
  * 'use strict';
  *
- * import { newEdges } from "./src/internals";
+ * import { LeafSet } from './src/internals';
  *
- * console.log(newEdges());  // MergeMap { ... }
+ * const leafSetA: LeafSet = new LeafSet()
+ *   .add({ type: 'bitcoin', height: 123 })
+ *   .add({ type: 'litecoin', height: 123 })
+ *   .add({ type: 'ethereum', height: 123 });
+ * const leafSetB: LeafSet = new LeafSet()
+ *   .add({ type: 'bitcoin', height: 123 })
+ *   .add({ type: 'litecoin', height: 456 })
+ *   .add({ type: 'ethereum', height: 456 });
+ * const leafSetC: LeafSet = new LeafSet();
+ *
+ * console.log(leafSetA.size());  // 3
+ * console.log(leafSetB.size());  // 3
+ * console.log(leafSetC.size());  // 0
+ *
+ * console.log(leafSetA.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 }, { type: 'ethereum', height: 123 } ]
+ * console.log(leafSetB.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 456 }, { type: 'ethereum', height: 456 } ]
+ * console.log(leafSetC.values());  // []
+ *
+ * console.log(leafSetA.remove({ type: 'ethereum', height: 123 }));  // LeafSet { mapping: { ... } }
+ * console.log(leafSetB.remove({ type: 'ethereum', height: 456 }));  // LeafSet { mapping: { ... } }
+ * console.log(leafSetC.remove({ type: 'ethereum', height: 789 }));  // LeafSet { mapping: {} }
+ *
+ * console.log(leafSetA.incorporate(leafSetB).size());                        // 3
+ * console.log(leafSetB.incorporate(leafSetC).size());                        // 2
+ * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());  // 3
  * ```
  *
- * @returns The empty {@link Edge}s mapping.
  */
-export function newEdges(): MergeMap<Op, Tree> {
-  return new MergeMap<Op, Tree>(
-    (op: Op): string => {
-      switch (op.type) {
-        case 'append':
-        case 'prepend':
-          return `${op.type}:${uint8ArrayToHex(op.operand)}`;
-        default:
-          return op.type;
-      }
-    },
-    (left: Tree, right: Tree): Tree => incorporateTreeToTree(left, right),
-  );
+export class LeafSet implements MergeSet<Leaf> {
+  /**
+   * The {@link LeafSet} is implemented via a {@link !Record} that maps "keys" (derived fom an actual {@link Leaf}) to actual values.
+   *
+   * This is the main storage mapping used to implement the {@link LeafSet}.
+   *
+   */
+  private readonly mapping: Record<string, Leaf> = {};
+
+  /**
+   * The callback that will transform a {@link Leaf} into a `string` (implicitly defining what "equality" between them means).
+   *
+   * @param leaf - Leaf to get the `string` representation of.
+   * @returns The `string` representation of the given {@link Leaf}.
+   */
+  private toKey(leaf: Leaf): string {
+    switch (leaf.type) {
+      case 'pending':
+        return `${leaf.type}:${leaf.url.toString()}`;
+      case 'unknown':
+        return `${leaf.type}:${uint8ArrayToHex(leaf.header)}:${uint8ArrayToHex(leaf.payload)}`;
+      default:
+        return `${leaf.type}:${leaf.height}`;
+    }
+  }
+
+  /**
+   * The callback that will be used to combine two equivalent {@link Leaf | leaves} within the {@link LeafSet}.
+   *
+   * @param left - First Leaf to combine.
+   * @param _right - Second Leaf to combine.
+   * @returns The resulting combined {@link Leaf}.
+   */
+  private combine(left: Leaf, _right: Leaf): Leaf {
+    return left;
+  }
+
+  /**
+   * Perform the addition "heavy-lifting" within a {@link LeafSet}.
+   *
+   * @param key - The `string` key to use (previously passed through {@link toKey}).
+   * @param leaf - The actual {@link Leaf} to add.
+   * @returns The {@link LeafSet} instance, for chaining.
+   */
+  private doAdd(key: string, leaf: Leaf): this {
+    this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, leaf) : leaf;
+    return this;
+  }
+
+  /**
+   * Return the number of {@link Leaf | leaves} in the {@link LeafSet}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { LeafSet } from './src/internals';
+   *
+   * const leafSet: LeafSet = new LeafSet();
+   *
+   * console.log(leafSet.size());                                        // 0
+   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).size());  // 1
+   * ```
+   *
+   * @returns The number of leaves in the {@link LeafSet}.
+   */
+  public size(): number {
+    return this.values().length;
+  }
+
+  /**
+   * Return a list of {@link Leaf | Leaves} stored in a {@link LeafSet}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { LeafSet } from './src/internals';
+   *
+   * const leafSet: LeafSet = new LeafSet();
+   *
+   * console.log(leafSet.values());                                        // []
+   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).values());  // [ { type: 'bitcoin', height: 123 } ]
+   * ```
+   *
+   * @returns The list of leaves in the {@link LeafSet}.
+   */
+  public values(): Leaf[] {
+    return Object.values(this.mapping);
+  }
+
+  /**
+   * Remove the given {@link Leaf} from the {@link LeafSet}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { LeafSet } from './src/internals';
+   *
+   * const leafSet: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 });
+   *
+   * console.log(leafSet.size());                                            // 2
+   * console.log(leafSet.remove({ type: 'ethereum', height: 123 }).size());  // 2
+   * console.log(leafSet.remove({ type: 'bitcoin', height: 123 }).size());   // 1
+   * console.log(leafSet.remove({ type: 'litecoin', height: 123 }).size());  // 0
+   * ```
+   *
+   * @param leaf - The Leaf to remove.
+   * @returns The original {@link LeafSet} with the given {@link Leaf} removed, for chaining.
+   */
+  public remove(leaf: Leaf): this {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete this.mapping[this.toKey(leaf)];
+    return this;
+  }
+
+  /**
+   * Add the given {@link Leaf} to the {@link LeafSet}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { LeafSet } from './src/internals';
+   *
+   * const leafSet: LeafSet = new LeafSet();
+   *
+   * console.log(leafSet.size()); // 0
+   * console.log(leafSet
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .size(),
+   * );                           // 1
+   * console.log(leafSet
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 123 })
+   *   .size(),
+   * );                           // 2
+   * console.log(leafSet
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 123 })
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .size(),
+   * );                           // 2
+   * ```
+   *
+   * @param leaf - The leaf to add to the {@link LeafSet}.
+   * @returns The original {@link LeafSet} with the given {@link Leaf} added, for chaining.
+   */
+  public add(leaf: Leaf): this {
+    return this.doAdd(this.toKey(leaf), leaf);
+  }
+
+  /**
+   * Add _all_ {@link Leaf | Leaves} of the given {@link LeafSet} to the current one.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { LeafSet } from './src/internals';
+   *
+   * const leafSetA: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 });
+   * const leafSetB: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 456 });
+   * const leafSetC: LeafSet = new LeafSet();
+   *
+   * console.log(leafSetA.incorporate(leafSetB).size());                        // 3
+   * console.log(leafSetB.incorporate(leafSetC).size());                        // 2
+   * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());  // 3
+   * ```
+   *
+   * @param other - The {@link LeafSet} to incorporate into this one.
+   * @returns The original {@link LeafSet} with the given other {@link LeafSet} incorporated, for chaining.
+   */
+  public incorporate(other: typeof this): this {
+    Object.entries(other.mapping).forEach(([key, value]: [string, Leaf]): void => {
+      this.doAdd(key, value);
+    });
+    return this;
+  }
 }
 
 /**
- * Construct an empty {@link MergeSet} suitable for usage to hold {@link Leaf} sets in a {@link Tree}.
+ * A mapping from {@link Op}s to {@link Tree}s which is implicitly deduplicated.
  *
- * A {@link MergeSet} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
- * In the case of {@link Leaf} mappings these are:
+ * An `EdgeMap` needs to take two operations into account:
  *
- * - **`toKey`:** return the {@link Leaf}'s `type` with a `:` at the, and, depending on the `type` itself, concatenate this with:
- *     - **`pending`:** the {@link Leaf}'s `url`;
- *     - **`unknown`:** the {@link Leaf}'s `header` as a hex string, a `:`, and its payload as a hex string;
- *     - **`bitcoin`, `litecoin`, or `ethereum`:** the {@link Leaf}'s height as a decimal string.
- * - **`combine`:** simply return the first of the two {@link Leaf | Leaves} (there's no point in holding more than one of each {@link Leaf} type).
+ * - **how to determine if two {@link Op}s are equivalent:** takes an {@link Op} and return a `string` that represents it unequivocally (ie. two {@link Op}s returning the same `string` will be taken to be equal themselves).
+ * - **how to combine two equivalent {@link Tree}s:** {@link Tree}s are combined by merging them recursively.
  *
  * @example
  * ```typescript
  * 'use strict';
  *
- * import { newLeaves } from "./src/internals";
+ * import { newTree, EdgeMap } from './src/internals';
  *
- * console.log(newLeaves());  // MergeSet { ... }
+ * const edgeMapA: EdgeMap = new EdgeMap()
+ *   .add({ type: 'sha1' }, newTree())
+ *   .add({ type: 'ripemd160' }, newTree())
+ *   .add({ type: 'sha256' }, newTree());
+ * const edgeMapB: EdgeMap = new EdgeMap()
+ *   .add({ type: 'sha1' }, newTree())
+ *   .add({ type: 'ripemd160' }, newTree())
+ *   .add({ type: 'sha256' }, newTree());
+ * const edgeMapC: EdgeMap = new EdgeMap();
+ *
+ * console.log(edgeMapA.size());  // 3
+ * console.log(edgeMapB.size());  // 3
+ * console.log(edgeMapC.size());  // 0
+ *
+ * console.log(edgeMapA.values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
+ * console.log(edgeMapB.values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
+ * console.log(edgeMapC.values());  // []
+ *
+ * console.log(edgeMapA.remove({ type: 'sha256' }));  // EdgeMap { keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } }, mapping: { ... } }
+ * console.log(edgeMapB.remove({ type: 'sha256' }));  // EdgeMap { keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } }, mapping: { ... } }
+ * console.log(edgeMapC.remove({ type: 'sha256' }));  // EdgeMap { keySet: {}, mapping: {} }
+ *
+ * console.log(edgeMapA.incorporate(edgeMapB).size());                        // 2
+ * console.log(edgeMapB.incorporate(edgeMapC).size());                        // 2
+ * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());  // 2
  * ```
  *
- * @returns The empty {@link Leaf | Leaves} set.
  */
-export function newLeaves(): MergeSet<Leaf> {
-  return new MergeSet<Leaf>(
-    (leaf: Leaf): string => {
-      switch (leaf.type) {
-        case 'pending':
-          return `${leaf.type}:${leaf.url.toString()}`;
-        case 'unknown':
-          return `${leaf.type}:${uint8ArrayToHex(leaf.header)}:${uint8ArrayToHex(leaf.payload)}`;
-        default:
-          return `${leaf.type}:${leaf.height}`;
-      }
-    },
-    (left: Leaf, _right: Leaf): Leaf => {
-      return left;
-    },
-  );
+export class EdgeMap implements MergeMap<Op, Tree> {
+  /**
+   * The {@link EdgeMap} is implemented via a pair of {@link !Record}s; the first one maps "keys" (derived form an actual {@link Op}) to actual {@link Op}s.
+   *
+   * This is the main {@link Op}-mapping used to implement the {@link EdgeMap}.
+   *
+   */
+  private readonly keySet: Record<string, Op> = {};
+
+  /**
+   * The {@link EdgeMap} is implemented via a pair of {@link !Record}s; the second one maps "keys" (derived from an actual {@link Op}) to actual {@link Tree}s.
+   *
+   * This is the main {@link Tree}-mapping used to implement the {@link EdgeMap}.
+   *
+   */
+  private readonly mapping: Record<string, Tree> = {};
+
+  /**
+   * The callback that will transform an {@link Op} into a `string` (implicitly defining what "equality" between keys means).
+   *
+   * @param op - Op to get the `string` representation of.
+   * @returns The `string` representation of the given {@link Op}.
+   */
+  private toKey(op: Op): string {
+    switch (op.type) {
+      case 'append':
+      case 'prepend':
+        return `${op.type}:${uint8ArrayToHex(op.operand)}`;
+      default:
+        return op.type;
+    }
+  }
+
+  /**
+   * The callback that will be used to combine two equivalent {@link Tree}s within the {@link EdgeMap}.
+   *
+   * @param left - First Tree to combine.
+   * @param right - Second Tree to combine.
+   * @returns The resulting combined {@link Tree}.
+   */
+  private combine(left: Tree, right: Tree): Tree {
+    return incorporateTreeToTree(left, right);
+  }
+
+  /**
+   * Perform the addition "heavy-lifting" within a {@link EdgeMap}.
+   *
+   * @param op - The {@link Op} to use.
+   * @param tree - The {@link Tree} to add.
+   * @returns The {@link EdgeMap} instance, for chaining.
+   */
+  private doAdd(op: Op, tree: Tree): this {
+    const sKey: string = this.toKey(op);
+    this.keySet[sKey] = op;
+    this.mapping[sKey] = sKey in this.mapping ? this.combine(this.mapping[sKey]!, tree) : tree;
+    return this;
+  }
+
+  /**
+   * Return the number of pairs in the {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMap.size());                                   // 0
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).size());  // 1
+   * ```
+   *
+   * @returns The number of pairs in the {@link EdgeMap}.
+   */
+  public size(): number {
+    return this.values().length;
+  }
+
+  /**
+   * Return a list of {@link Op}s stored in a {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMap.values());                                 // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).keys());  // [ { type: 'sha1' } ]
+   * ```
+   *
+   * @returns The list of {@link Op}s in the {@link EdgeMap}.
+   */
+  public keys(): Op[] {
+    return Object.values(this.keySet);
+  }
+
+  /**
+   * Return a list of {@link Tree}s stored in a {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMap.values());                                   // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
+   * ```
+   *
+   * @returns The list of {@link Tree}s in the {@link EdgeMap}.
+   */
+  public values(): Tree[] {
+    return Object.values(this.mapping);
+  }
+
+  /**
+   * Return a list of _entries_ (ie. {@link Op} / {@link Tree} pairs) stored in an {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMap.values());                                    // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).entries());  // [ [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ] ]
+   * ```
+   *
+   * @returns The list of entries in the {@link EdgeMap}.
+   */
+  public entries(): [Op, Tree][] {
+    return this.keys().map((key: Op): [Op, Tree] => [key, this.mapping[this.toKey(key)]!]);
+  }
+
+  /**
+   * Remove the given {@link Op} from the {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'ripemd160' }, newTree());
+   *
+   * console.log(edgeMap.size());                                // 2
+   * console.log(edgeMap.remove({ type: 'sha256' }).size());     // 2
+   * console.log(edgeMap.remove({ type: 'sha1' }).size());       // 1
+   * console.log(edgeMap.remove({ type: 'ripemd160' }).size());  // 0
+   * ```
+   *
+   * @param op - The {@link Op} to remove.
+   * @returns The original {@link EdgeMap} with the given {@link Op} removed, for chaining.
+   */
+  public remove(op: Op): this {
+    const sKey: string = this.toKey(op);
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete this.mapping[sKey];
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete this.keySet[sKey];
+    return this;
+  }
+
+  /**
+   * Add the given {@link Op} / {@link Tree} pair to the {@link EdgeMap}.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMap: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMap.size()); // 0
+   * console.log(edgeMap
+   *   .add({ type: 'sha1' }, newTree())
+   *   .size(),
+   * );                           // 1
+   * console.log(edgeMap
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree())
+   *   .size(),
+   * );                           // 2
+   * console.log(edgeMap
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree())
+   *   .add({ type: 'sha1' }, newTree())
+   *   .size(),
+   * );                           // 2
+   * ```
+   *
+   * @param op - The {@link Op} to add to the {@link EdgeMap}.
+   * @param tree - The {@link Tree} to add to the {@link EdgeMap}.
+   * @returns The original {@link EdgeMap} with the given {@link Op} / {@link Tree} pair added, for chaining.
+   */
+  public add(op: Op, tree: Tree): this {
+    return this.doAdd(op, tree);
+  }
+
+  /**
+   * Add _all_ {@link Op} / {@link Tree} pairs of the given {@link EdgeMap} to the current one.
+   *
+   * @example
+   * ```typescript
+   * 'use strict';
+   *
+   * import { newTree, EdgeMap } from './src/internals';
+   *
+   * const edgeMapA: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'ripemd160' }, newTree());
+   * const edgeMapB: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree());
+   * const edgeMapC: EdgeMap = new EdgeMap();
+   *
+   * console.log(edgeMapA.incorporate(edgeMapB).size());                        // 3
+   * console.log(edgeMapB.incorporate(edgeMapC).size());                        // 2
+   * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());  // 3
+   * ```
+   *
+   * @param other - The {@link EdgeMap} to incorporate into this one.
+   * @returns The original {@link EdgeMap} with the given other {@link EdgeMap} incorporated, for chaining.
+   */
+  public incorporate(other: typeof this): this {
+    other.entries().forEach(([op, tree]: [Op, Tree]): void => {
+      this.doAdd(op, tree);
+    });
+    return this;
+  }
 }
 
 /**
  * Construct an empty {@link Tree}.
  *
- * This function merely calls {@link newLeaves} and {@link newEdges} to construct an empty {@link Tree}.
- *
  * @example
  * ```typescript
  * 'use strict';
  *
- * import { newTree } from "./src/internals";
+ * import { newTree } from './src/internals';
  *
- * console.log(newTree());  // { edges: MergeMap { ... }, leaves: MergeSet { ... } }
+ * console.log(newTree());  // { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
  * ```
  *
  * @returns The empty tree constructed.
  */
 export function newTree(): Tree {
-  return { edges: newEdges(), leaves: newLeaves() };
+  return { edges: new EdgeMap(), leaves: new LeafSet() };
 }
 
 /**
@@ -754,17 +1177,17 @@ export function newTree(): Tree {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from "./src/types";
+ * import type { Tree } from './src/types';
  *
- * import { decoalesceOperations, newEdges, newLeaves, newTree } from "./src/internals";
+ * import { decoalesceOperations, EdgeMap, LeafSet, newTree } from './src/internals';
  *
  * const tree: Tree = {
- *   leaves: newLeaves(),
- *   edges: newEdges().add(
+ *   leaves: new LeafSet(),
+ *   edges: new EdgeMap().add(
  *     { type: 'append', operand: Uint8Array.of(1) },
  *     {
- *       leaves: newLeaves(),
- *       edges: newEdges()
+ *       leaves: new LeafSet(),
+ *       edges: new EdgeMap()
  *         .add({ type: 'append', operand: Uint8Array.of(2, 3) }, newTree())
  *         .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
  *     },
@@ -870,21 +1293,21 @@ export function decoalesceOperations(tree: Tree): Tree {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from "./src/types";
+ * import type { Tree } from './src/types';
  *
- * import { coalesceOperations, newEdges, newLeaves, newTree } from "./src/internals";
+ * import { coalesceOperations, newTree, EdgeMap, LeafSet } from './src/internals';
  *
  * const tree: Tree = {
- *   leaves: newLeaves(),
- *   edges: newEdges().add(
+ *   leaves: new LeafSet(),
+ *   edges: new EdgeMap().add(
  *     { type: 'append', operand: Uint8Array.of(1) },
  *     {
- *       leaves: newLeaves(),
- *       edges: newEdges().add(
+ *       leaves: new LeafSet(),
+ *       edges: new EdgeMap().add(
  *         { type: 'append', operand: Uint8Array.of(2) },
  *         {
- *           leaves: newLeaves(),
- *           edges: newEdges().add({ type: 'append', operand: Uint8Array.of(3) }, newTree()),
+ *           leaves: new LeafSet(),
+ *           edges: new EdgeMap().add({ type: 'append', operand: Uint8Array.of(3) }, newTree()),
  *         },
  *       ),
  *     },
@@ -930,7 +1353,7 @@ export function coalesceOperations(tree: Tree): Tree {
  * ```typescript
  * 'use strict';
  *
- * import { atomizePrependOp } from "./src/internals";
+ * import { atomizePrependOp } from './src/internals';
  *
  * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));  // [
  *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
@@ -957,7 +1380,7 @@ export function atomizePrependOp(prefix: Uint8Array): Ops {
  * ```typescript
  * 'use strict';
  *
- * import { atomizeAppendOp } from "./src/internals";
+ * import { atomizeAppendOp } from './src/internals';
  *
  * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));  // [
  *                                                        //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
@@ -999,7 +1422,7 @@ export function atomizeAppendOp(suffix: Uint8Array): Ops {
  * ```typescript
  * 'use strict';
  *
- * import { normalizeOps } from "./src/internals";
+ * import { normalizeOps } from './src/internals';
  *
  * console.log(normalizeOps([
  *   { type: 'append', operand: Uint8Array.of(1, 2) },
@@ -1077,9 +1500,9 @@ export function normalizeOps(operations: Ops): Ops {
  * ```typescript
  * 'use strict';
  *
- * import type { Op, Tree } from "./src/types";
- * import type { Path } from "./src/internals";
- * import { pathsToTree } from "./src/internals";
+ * import type { Path } from './src/internals';
+ * import type { Op, Tree } from './src/types';
+ * import { pathsToTree } from './src/internals';
  *
  * const path1: Path = { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } };
  * const path2: Path = { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } };
@@ -1105,7 +1528,7 @@ export function pathsToTree(paths: Paths): Tree {
           result.edges.add(op, tree);
           return result;
         },
-        { leaves: newLeaves().add(path.leaf), edges: newEdges() },
+        { leaves: new LeafSet().add(path.leaf), edges: new EdgeMap() },
       );
     })
     .reduce(incorporateTreeToTree, newTree());
@@ -1118,16 +1541,16 @@ export function pathsToTree(paths: Paths): Tree {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from "./src/types";
- * import type { Path } from "./src/internals";
+ * import type { Path } from './src/internals';
+ * import type { Tree } from './src/types';
  *
- * import { newEdges, newLeaves, treeToPaths } from "./src/internals";
+ * import { treeToPaths, EdgeMap, LeafSet } from './src/internals';
  *
  * const tree: Tree = {
- *   leaves: newLeaves(),
- *   edges: newEdges()
- *     .add({ type: 'sha1' }, { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() })
- *     .add({ type: 'sha256' }, { leaves: newLeaves().add({ type: 'bitcoin', height: 456 }), edges: newEdges() }),
+ *   leaves: new LeafSet(),
+ *   edges: new EdgeMap()
+ *     .add({ type: 'sha1' }, { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() })
+ *     .add({ type: 'sha256' }, { leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }), edges: new EdgeMap() }),
  * };
  *
  * treeToPaths(tree).forEach((path: Path): void => {
@@ -1173,9 +1596,9 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  * ```typescript
  * 'use strict';
  *
- * import type { Timestamp } from "./src/types";
+ * import type { Timestamp } from './src/types';
  *
- * import { newEdges, newLeaves, normalize } from "./src/internals";
+ * import { normalize, EdgeMap, LeafSet } from './src/internals';
  *
  * const timestamp: Timestamp = normalize({
  *   version: 1,
@@ -1184,26 +1607,26 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
+ *     leaves: new LeafSet(),
+ *     edges: new EdgeMap().add(
  *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
+ *       { leaves: new LeafSet(),
+ *         edges: new EdgeMap()
  *           .add(
  *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
+ *             { leaves: new LeafSet(),
+ *               edges: new EdgeMap().add(
  *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 { edges: new EdgeMap(),
+ *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *                 },
  *               ),
  *             },
  *           )
  *           .add(
  *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             { edges: new EdgeMap(),
+ *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *             },
  *           ),
  *       },

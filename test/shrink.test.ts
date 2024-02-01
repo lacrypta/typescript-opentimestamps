@@ -16,11 +16,12 @@
 
 'use strict';
 
-import type { Timestamp } from '../src';
+import type { Timestamp } from '../src/types';
 
-import { newEdges, newLeaves } from '../src/internals';
+import { EdgeMap, LeafSet } from '../src/internals';
 import { shrink } from '../src/shrink';
 import { uint8ArrayFromHex } from '../src/utils';
+
 import { timestampToString } from './helpers';
 
 describe('Shrink', (): void => {
@@ -31,16 +32,16 @@ describe('Shrink', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
           },
         } as Timestamp,
         expected: {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         name: 'should shrink to lowest height',
@@ -50,16 +51,16 @@ describe('Shrink', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 789 }).add({ type: 'bitcoin', height: 456 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 789 }).add({ type: 'bitcoin', height: 456 }),
           },
         } as Timestamp,
         expected: {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
           },
         } as Timestamp,
         name: 'should shrink to lowest height (again)',
@@ -69,8 +70,8 @@ describe('Shrink', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'pending', url: new URL('http://www.example.com') })
               .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() }),
           },
@@ -79,8 +80,8 @@ describe('Shrink', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'pending', url: new URL('http://www.example.com') })
               .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() }),
           },

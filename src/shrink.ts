@@ -16,10 +16,10 @@
 
 'use strict';
 
-import type { Leaf, Timestamp } from './types';
 import type { Path } from './internals';
+import type { Leaf, Timestamp } from './types';
 
-import { treeToPaths, pathsToTree, normalize } from './internals';
+import { normalize, pathsToTree, treeToPaths } from './internals';
 
 export function shrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)

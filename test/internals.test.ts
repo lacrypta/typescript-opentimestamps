@@ -16,8 +16,8 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Op, Timestamp, Tree } from '../src/types';
 import type { Edge, Ops, Paths } from '../src/internals';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from '../src/types';
 
 import {
   atomizeAppendOp,
@@ -31,21 +31,21 @@ import {
   decoalesceOperations,
   incorporateToTree,
   incorporateTreeToTree,
-  newEdges,
-  newLeaves,
+  magicHeader,
   newTree,
+  nonFinal,
   normalizeOps,
   normalize,
   pathsToTree,
   treeToPaths,
+  EdgeMap,
   LeafHeader,
+  LeafSet,
   Tag,
-  magicHeader,
-  nonFinal,
 } from '../src/internals';
-import { MergeMap, MergeSet, uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
+import { uint8ArrayFromHex, uint8ArrayToHex } from '../src/utils';
 
-import { mergeMapToString, mergeSetToString, timestampToString, treeToString } from './helpers';
+import { timestampToString, treeToString } from './helpers';
 
 describe('Internals', (): void => {
   describe('Tag', (): void => {
@@ -441,92 +441,92 @@ describe('Internals', (): void => {
       {
         left: newTree(),
         right: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         expected: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         name: 'should incorporate leaves into empty tree',
       },
       {
         left: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         right: newTree(),
         expected: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         name: 'should incorporate empty tree into leaves',
       },
       {
         left: newTree(),
-        right: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
-        expected: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        right: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
+        expected: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         name: 'should incorporate edges into empty tree',
       },
       {
-        left: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        left: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         right: newTree(),
-        expected: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        expected: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         name: 'should incorporate empty tree into edges',
       },
       {
-        left: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        left: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         right: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         expected: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges().add({ type: 'sha1' }, newTree()),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
         },
         name: 'should incorporate leaves into edges',
       },
       {
         left: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
-        right: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        right: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         expected: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges().add({ type: 'sha1' }, newTree()),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
         },
         name: 'should incorporate edges into leaves',
       },
@@ -541,19 +541,19 @@ describe('Internals', (): void => {
         left: newTree(),
         right: { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() } as Leaf,
         expected: {
-          leaves: newLeaves().add({
+          leaves: new LeafSet().add({
             type: 'unknown',
             header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
             payload: Uint8Array.of(),
           }),
-          edges: newEdges(),
+          edges: new EdgeMap(),
         },
         name: 'should incorporate leaves into empty tree',
       },
       {
         left: newTree(),
         right: [{ type: 'sha1' }, newTree()] as Edge,
-        expected: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        expected: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         name: 'should incorporate edges into empty tree',
       },
     ])('$name', ({ left, right, expected }: { left: Tree; right: Edge | Leaf; expected: Tree }): void => {
@@ -561,205 +561,553 @@ describe('Internals', (): void => {
     });
   });
 
-  describe('newEdges()', (): void => {
-    it.each([
-      {
-        edges: [] as Edge[],
-        expected: newEdges(),
-        name: 'should build empty edges',
-      },
-      {
-        edges: [[{ type: 'sha1' }, newTree()]] as Edge[],
-        expected: newEdges().add({ type: 'sha1' }, newTree()),
-        name: 'should add simple operation',
-      },
-      {
-        edges: [
-          [{ type: 'sha1' }, newTree()],
-          [{ type: 'sha256' }, newTree()],
-        ] as Edge[],
-        expected: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-        name: 'should add two operations',
-      },
-      {
-        edges: [
-          [{ type: 'sha1' }, newTree()],
-          [{ type: 'sha1' }, newTree()],
-        ] as Edge[],
-        expected: newEdges().add({ type: 'sha1' }, newTree()),
-        name: 'should add the same operation twice',
-      },
-      {
-        edges: [
-          [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
-          [{ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()],
-        ] as Edge[],
-        expected: newEdges()
-          .add({ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree())
-          .add({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()),
-        name: 'should discriminate by operand',
-      },
-      {
-        edges: [
-          [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
-          [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
-        ] as Edge[],
-        expected: newEdges().add({ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()),
-        name: 'should not discriminate by same operand',
-      },
-    ])('$name', ({ edges, expected }: { edges: Edge[]; expected: MergeMap<Op, Tree> }): void => {
-      expect(
-        mergeMapToString(
-          edges.reduce((prev: MergeMap<Op, Tree>, edge: Edge): MergeMap<Op, Tree> => prev.add(...edge), newEdges()),
-        ),
-      ).toStrictEqual(mergeMapToString(expected));
+  describe('LeafSet', (): void => {
+    describe('size()', (): void => {
+      it.each([
+        {
+          leafSet: new LeafSet(),
+          expected: 0,
+          name: 'should return 0 for empty LeafSet',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          expected: 1,
+          name: 'should return 1 for singleton LeafSet',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 123 }),
+          expected: 1,
+          name: 'should return 1 for singleton LeafSet (again)',
+        },
+      ])('$name', ({ leafSet, expected }: { leafSet: LeafSet; expected: number }): void => {
+        expect(leafSet.size()).toEqual(expected);
+      });
+    });
+
+    describe('values()', (): void => {
+      it.each([
+        {
+          leafSet: new LeafSet(),
+          expected: [] as Leaf[],
+          name: 'should return empty for empty LeafSet',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          expected: [{ type: 'bitcoin', height: 123 }] as Leaf[],
+          name: 'should return singleton for singleton LeafSet',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 123 }),
+          expected: [{ type: 'bitcoin', height: 123 }] as Leaf[],
+          name: 'should return singleton for singleton LeafSet (again)',
+        },
+        {
+          leafSet: new LeafSet()
+            .add({ type: 'bitcoin', height: 123 })
+            .add({ type: 'bitcoin', height: 123 })
+            .add({ type: 'litecoin', height: 123 }),
+          expected: [
+            { type: 'bitcoin', height: 123 },
+            { type: 'litecoin', height: 123 },
+          ] as Leaf[],
+          name: 'should return non-singleton for non-singleton LeafSet',
+        },
+      ])('$name', ({ leafSet, expected }: { leafSet: LeafSet; expected: Leaf[] }): void => {
+        expect(leafSet.values()).toEqual(expected);
+      });
+    });
+
+    describe('remove()', (): void => {
+      it.each([
+        {
+          leafSet: new LeafSet(),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet(),
+          name: 'should not alter empty LeafSet',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet(),
+          name: 'should return empty LeafSet when removing last element',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet().add({ type: 'litecoin', height: 123 }),
+          name: 'should remove non-combined element',
+        },
+        {
+          leafSet: new LeafSet()
+            .add({ type: 'bitcoin', height: 123 })
+            .add({ type: 'litecoin', height: 123 })
+            .add({ type: 'bitcoin', height: 123 }),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet().add({ type: 'litecoin', height: 123 }),
+          name: 'should remove combined element',
+        },
+      ])('$name', ({ leafSet, item, expected }: { leafSet: LeafSet; item: Leaf; expected: LeafSet }): void => {
+        expect(leafSet.remove(item)).toEqual(expected);
+      });
+    });
+
+    describe('add()', (): void => {
+      it.each([
+        {
+          leafSet: new LeafSet(),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          name: 'should add single item',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 123 }),
+          name: 'should add item and combine it',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+          item: { type: 'bitcoin', height: 123 } as Leaf,
+          expected: new LeafSet()
+            .add({ type: 'litecoin', height: 123 })
+            .add({ type: 'bitcoin', height: 123 })
+            .add({ type: 'bitcoin', height: 123 }),
+          name: 'should add item and combine it regardless of order',
+        },
+      ])('$name', ({ leafSet, item, expected }: { leafSet: LeafSet; item: Leaf; expected: LeafSet }): void => {
+        expect(leafSet.add(item)).toEqual(expected);
+      });
+    });
+
+    describe('incorporate()', (): void => {
+      it.each([
+        {
+          leafSet: new LeafSet(),
+          other: new LeafSet(),
+          expected: new LeafSet(),
+          name: 'should return empty LeafSet when combining empty LeafSets',
+        },
+        {
+          leafSet: new LeafSet(),
+          other: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          expected: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          name: 'should ignore empty LeafSet left',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          other: new LeafSet(),
+          expected: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          name: 'should ignore empty LeafSet right',
+        },
+        {
+          leafSet: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          other: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          expected: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 123 }),
+          name: 'should return combined LeafSet when incorporating no new elements',
+        },
+      ])('$name', ({ leafSet, other, expected }: { leafSet: LeafSet; other: LeafSet; expected: LeafSet }): void => {
+        expect(leafSet.incorporate(other)).toEqual(expected);
+      });
     });
   });
 
-  describe('newLeaves()', (): void => {
-    it.each([
-      {
-        leaves: [] as Leaf[],
-        expected: newLeaves(),
-        name: 'should build empty leaves',
-      },
-      {
-        leaves: [{ type: 'bitcoin', height: 123 }] as Leaf[],
-        expected: newLeaves().add({ type: 'bitcoin', height: 123 }),
-        name: 'should add simple leaf',
-      },
-      {
-        leaves: [
-          { type: 'bitcoin', height: 123 },
-          { type: 'litecoin', height: 456 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 456 }),
-        name: 'should add two leaves',
-      },
-      {
-        leaves: [
-          { type: 'bitcoin', height: 123 },
-          { type: 'bitcoin', height: 123 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'bitcoin', height: 123 }),
-        name: 'should add the same leaf twice',
-      },
-      {
-        leaves: [
-          { type: 'pending', url: new URL('http://www.example.com/a') },
-          { type: 'pending', url: new URL('http://www.example.com/b') },
-        ] as Leaf[],
-        expected: newLeaves()
-          .add({ type: 'pending', url: new URL('http://www.example.com/a') })
-          .add({ type: 'pending', url: new URL('http://www.example.com/b') }),
-        name: 'should discriminate by pending URL',
-      },
-      {
-        leaves: [
-          { type: 'pending', url: new URL('http://www.example.com/a') },
-          { type: 'pending', url: new URL('http://www.example.com/a') },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'pending', url: new URL('http://www.example.com/a') }),
-        name: 'should not discriminate by same pending URL',
-      },
-      {
-        leaves: [
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
-          { type: 'unknown', header: Uint8Array.of(2, 3, 4, 5, 6, 7, 8, 9), payload: Uint8Array.of() },
-        ] as Leaf[],
-        expected: newLeaves()
-          .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() })
-          .add({ type: 'unknown', header: Uint8Array.of(2, 3, 4, 5, 6, 7, 8, 9), payload: Uint8Array.of() }),
-        name: 'should discriminate by unknown header',
-      },
-      {
-        leaves: [
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
-        ] as Leaf[],
-        expected: newLeaves().add({
-          type: 'unknown',
-          header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
-          payload: Uint8Array.of(),
-        }),
-        name: 'should not discriminate by same unknown header',
-      },
-      {
-        leaves: [
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) },
-        ] as Leaf[],
-        expected: newLeaves()
-          .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) })
-          .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) }),
-        name: 'should discriminate by unknown payload',
-      },
-      {
-        leaves: [
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
-          { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
-        ] as Leaf[],
-        expected: newLeaves().add({
-          type: 'unknown',
-          header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
-          payload: Uint8Array.of(1, 2, 3),
-        }),
-        name: 'should not discriminate by same unknown payload',
-      },
-      {
-        leaves: [
-          { type: 'bitcoin', height: 123 },
-          { type: 'bitcoin', height: 456 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
-        name: 'should discriminate by bitcoin height',
-      },
-      {
-        leaves: [
-          { type: 'bitcoin', height: 123 },
-          { type: 'bitcoin', height: 123 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'bitcoin', height: 123 }),
-        name: 'should not discriminate by same bitcoin height',
-      },
-      {
-        leaves: [
-          { type: 'litecoin', height: 123 },
-          { type: 'litecoin', height: 456 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'litecoin', height: 123 }).add({ type: 'litecoin', height: 456 }),
-        name: 'should discriminate by litecoin height',
-      },
-      {
-        leaves: [
-          { type: 'litecoin', height: 123 },
-          { type: 'litecoin', height: 123 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'litecoin', height: 123 }),
-        name: 'should not discriminate by same litecoin height',
-      },
-      {
-        leaves: [
-          { type: 'ethereum', height: 123 },
-          { type: 'ethereum', height: 456 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'ethereum', height: 123 }).add({ type: 'ethereum', height: 456 }),
-        name: 'should discriminate by ethereum height',
-      },
-      {
-        leaves: [
-          { type: 'ethereum', height: 123 },
-          { type: 'ethereum', height: 123 },
-        ] as Leaf[],
-        expected: newLeaves().add({ type: 'ethereum', height: 123 }),
-        name: 'should not discriminate by same ethereum height',
-      },
-    ])('$name', ({ leaves, expected }: { leaves: Leaf[]; expected: MergeSet<Leaf> }): void => {
-      expect(
-        mergeSetToString(
-          leaves.reduce((prev: MergeSet<Leaf>, leaf: Leaf): MergeSet<Leaf> => prev.add(leaf), newLeaves()),
-        ),
-      ).toStrictEqual(mergeSetToString(expected));
+  describe('EdgeMap', (): void => {
+    describe('size()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          expected: 0,
+          name: 'should return 0 for empty EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: 1,
+          name: 'should return 1 for singleton EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: 1,
+          name: 'should return 1 for singleton EdgeMap (again)',
+        },
+      ])('$name', ({ edgeMap, expected }: { edgeMap: EdgeMap; expected: number }): void => {
+        expect(edgeMap.size()).toEqual(expected);
+      });
+    });
+
+    describe('keys()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          expected: [] as Op[],
+          name: 'should return empty for empty EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: [{ type: 'sha1' }] as Op[],
+          name: 'should return singleton for singleton EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [{ type: 'sha1' }] as Op[],
+          name: 'should return singleton for singleton EdgeMap (again)',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [{ type: 'sha1' }, { type: 'ripemd160' }] as Op[],
+          name: 'should return non-singleton for non-singleton EdgeMap',
+        },
+      ])('$name', ({ edgeMap, expected }: { edgeMap: EdgeMap; expected: Op[] }): void => {
+        expect(edgeMap.keys()).toEqual(expected);
+      });
+    });
+
+    describe('values()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          expected: [] as Tree[],
+          name: 'should return empty for empty EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: [{ leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() }],
+          name: 'should return singleton for singleton EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [
+            {
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+              edges: new EdgeMap(),
+            },
+          ] as Tree[],
+          name: 'should return singleton for singleton EdgeMap (again)',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [
+            {
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+              edges: new EdgeMap(),
+            },
+            { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+          ] as Tree[],
+          name: 'should return non-singleton for non-singleton EdgeMap',
+        },
+      ])('$name', ({ edgeMap, expected }: { edgeMap: EdgeMap; expected: Tree[] }): void => {
+        expect(edgeMap.values()).toEqual(expected);
+      });
+    });
+
+    describe('entries()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          expected: [] as [Op, Tree][],
+          name: 'should return empty for empty EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: [
+            [{ type: 'sha1' }, { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() }],
+          ] as [Op, Tree][],
+          name: 'should return singleton for singleton EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [
+            [
+              { type: 'sha1' },
+              {
+                leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+                edges: new EdgeMap(),
+              },
+            ],
+          ] as [Op, Tree][],
+          name: 'should return singleton for singleton EdgeMap (again)',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ),
+          expected: [
+            [
+              { type: 'sha1' },
+              {
+                leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+                edges: new EdgeMap(),
+              },
+            ],
+            [
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ],
+          ] as [Op, Tree][],
+          name: 'should return non-singleton for non-singleton EdgeMap',
+        },
+      ])('$name', ({ edgeMap, expected }: { edgeMap: EdgeMap; expected: [Op, Tree][] }): void => {
+        expect(edgeMap.entries()).toEqual(expected);
+      });
+    });
+
+    describe('remove()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          item: { type: 'sha1' } as Op,
+          expected: new EdgeMap(),
+          name: 'should not alter empty EdgeMap',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          item: { type: 'sha1' } as Op,
+          expected: new EdgeMap(),
+          name: 'should return empty EdgeMap when removing last element',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          item: { type: 'sha1' } as Op,
+          expected: new EdgeMap().add(
+            { type: 'ripemd160' },
+            { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          name: 'should remove non-combined element',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ),
+          item: { type: 'sha1' } as Op,
+          expected: new EdgeMap().add(
+            { type: 'ripemd160' },
+            { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          name: 'should remove combined element',
+        },
+      ])('$name', ({ edgeMap, item, expected }: { edgeMap: EdgeMap; item: Op; expected: EdgeMap }): void => {
+        expect(edgeMap.remove(item)).toEqual(expected);
+      });
+    });
+
+    describe('add()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          key: { type: 'sha1' } as Op,
+          value: { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          expected: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          name: 'should add single item',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          key: { type: 'sha1' } as Op,
+          value: { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+          expected: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          name: 'should add item and combine it',
+        },
+        {
+          edgeMap: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          key: { type: 'sha1' } as Op,
+          value: { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+          expected: new EdgeMap()
+            .add(
+              { type: 'ripemd160' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'ethereum', height: 123 }), edges: new EdgeMap() },
+            ),
+          name: 'should add item and combine it regardless of order',
+        },
+      ])(
+        '$name',
+        ({ edgeMap, key, value, expected }: { edgeMap: EdgeMap; key: Op; value: Tree; expected: EdgeMap }): void => {
+          expect(edgeMap.add(key, value)).toEqual(expected);
+        },
+      );
+    });
+
+    describe('incorporate()', (): void => {
+      it.each([
+        {
+          edgeMap: new EdgeMap(),
+          other: new EdgeMap(),
+          expected: new EdgeMap(),
+          name: 'should return empty EdgeMap when combining empty MergeMaps',
+        },
+        {
+          edgeMap: new EdgeMap(),
+          other: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          name: 'should ignore empty EdgeMap left',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          other: new EdgeMap(),
+          expected: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          name: 'should ignore empty EdgeMap right',
+        },
+        {
+          edgeMap: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          other: new EdgeMap().add(
+            { type: 'sha1' },
+            { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+          ),
+          expected: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+            )
+            .add(
+              { type: 'sha1' },
+              { leaves: new LeafSet().add({ type: 'litecoin', height: 123 }), edges: new EdgeMap() },
+            ),
+          name: 'should return combined EdgeMap when incorporating no new elements',
+        },
+      ])('$name', ({ edgeMap, other, expected }: { edgeMap: EdgeMap; other: EdgeMap; expected: EdgeMap }): void => {
+        expect(edgeMap.incorporate(other)).toEqual(expected);
+      });
     });
   });
 
@@ -777,273 +1125,273 @@ describe('Internals', (): void => {
         name: 'should not modify an empty tree',
       },
       {
-        input: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
-        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        input: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+        expected: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         name: 'should not modify a tree with no edges',
       },
       {
         input: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a tree with two or more edges',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a subtree with leaves',
       },
       {
         input: {
-          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, { edges: new EdgeMap(), leaves: new LeafSet() }),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, { edges: new EdgeMap(), leaves: new LeafSet() }),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a subtree with no edges',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+            { edges: new EdgeMap().add({ type: 'sha1' }, newTree()), leaves: new LeafSet() },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+            { edges: new EdgeMap().add({ type: 'sha1' }, newTree()), leaves: new LeafSet() },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a subtree with a single edge',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'sha1' }, newTree())
                 .add({ type: 'sha256' }, newTree())
                 .add({ type: 'ripemd160' }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'sha1' }, newTree())
                 .add({ type: 'sha256' }, newTree())
                 .add({ type: 'ripemd160' }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a subtree with three or more edges',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a binary subtree if the operation is not binary',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a binary subtree if the operation is binary with more than 1 byte operand',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a binary subtree if the operation is binary with a 1 byte operand and the sub-operations are not equal to it',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1) },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
                 .add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1) },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
                 .add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify a singleton tree with a binary subtree if the operation is binary with a 1 byte operand and the sub-operations are not both equal to it',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1) },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'prepend', operand: Uint8Array.of(2, 3) }, newTree())
                 .add({ type: 'prepend', operand: Uint8Array.of(4, 5) }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges()
+          edges: new EdgeMap()
             .add({ type: 'prepend', operand: Uint8Array.of(2, 3, 1) }, newTree())
             .add({ type: 'prepend', operand: Uint8Array.of(4, 5, 1) }, newTree()),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should decoalesce prepend',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'append', operand: Uint8Array.of(1) },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add({ type: 'append', operand: Uint8Array.of(2, 3) }, newTree())
                 .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges()
+          edges: new EdgeMap()
             .add({ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree())
             .add({ type: 'append', operand: Uint8Array.of(1, 4, 5) }, newTree()),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should decoalesce append',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'append', operand: Uint8Array.of(1) },
             {
-              edges: newEdges()
+              edges: new EdgeMap()
                 .add(
                   { type: 'append', operand: Uint8Array.of(2, 3) },
                   {
-                    edges: newEdges().add(
+                    edges: new EdgeMap().add(
                       { type: 'prepend', operand: Uint8Array.of(6) },
                       {
-                        leaves: newLeaves(),
-                        edges: newEdges()
+                        leaves: new LeafSet(),
+                        edges: new EdgeMap()
                           .add({ type: 'prepend', operand: Uint8Array.of(7, 8) }, newTree())
                           .add({ type: 'prepend', operand: Uint8Array.of(9, 0) }, newTree()),
                       },
                     ),
-                    leaves: newLeaves(),
+                    leaves: new LeafSet(),
                   },
                 )
                 .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges()
+          edges: new EdgeMap()
             .add(
               { type: 'append', operand: Uint8Array.of(1, 2, 3) },
               {
-                leaves: newLeaves(),
-                edges: newEdges()
+                leaves: new LeafSet(),
+                edges: new EdgeMap()
                   .add({ type: 'prepend', operand: Uint8Array.of(7, 8, 6) }, newTree())
                   .add({ type: 'prepend', operand: Uint8Array.of(9, 0, 6) }, newTree()),
               },
             )
             .add({ type: 'append', operand: Uint8Array.of(1, 4, 5) }, newTree()),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should recursively decoalesce',
       },
@@ -1060,162 +1408,162 @@ describe('Internals', (): void => {
         name: 'should not modify an empty tree',
       },
       {
-        input: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
-        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        input: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+        expected: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         name: 'should not modify a tree with leaves',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify subtrees with leaves',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify non-singleton subtrees',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify tree with non binary operation on singleton subtrees',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'sha1' }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should not modify tree with binary operation on non-binary singleton subtrees',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
+          leaves: new LeafSet(),
         },
         name: 'should coalesce prepend',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'append', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add({ type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) }, newTree()),
+          leaves: new LeafSet(),
         },
         name: 'should coalesce append',
       },
       {
         input: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'append', operand: Uint8Array.of(1, 2, 3) },
             {
-              edges: newEdges().add(
+              edges: new EdgeMap().add(
                 { type: 'append', operand: Uint8Array.of(4, 5, 6) },
                 {
-                  edges: newEdges().add(
+                  edges: new EdgeMap().add(
                     { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
                     {
-                      edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
-                      leaves: newLeaves(),
+                      edges: new EdgeMap().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, newTree()),
+                      leaves: new LeafSet(),
                     },
                   ),
-                  leaves: newLeaves(),
+                  leaves: new LeafSet(),
                 },
               ),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
             {
-              edges: newEdges().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
-              leaves: newLeaves(),
+              edges: new EdgeMap().add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6, 1, 2, 3) }, newTree()),
+              leaves: new LeafSet(),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should recursively coalesce',
       },
@@ -1387,17 +1735,17 @@ describe('Internals', (): void => {
       },
       {
         paths: [{ operations: [], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
-        expected: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        expected: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         name: 'should return simple tree for simple path',
       },
       {
         paths: [{ operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should return singleton tree for singleton path',
       },
@@ -1407,14 +1755,14 @@ describe('Internals', (): void => {
           { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 456 } },
         ] as Paths,
         expected: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges(),
-              leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+              edges: new EdgeMap(),
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         name: 'should return singleton tree with double leaves for double paths',
       },
@@ -1424,10 +1772,16 @@ describe('Internals', (): void => {
           { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } },
         ] as Paths,
         expected: {
-          edges: newEdges()
-            .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
-            .add({ type: 'sha256' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) }),
-          leaves: newLeaves(),
+          edges: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+            )
+            .add(
+              { type: 'sha256' },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
+            ),
+          leaves: new LeafSet(),
         },
         name: 'should return complex tree for complex paths',
       },
@@ -1444,39 +1798,39 @@ describe('Internals', (): void => {
         name: 'should return empty paths for empty tree',
       },
       {
-        tree: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         expected: [{ operations: [], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
         name: 'should return simple path for simple tree',
       },
       {
         tree: {
-          edges: newEdges().add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves() }),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, { edges: new EdgeMap(), leaves: new LeafSet() }),
+          leaves: new LeafSet(),
         },
         expected: [],
         name: 'should return empty paths for barren tree',
       },
       {
         tree: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: [{ operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } }] as Paths,
         name: 'should return singleton path for singleton tree',
       },
       {
         tree: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
             {
-              edges: newEdges(),
-              leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+              edges: new EdgeMap(),
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
             },
           ),
-          leaves: newLeaves(),
+          leaves: new LeafSet(),
         },
         expected: [
           { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
@@ -1486,10 +1840,16 @@ describe('Internals', (): void => {
       },
       {
         tree: {
-          edges: newEdges()
-            .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
-            .add({ type: 'sha256' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) }),
-          leaves: newLeaves(),
+          edges: new EdgeMap()
+            .add(
+              { type: 'sha1' },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+            )
+            .add(
+              { type: 'sha256' },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
+            ),
+          leaves: new LeafSet(),
         },
         expected: [
           { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } },
@@ -1519,26 +1879,32 @@ describe('Internals', (): void => {
           version,
           fileHash,
           tree: {
-            edges: newEdges()
-              .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+            edges: new EdgeMap()
+              .add(
+                { type: 'sha1' },
+                { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+              )
               .add(
                 { type: 'sha256' },
-                { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+                { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
               ),
-            leaves: newLeaves(),
+            leaves: new LeafSet(),
           },
         } as Timestamp,
         expected: {
           version,
           fileHash,
           tree: {
-            edges: newEdges()
-              .add({ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) })
+            edges: new EdgeMap()
+              .add(
+                { type: 'sha1' },
+                { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+              )
               .add(
                 { type: 'sha256' },
-                { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+                { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
               ),
-            leaves: newLeaves(),
+            leaves: new LeafSet(),
           },
         },
         name: 'should return timestamp for non-empty timestamp',

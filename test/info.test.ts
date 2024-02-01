@@ -16,11 +16,11 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
 import type { Edge } from '../src/internals';
+import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
 
-import { indent, infoEdge, infoFileHash, infoLeaf, info, infoTree } from '../src/info';
-import { newEdges, newLeaves, newTree } from '../src/internals';
+import { indent, info, infoEdge, infoFileHash, infoLeaf, infoTree } from '../src/info';
+import { newTree, EdgeMap, LeafSet } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 
 describe('Info', (): void => {
@@ -109,7 +109,10 @@ describe('Info', (): void => {
         name: 'should show unary operation (verbose)',
       },
       {
-        edge: [{ type: 'sha1' }, { leaves: newLeaves(), edges: newEdges().add({ type: 'sha256' }, newTree()) }] as Edge,
+        edge: [
+          { type: 'sha1' },
+          { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha256' }, newTree()) },
+        ] as Edge,
         msg: undefined,
         expected: 'msg = sha1(msg)\nmsg = sha256(msg)',
         name: 'should show subtree',
@@ -117,7 +120,7 @@ describe('Info', (): void => {
       {
         edge: [
           { type: 'reverse' },
-          { leaves: newLeaves(), edges: newEdges().add({ type: 'reverse' }, newTree()) },
+          { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'reverse' }, newTree()) },
         ] as Edge,
         msg: Uint8Array.of(4, 5, 6),
         expected: 'msg = reverse(msg)\n    = 060504\nmsg = reverse(msg)\n    = 040506',
@@ -137,30 +140,30 @@ describe('Info', (): void => {
         name: 'should show empty tree',
       },
       {
-        tree: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         msg: undefined,
         expected: 'bitcoinVerify(msg, 123)',
         name: 'should show tree with single leaf',
       },
       {
         tree: {
-          edges: newEdges(),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+          edges: new EdgeMap(),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
         },
         msg: undefined,
         expected: ' -> bitcoinVerify(msg, 123)\n -> bitcoinVerify(msg, 456)',
         name: 'should show tree with two leaves',
       },
       {
-        tree: { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+        tree: { edges: new EdgeMap().add({ type: 'sha1' }, newTree()), leaves: new LeafSet() },
         msg: undefined,
         expected: 'msg = sha1(msg)',
         name: 'should show tree with single edge',
       },
       {
         tree: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'reverse' }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'reverse' }, newTree()),
+          leaves: new LeafSet(),
         },
         msg: undefined,
         expected: ' -> msg = sha1(msg)\n -> msg = reverse(msg)',
@@ -168,26 +171,26 @@ describe('Info', (): void => {
       },
       {
         tree: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
           ),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
         },
         msg: undefined,
         expected: ' -> bitcoinVerify(msg, 123)\n -> msg = sha1(msg)\n    bitcoinVerify(msg, 456)',
         name: 'should show tree with leaves and edges',
       },
       {
-        tree: { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+        tree: { edges: new EdgeMap().add({ type: 'sha1' }, newTree()), leaves: new LeafSet() },
         msg: Uint8Array.of(1, 2, 3),
         expected: 'msg = sha1(msg)\n    = 7037807198c22a7d2b0807371d763779a84fdfcf',
         name: 'should show tree with single edge (verbose)',
       },
       {
         tree: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'reverse' }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'reverse' }, newTree()),
+          leaves: new LeafSet(),
         },
         msg: Uint8Array.of(1, 2, 3),
         expected:
@@ -196,11 +199,11 @@ describe('Info', (): void => {
       },
       {
         tree: {
-          edges: newEdges().add(
+          edges: new EdgeMap().add(
             { type: 'sha1' },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
           ),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
         },
         msg: Uint8Array.of(1, 2, 3),
         expected:
@@ -273,11 +276,11 @@ describe('Info', (): void => {
             value: uint8ArrayFromHex('0123456789abcdef0123456789abcdef01234567'),
           },
           tree: {
-            edges: newEdges().add(
+            edges: new EdgeMap().add(
               { type: 'sha1' },
-              { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
             ),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         verbose: false,
@@ -292,11 +295,11 @@ describe('Info', (): void => {
             value: uint8ArrayFromHex('0123456789abcdef0123456789abcdef01234567'),
           },
           tree: {
-            edges: newEdges().add(
+            edges: new EdgeMap().add(
               { type: 'sha1' },
-              { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+              { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
             ),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         verbose: true,

@@ -16,10 +16,10 @@
 
 'use strict';
 
-import type { Timestamp, Tree } from './types';
 import type { Path, Paths } from './internals';
+import type { Timestamp, Tree } from './types';
 
-import { callOps, normalize, pathsToTree, treeToPaths } from './internals';
+import { callOps, normalize, treeToPaths, pathsToTree } from './internals';
 import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 

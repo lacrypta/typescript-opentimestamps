@@ -16,21 +16,22 @@
 
 'use strict';
 
-import type { Leaf, Op, Timestamp, Tree } from '../src/types';
 import type { Edge } from '../src/internals';
+import type { Leaf, Op, Timestamp, Tree } from '../src/types';
+
+import { newTree, EdgeMap, LeafSet } from '../src/internals';
+import { uint8ArrayFromHex } from '../src/utils';
 
 import {
+  edgeMapToString,
   edgeToString,
   leafOrEdgeToString,
+  leafSetToString,
   leafToString,
-  mergeMapToString,
-  mergeSetToString,
   opToString,
   timestampToString,
   treeToString,
 } from './helpers';
-import { newEdges, newLeaves, newTree } from '../src/internals';
-import { MergeMap, MergeSet, uint8ArrayFromHex } from '../src/utils';
 
 describe('Helpers', (): void => {
   describe('opToString()', (): void => {
@@ -231,47 +232,47 @@ describe('Helpers', (): void => {
     });
   });
 
-  describe('mergeSetToString()', (): void => {
+  describe('leafSetToString()', (): void => {
     it.each([
       {
-        input: newLeaves(),
+        input: new LeafSet(),
         expected: '',
-        name: 'should stringify empty MergeSet',
+        name: 'should stringify empty LeafSet',
       },
       {
-        input: newLeaves().add({ type: 'bitcoin', height: 123 }),
+        input: new LeafSet().add({ type: 'bitcoin', height: 123 }),
         expected: 'bitcoin:123',
-        name: 'should stringify singleton MergeSet',
+        name: 'should stringify singleton LeafSet',
       },
       {
-        input: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+        input: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
         expected: 'bitcoin:123,bitcoin:456',
-        name: 'should stringify non-empty MergeSet',
+        name: 'should stringify non-empty LeafSet',
       },
-    ])('$name', ({ input, expected }: { input: MergeSet<Leaf>; expected: string }): void => {
-      expect(mergeSetToString(input)).toStrictEqual(expected);
+    ])('$name', ({ input, expected }: { input: LeafSet; expected: string }): void => {
+      expect(leafSetToString(input)).toStrictEqual(expected);
     });
   });
 
-  describe('mergeMapToString()', (): void => {
+  describe('edgeMapToString()', (): void => {
     it.each([
       {
-        input: newEdges(),
+        input: new EdgeMap(),
         expected: '',
-        name: 'should stringify empty MergeMap',
+        name: 'should stringify empty EdgeMap',
       },
       {
-        input: newEdges().add({ type: 'sha1' }, newTree()),
+        input: new EdgeMap().add({ type: 'sha1' }, newTree()),
         expected: 'sha1=>{[]()}',
-        name: 'should stringify singleton MergeMap',
+        name: 'should stringify singleton EdgeMap',
       },
       {
-        input: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+        input: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
         expected: 'sha1=>{[]()},sha256=>{[]()}',
-        name: 'should stringify singleton MergeMap',
+        name: 'should stringify singleton EdgeMap',
       },
-    ])('$name', ({ input, expected }: { input: MergeMap<Op, Tree>; expected: string }): void => {
-      expect(mergeMapToString(input)).toStrictEqual(expected);
+    ])('$name', ({ input, expected }: { input: EdgeMap; expected: string }): void => {
+      expect(edgeMapToString(input)).toStrictEqual(expected);
     });
   });
 
@@ -283,35 +284,35 @@ describe('Helpers', (): void => {
         name: 'should stringify empty tree',
       },
       {
-        input: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+        input: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         expected: '[bitcoin:123]()',
         name: 'should stringify tree with one leaf',
       },
       {
         input: {
-          edges: newEdges(),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+          edges: new EdgeMap(),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
         },
         expected: '[bitcoin:123,bitcoin:456]()',
         name: 'should stringify tree with two leaves',
       },
       {
-        input: { edges: newEdges().add({ type: 'sha1' }, newTree()), leaves: newLeaves() },
+        input: { edges: new EdgeMap().add({ type: 'sha1' }, newTree()), leaves: new LeafSet() },
         expected: '[](sha1=>{[]()})',
         name: 'should stringify tree with one edge',
       },
       {
         input: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-          leaves: newLeaves(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet(),
         },
         expected: '[](sha1=>{[]()},sha256=>{[]()})',
         name: 'should stringify tree with two edges',
       },
       {
         input: {
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
         },
         expected: '[bitcoin:123,bitcoin:456](sha1=>{[]()},sha256=>{[]()})',
         name: 'should stringify tree with two leaves and two edges',
@@ -337,8 +338,8 @@ describe('Helpers', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('0011223344556677889900aabbccddeeff112233') },
           tree: {
-            edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+            edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
           },
         } as Timestamp,
         expected:

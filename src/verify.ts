@@ -16,10 +16,10 @@
 
 'use strict';
 
-import type { Timestamp, Verifier } from './types';
 import type { Path } from './internals';
+import type { Timestamp, Verifier } from './types';
 
-import { treeToPaths, callOps } from './internals';
+import { callOps, treeToPaths } from './internals';
 
 export async function verify(
   timestamp: Timestamp,

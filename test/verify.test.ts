@@ -18,7 +18,7 @@
 
 import type { Leaf } from '../src/types';
 
-import { newEdges, newLeaves } from '../src/internals';
+import { EdgeMap, LeafSet } from '../src/internals';
 import { uint8ArrayFromHex } from '../src/utils';
 import { verify } from '../src/verify';
 
@@ -99,8 +99,8 @@ describe('Verify', (): void => {
                 value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
               },
               tree: {
-                edges: newEdges(),
-                leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+                edges: new EdgeMap(),
+                leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
               },
             },
             {

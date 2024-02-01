@@ -21,7 +21,7 @@ import { randomBytes } from '@noble/hashes/utils';
 
 import type { FileHash, Timestamp, Tree } from './types';
 
-import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalize } from './internals';
+import { incorporateTreeToTree, newTree, normalize, EdgeMap, LeafSet } from './internals';
 import { readTree } from './read';
 import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
@@ -73,14 +73,14 @@ export async function submit(
   );
 
   const resultTree: Tree = {
-    leaves: newLeaves(),
-    edges: newEdges().add({ type: 'sha256' }, stampedTree),
+    leaves: new LeafSet(),
+    edges: new EdgeMap().add({ type: 'sha256' }, stampedTree),
   };
 
   const fudgedTree: Tree =
     0 === fudge.length
       ? resultTree
-      : { leaves: newLeaves(), edges: newEdges().add({ type: 'append', operand: fudge }, resultTree) };
+      : { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'append', operand: fudge }, resultTree) };
 
   return {
     timestamp: normalize({

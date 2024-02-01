@@ -17,9 +17,9 @@
 'use strict';
 
 import type { Path, Paths } from './internals';
+import type { Timestamp } from './types';
 
 import { treeToPaths } from './internals';
-import { Timestamp } from './types';
 
 export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {
   const paths: Paths = treeToPaths(timestamp.tree);

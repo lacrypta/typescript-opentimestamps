@@ -23,10 +23,10 @@
 
 'use strict';
 
-import type { FileHash, Leaf, Timestamp, Tree } from './types';
 import type { Edge } from './internals';
+import type { FileHash, Leaf, Timestamp, Tree } from './types';
 
-import { compareEdges, compareLeaves, LeafHeader, Tag, magicHeader, nonFinal } from './internals';
+import { compareEdges, compareLeaves, magicHeader, nonFinal, LeafHeader, Tag } from './internals';
 import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
 
 /**
@@ -48,7 +48,7 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```typescript
  * 'use strict';
  *
- * import { writeUint } from "./src/write";
+ * import { writeUint } from './src/write';
  *
  * console.log(writeUint(0));         // Uint8Array(1) [ 0 ]
  * console.log(writeUint(1));         // Uint8Array(1) [ 1 ]
@@ -60,7 +60,7 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```typescript
  * 'use strict';
  *
- * import { writeUint } from "./src/write";
+ * import { writeUint } from './src/write';
  *
  * console.log(writeUint(-1));       // Error: Expected safe non-negative value
  * console.log(writeUint(NaN));      // Error: Expected safe non-negative value
@@ -95,7 +95,7 @@ export function writeUint(value: number): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { writeBytes } from "./src/write";
+ * import { writeBytes } from './src/write';
  *
  * console.log(writeBytes(Uint8Array.of()));            // Uint8Array(1) [ 0 ]
  * console.log(writeBytes(Uint8Array.of(1, 2, 3, 4)));  // Uint8Array(5) [ 4, 1, 2, 3, 4 ]
@@ -118,7 +118,7 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { writeFileHash } from "./src/write";
+ * import { writeFileHash } from './src/write';
  *
  * console.log(writeFileHash({
  *   algorithm: 'sha1',
@@ -178,7 +178,7 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { writeLeaf } from "./src/write";
+ * import { writeLeaf } from './src/write';
  *
  * console.log(writeLeaf({ type: 'bitcoin', height: 123 }));
  *   // Uint8Array(11) [ 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123 ]
@@ -238,8 +238,8 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { newTree } from "./src/internals";
- * import { writeEdge } from "./src/write";
+ * import { newTree } from './src/internals';
+ * import { writeEdge } from './src/write';
  *
  * console.log(writeEdge([{ type: 'sha1' }, newTree()]));
  *   // Uint8Array(1) [ 2 ]
@@ -294,30 +294,30 @@ export function writeEdge(edge: Edge): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { newEdges, newLeaves, newTree } from "./src/internals";
- * import { writeTree } from "./src/write";
+ * import { EdgeMap, LeafSet, newTree } from './src/internals';
+ * import { writeTree } from './src/write';
  *
  * console.log(writeTree(newTree()));
  *   // Uint8Array(0) []
- * console.log(writeTree({ edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }));
+ * console.log(writeTree({ edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }));
  *   // Uint8Array(11) [ 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123 ]
  * console.log(writeTree({
- *   edges: newEdges(),
- *   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+ *   edges: new EdgeMap(),
+ *   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
  * }));
  *   // Uint8Array(23) [ 255, 0,   5, 136, 150,  13, 115, 215, 25, 1,   1, 123,
  *   //                    0, 6, 134, 154,  13, 115, 215,  27, 69, 1, 123 ]
  * console.log(
  *   writeTree({
- *     edges: newEdges().add({ type: 'sha1' }, newTree()),
- *     leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *     edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
+ *     leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *   }),
  * );
  *   // Uint8Array(13) [ 255, 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123, 2 ]
  * console.log(
  *   writeTree({
- *     edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
- *     leaves: newLeaves(),
+ *     edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+ *     leaves: new LeafSet(),
  *   }),
  * );
  *   // Uint8Array(3) [ 255, 2, 8 ]
@@ -371,8 +371,8 @@ export function writeTree(tree: Tree): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { newTree } from "./src/internals";
- * import { write } from "./src/write";
+ * import { newTree } from './src/internals';
+ * import { write } from './src/write';
  *
  * console.log(write({
  *   version: 1,

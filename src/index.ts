@@ -17,88 +17,23 @@
 
 'use strict';
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API (type-likes) --------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
-export type { Timestamp, FileHash, Tree, Leaf, Op, Verifier } from './types';
-export type { Combine, ToKey } from './utils';
-
-export { MergeMap, MergeSet } from './utils';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API (function-likes) ----------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
+export type { FileHash, Leaf, MergeMap, MergeSet, Op, Timestamp, Tree, Verifier } from './types';
 
 import { info as _info } from './info';
-import {
-  normalize as _normalize,
-  newEdges as _newEdges,
-  newLeaves as _newLeaves,
-  newTree as _newTree,
-} from './internals';
+import { newTree as _newTree, normalize as _normalize } from './internals';
 import { canShrink as _canShrink, canUpgrade as _canUpgrade, canVerify as _canVerify } from './predicates';
 import { read as _read } from './read';
 import { shrink as _shrink } from './shrink';
 import { submit as _submit } from './submit';
 import { upgrade as _upgrade } from './upgrade';
-import { is as _is, assert as _assert, validate as _validate } from './validation';
+import { assert as _assert, is as _is, validate as _validate } from './validation';
 import { write as _write } from './write';
 
 import { verify as _verify } from './verify';
 import { default as verifiers } from './verifiers';
 
 /**
- * Construct an empty {@link MergeMap} suitable for usage to hold `<{@link Op}, {@link Tree}>` maps in a {@link Tree}.
- *
- * A {@link MergeMap} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
- * In the case of `<{@link Op}, {@link Tree}>` mappings these are:
- *
- * - **`toKey`:** use the {@link Op}'s `type`; if this happens to be `append` or `prepend`, append a `:` followed by their `operand` to the constructed key.
- * - **`combine`:** simply merge the two {@link Tree}s.
- *
- * @example
- * ```typescript
- * 'use strict';
- *
- * import { newEdges } from '@lacrypta/typescript-opentimestamps';
- *
- * console.log(newEdges());  // MergeMap { ... }
- * ```
- *
- * @returns The empty `<{@link Op}, {@link Tree}>` mapping.
- */
-export const newEdges = _newEdges;
-
-/**
- * Construct an empty {@link MergeSet} suitable for usage to hold {@link Leaf} sets in a {@link Tree}.
- *
- * A {@link MergeSet} suitable for {@link Tree} usage requires two parameters: the `toKey` and `combine` functions.
- * In the case of {@link Leaf} mappings these are:
- *
- * - **`toKey`:** return the {@link Leaf}'s `type` with a `:` at the, and, depending on the `type` itself, concatenate this with:
- *     - **`pending`:** the {@link Leaf}'s `url`;
- *     - **`unknown`:** the {@link Leaf}'s `header` as a hex string, a `:`, and its payload as a hex string;
- *     - **`bitcoin`, `litecoin`, or `ethereum`:** the {@link Leaf}'s height as a decimal string.
- * - **`combine`:** simply return the first of the two {@link Leaf | Leaves} (there's no point in holding more than one of each {@link Leaf} type).
- *
- * @example
- * ```typescript
- * 'use strict';
- *
- * import { newLeaves } from '@lacrypta/typescript-opentimestamps';
- *
- * console.log(newLeaves());  // MergeSet { ... }
- * ```
- *
- * @returns The empty {@link Leaf | Leaves} set.
- */
-export const newLeaves = _newLeaves;
-
-/**
  * Construct an empty {@link Tree}.
- *
- * This function merely calls {@link newLeaves} and {@link newEdges} to construct an empty {@link Tree}.
  *
  * @example
  * ```typescript
@@ -106,7 +41,7 @@ export const newLeaves = _newLeaves;
  *
  * import { newTree } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(newTree());  // { edges: MergeMap { ... }, leaves: MergeSet { ... } }
+ * console.log(newTree());  // { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
  * ```
  *
  * @returns The empty tree constructed.
@@ -126,7 +61,7 @@ export const newTree = _newTree;
  * ```typescript
  * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
  *
- * import { info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ * import { info, EdgeMap, LeafSet } from '@lacrypta/typescript-opentimestamps';
  *
  * const timestamp: Timestamp = {
  *   version: 1,
@@ -135,26 +70,26 @@ export const newTree = _newTree;
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
+ *     leaves: new LeafSet(),
+ *     edges: new EdgeMap().add(
  *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
+ *       { leaves: new LeafSet(),
+ *         edges: new EdgeMap()
  *           .add(
  *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
+ *             { leaves: new LeafSet(),
+ *               edges: new EdgeMap().add(
  *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 { edges: new EdgeMap(),
+ *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *                 },
  *               ),
  *             },
  *           )
  *           .add(
  *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             { edges: new EdgeMap(),
+ *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *             },
  *           ),
  *       },
@@ -211,7 +146,7 @@ export const info = _info;
  *
  * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
  *
- * import { normalize, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ * import { normalize, EdgeMap, LeafSet } from '@lacrypta/typescript-opentimestamps';
  *
  * const timestamp: Timestamp = normalize({
  *   version: 1,
@@ -220,26 +155,26 @@ export const info = _info;
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
+ *     leaves: new LeafSet(),
+ *     edges: new EdgeMap().add(
  *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
+ *       { leaves: new LeafSet(),
+ *         edges: new EdgeMap()
  *           .add(
  *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
+ *             { leaves: new LeafSet(),
+ *               edges: new EdgeMap().add(
  *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 { edges: new EdgeMap(),
+ *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *                 },
  *               ),
  *             },
  *           )
  *           .add(
  *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             { edges: new EdgeMap(),
+ *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *             },
  *           ),
  *       },
@@ -310,10 +245,7 @@ export const canVerify = _canVerify;
  *   // {
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
- *   //   tree: {
- *   //     edges: MergeMap { },
- *   //     leaves: MergeSet { ... }
- *   //   }
+ *   //   tree: { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: [Object] } }
  *   // }
  * ```
  *
@@ -360,7 +292,7 @@ export const upgrade = _upgrade;
  * ```typescript
  * 'use strict';
  *
- * import { Leaf, Op, Tree, MergeMap, MergeSet, is } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree, is } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(is(123));             // false
  * console.log(is({}));              // false
@@ -380,16 +312,7 @@ export const upgrade = _upgrade;
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
  *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
+ *   tree: newTree(),
  * }));                              // true
  * ```
  *
@@ -408,7 +331,7 @@ export const is = _is;
  * ```typescript
  * 'use strict';
  *
- * import { Leaf, Op, Tree, MergeMap, MergeSet, assert } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree, assert } from '@lacrypta/typescript-opentimestamps';
  *
  * assert({
  *   version: 1,
@@ -417,16 +340,7 @@ export const is = _is;
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
  *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
+ *   tree: newTree(),
  * });  // OK
  * ```
  *
@@ -461,7 +375,7 @@ export const assert = _assert;
  * ```typescript
  * 'use strict';
  *
- * import { Leaf, Op, Tree, MergeMap, MergeSet, validate } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree, validate } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(validate({
  *   version: 1,
@@ -470,17 +384,13 @@ export const assert = _assert;
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
  *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
- * }));  // { version: 1, fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, tree: { leaves: MergeSet { ... }, edges: MergeMap { ... } } }
+ *   tree: newTree(),
+ * }));
+ *   // {
+ *   //   version: 1,
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
+ *   //   tree: { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ *   // }
  * ```
  *
  * @example
