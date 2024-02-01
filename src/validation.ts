@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
 import { EdgeMap, LeafSet } from './internals';
@@ -32,8 +30,6 @@ import { EdgeMap, LeafSet } from './internals';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateNonNullObject } from './src/validation';
  *
  * console.log(validateNonNullObject({}));  // {}
@@ -41,8 +37,6 @@ import { EdgeMap, LeafSet } from './internals';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateNonNullObject } from './src/validation';
  *
  * console.log(validateNonNullObject(123));
@@ -69,8 +63,6 @@ export function validateNonNullObject(obj: unknown): object {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateUint8Array } from './src/validation';
  *
  * console.log(validateUint8Array(Uint8Array.of(1, 2, 3)));
@@ -79,8 +71,6 @@ export function validateNonNullObject(obj: unknown): object {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateUint8Array } from './src/validation';
  *
  * console.log(validateUint8Array({}));
@@ -106,8 +96,6 @@ export function validateUint8Array(array: unknown): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateURL } from './src/validation';
  *
  * console.log(validateURL(new URL('http://example.com')));
@@ -116,8 +104,6 @@ export function validateUint8Array(array: unknown): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateURL } from './src/validation';
  *
  * console.log(validateURL({}));
@@ -150,8 +136,6 @@ export function validateURL(url: unknown): URL {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateCalendarUrl } from './src/validation';
  *
  * console.log(validateCalendarUrl('https://www.example.com/something'));
@@ -160,8 +144,6 @@ export function validateURL(url: unknown): URL {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateCalendarUrl } from './src/validation';
  *
  * console.log(validateCalendarUrl(123));
@@ -192,8 +174,6 @@ export function validateCalendarUrl(url: unknown): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateNonNegativeInteger } from './src/validation';
  *
  * console.log(validateNonNegativeInteger(1234));  // 1234
@@ -201,8 +181,6 @@ export function validateCalendarUrl(url: unknown): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateNonNegativeInteger } from './src/validation';
  *
  * console.log(validateNonNegativeInteger('something'));
@@ -239,8 +217,6 @@ export function validateNonNegativeInteger(num: unknown): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateOneOfStrings } from './src/validation';
  *
  * console.log(validateOneOfStrings('something', ['something', 'else', 'entirely']));
@@ -249,8 +225,6 @@ export function validateNonNegativeInteger(num: unknown): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateOneOfStrings } from './src/validation';
  *
  * console.log(validateOneOfStrings('something', ['else', 'entirely']));
@@ -274,8 +248,6 @@ export function validateOneOfStrings(value: string, options: string[]): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasTypeKey } from './src/validation';
  *
  * console.log(validateObjectHasTypeKey({ type: 'something' }));
@@ -284,8 +256,6 @@ export function validateOneOfStrings(value: string, options: string[]): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasTypeKey } from './src/validation';
  *
  * console.log(validateObjectHasTypeKey({}));
@@ -316,8 +286,6 @@ export function validateObjectHasTypeKey(obj: object): { type: string } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasHeightKey } from './src/validation';
  *
  * console.log(validateObjectHasHeightKey({ height: 123 }));
@@ -326,8 +294,6 @@ export function validateObjectHasTypeKey(obj: object): { type: string } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasHeightKey } from './src/validation';
  *
  * console.log(validateObjectHasHeightKey({}));
@@ -353,8 +319,6 @@ export function validateObjectHasHeightKey(obj: object): { height: number } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasUrlKey } from './src/validation';
  *
  * console.log(validateObjectHasUrlKey({ url: new URL('https://www.example.com') }));
@@ -363,8 +327,6 @@ export function validateObjectHasHeightKey(obj: object): { height: number } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasUrlKey } from './src/validation';
  *
  * console.log(validateObjectHasUrlKey({}));
@@ -390,8 +352,6 @@ export function validateObjectHasUrlKey(obj: object): { url: URL } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasHeaderKey } from './src/validation';
  *
  * console.log(validateObjectHasHeaderKey({ header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8) }));
@@ -400,8 +360,6 @@ export function validateObjectHasUrlKey(obj: object): { url: URL } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasHeaderKey } from './src/validation';
  *
  * console.log(validateObjectHasHeaderKey({}));
@@ -433,8 +391,6 @@ export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasPayloadKey } from './src/validation';
  *
  * console.log(validateObjectHasPayloadKey({ payload: Uint8Array.of() }));
@@ -443,8 +399,6 @@ export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasPayloadKey } from './src/validation';
  *
  * console.log(validateObjectHasPayloadKey({}));
@@ -470,8 +424,6 @@ export function validateObjectHasPayloadKey(obj: object): { payload: Uint8Array 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasOperandKey } from './src/validation';
  *
  * console.log(validateObjectHasOperandKey({ operand: Uint8Array.of() }));
@@ -480,8 +432,6 @@ export function validateObjectHasPayloadKey(obj: object): { payload: Uint8Array 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasOperandKey } from './src/validation';
  *
  * console.log(validateObjectHasOperandKey({}));
@@ -509,8 +459,6 @@ export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { LeafSet } from './src/internals';
  * import { validateObjectHasLeavesKey } from './src/validation';
  *
@@ -520,8 +468,6 @@ export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasLeavesKey } from './src/validation';
  *
  * console.log(validateObjectHasLeavesKey({}));
@@ -559,8 +505,6 @@ export function validateObjectHasLeavesKey(obj: object): { leaves: LeafSet } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { EdgeMap } from './src/internals';
  * import { validateObjectHasEdgesKey } from './src/validation';
  *
@@ -570,8 +514,6 @@ export function validateObjectHasLeavesKey(obj: object): { leaves: LeafSet } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasEdgesKey } from './src/validation';
  *
  * console.log(validateObjectHasEdgesKey({}));
@@ -606,8 +548,6 @@ export function validateObjectHasEdgesKey(obj: object): { edges: EdgeMap } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasAlgorithmKey } from './src/validation';
  *
  * console.log(validateObjectHasAlgorithmKey({ algorithm: 'sha1' }));
@@ -616,8 +556,6 @@ export function validateObjectHasEdgesKey(obj: object): { edges: EdgeMap } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasAlgorithmKey } from './src/validation';
  *
  * console.log(validateObjectHasAlgorithmKey({}));
@@ -650,8 +588,6 @@ export function validateObjectHasAlgorithmKey(obj: object): { algorithm: string 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasValueKey } from './src/validation';
  *
  * console.log(validateObjectHasValueKey({ value: Uint8Array.of() }));
@@ -660,8 +596,6 @@ export function validateObjectHasAlgorithmKey(obj: object): { algorithm: string 
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateObjectHasValueKey } from './src/validation';
  *
  * console.log(validateObjectHasValueKey({}));
@@ -700,8 +634,6 @@ export function validateObjectHasValueKey(obj: object): { value: Uint8Array } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateLeaf } from './src/validation';
  *
  * console.log(validateLeaf({ type: 'bitcoin', height: 123 }));
@@ -733,8 +665,6 @@ export function validateObjectHasValueKey(obj: object): { value: Uint8Array } {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateLeaf } from './src/validation';
  *
  * console.log(validateLeaf(123));
@@ -804,8 +734,6 @@ export function validateLeaf(leaf: unknown): Leaf {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateOp } from './src/validation';
  *
  * console.log(validateOp({ type: 'sha1' }));
@@ -828,8 +756,6 @@ export function validateLeaf(leaf: unknown): Leaf {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateOp } from './src/validation';
  *
  * console.log(validateOp(123));
@@ -897,8 +823,6 @@ export function validateOp(op: unknown): Op {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { validateTree } from './src/validation';
  *
@@ -911,8 +835,6 @@ export function validateOp(op: unknown): Op {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { LeafSet } from './src/internals';
  * import { validateTree } from './src/validation';
  *
@@ -943,8 +865,6 @@ export function validateTree(tree: unknown): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateFileHashValue } from './src/validation';
  *
  * console.log(validateFileHashValue(
@@ -980,8 +900,6 @@ export function validateTree(tree: unknown): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateFileHashValue } from './src/validation';
  *
  * console.log(validateFileHashValue('something', Uint8Array.of()));
@@ -1033,8 +951,6 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateFileHash } from './src/validation';
  *
  * console.log(validateFileHash(
@@ -1049,8 +965,6 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateFileHash } from './src/validation';
  *
  * console.log(validateFileHash(123));
@@ -1077,8 +991,6 @@ export function validateFileHash(fileHash: unknown): FileHash {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateVersion } from './src/validation';
  *
  * console.log(validateVersion(1));  // 1
@@ -1086,8 +998,6 @@ export function validateFileHash(fileHash: unknown): FileHash {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validateVersion } from './src/validation';
  *
  * console.log(validateVersion(123));  // Error: Expected .version to be 1
@@ -1119,8 +1029,6 @@ export function validateVersion(version: unknown): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { validate } from './src/validation';
  *
@@ -1147,8 +1055,6 @@ export function validateVersion(version: unknown): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validate } from './src/validation';
  *
  * console.log(validate(123));
@@ -1203,8 +1109,6 @@ export function validate(timestamp: unknown): Timestamp {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { assert } from './src/validation';
  *
@@ -1222,8 +1126,6 @@ export function validate(timestamp: unknown): Timestamp {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { assert } from './src/validation';
  *
  * assert(123);
@@ -1255,8 +1157,6 @@ export function assert(timestamp: unknown): asserts timestamp is Timestamp {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { is } from './src/validation';
  *

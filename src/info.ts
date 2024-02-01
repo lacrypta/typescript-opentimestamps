@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 import type { Edge } from './internals';
 import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
@@ -34,8 +32,6 @@ import { uint8ArrayToHex } from './utils';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { indent } from './src/info';
  *
  * console.log(indent(''));
@@ -70,8 +66,6 @@ export function indent(text: string): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { infoLeaf } from './src/info';
  *
  * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
@@ -108,8 +102,6 @@ export function infoLeaf(leaf: Leaf): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { infoEdge } from './src/info';
  * import { EdgeMap, LeafSet } from './src/internals';
  *
@@ -167,8 +159,6 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Tree } from './src/types';
  *
  * import { infoTree } from './src/info';
@@ -249,8 +239,6 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { FileHash } from './src/types';
  *
  * import { infoFileHash } from './src/info';
@@ -289,8 +277,6 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Timestamp } from './src/types';
  *
  * import { info } from './src/info';

@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 import type { Edge } from './internals';
 import type { FileHash, Leaf, Timestamp, Tree } from './types';
 
@@ -46,8 +44,6 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { writeUint } from './src/write';
  *
  * console.log(writeUint(0));
@@ -62,8 +58,6 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { writeUint } from './src/write';
  *
  * console.log(writeUint(-1));
@@ -100,8 +94,6 @@ export function writeUint(value: number): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { writeBytes } from './src/write';
  *
  * console.log(writeBytes(Uint8Array.of()));
@@ -125,8 +117,6 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { writeFileHash } from './src/write';
  *
  * console.log(writeFileHash({
@@ -197,8 +187,6 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { writeLeaf } from './src/write';
  *
  * console.log(writeLeaf({ type: 'bitcoin', height: 123 }));
@@ -261,8 +249,6 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { writeEdge } from './src/write';
  *
@@ -317,8 +303,6 @@ export function writeEdge(edge: Edge): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, EdgeMap, LeafSet } from './src/internals';
  * import { writeTree } from './src/write';
  *
@@ -410,8 +394,6 @@ export function writeTree(tree: Tree): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  * import { write } from './src/write';
  *

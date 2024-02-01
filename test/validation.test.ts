@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import type { FileHash } from '../src/types';
 
 import { newTree, EdgeMap, LeafSet } from '../src/internals';

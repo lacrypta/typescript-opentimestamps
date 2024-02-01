@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 /**
  * An interface for an iteration over the standard {@link !Set} generic class, that's supposed to allow for identical elements to be identified and merged together.
  *

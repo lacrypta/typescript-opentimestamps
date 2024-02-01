@@ -21,15 +21,11 @@
  * @module
  */
 
-'use strict';
-
 /**
  * Serialize the given {@link !Uint8Array} to a hex string.
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayToHex } from './src/utils';
  *
  * console.log(uint8ArrayToHex(Uint8Array.of(1, 2, 3, 4, 5, 6)));
@@ -50,8 +46,6 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayFromHex } from './src/utils';
  *
  * console.log(uint8ArrayFromHex('010203040506'));
@@ -60,8 +54,6 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayFromHex } from './src/utils';
  *
  * console.log(uint8ArrayFromHex('102030405'));
@@ -94,8 +86,6 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayEquals } from './src/utils';
  *
  * console.log(uint8ArrayEquals(
@@ -127,8 +117,6 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayCompare } from './src/utils';
  *
  * console.log(uint8ArrayCompare(
@@ -172,8 +160,6 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayConcat } from './src/utils';
  *
  * console.log(uint8ArrayConcat());
@@ -206,8 +192,6 @@ export function uint8ArrayConcat(...arrays: Uint8Array[]): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { uint8ArrayReversed } from './src/utils';
  *
  * console.log(uint8ArrayReversed(Uint8Array.of()));
@@ -232,8 +216,6 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { fetchBody } from './src/utils';
  *
  * fetchBody(new URL('http://example.org'))
@@ -243,8 +225,6 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { fetchBody } from './src/utils';
  *
  * fetchBody(new URL('something://else'))
@@ -282,8 +262,6 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { retrieveGetBody } from './src/utils';
  *
  * retrieveGetBody(new URL('http://example.org'))
@@ -293,8 +271,6 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { retrieveGetBody } from './src/utils';
  *
  * retrieveGetBody(new URL('something://else'))
@@ -324,8 +300,6 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { retrievePostBody } from './src/utils';
  *
  * retrievePostBody(
@@ -337,8 +311,6 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { retrievePostBody } from './src/utils';
  *
  * retrievePostBody(
@@ -374,8 +346,6 @@ export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { textEncoder } from './src/utils';
  *
  * console.log(textEncoder);
@@ -389,8 +359,6 @@ export const textEncoder: TextEncoder = new TextEncoder();
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { textDecoder } from './src/utils';
  *
  * console.log(textDecoder);

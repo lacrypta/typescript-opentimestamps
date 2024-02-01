@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 import type { Edge } from './internals';
 import type { FileHash, Leaf, Timestamp, Tree } from './types';
 
@@ -35,8 +33,6 @@ import { validateCalendarUrl } from './validation';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { getBytes } from './src/read';
  *
  * console.log(getBytes(2, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
@@ -45,8 +41,6 @@ import { validateCalendarUrl } from './validation';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { getBytes } from './src/read';
  *
  * console.log(getBytes(8, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
@@ -73,8 +67,6 @@ export function getBytes(length: number, data: Uint8Array, index: number): [Uint
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { getByte } from './src/read';
  *
  * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
@@ -83,8 +75,6 @@ export function getBytes(length: number, data: Uint8Array, index: number): [Uint
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { getByte } from './src/read';
  *
  * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 15));
@@ -120,8 +110,6 @@ export function getByte(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readUint } from './src/read';
  *
  * console.log(readUint(Uint8Array.of(0x00), 0));
@@ -134,8 +122,6 @@ export function getByte(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readUint } from './src/read';
  *
  * console.log(readUint(Uint8Array.of(0x80), 0));
@@ -168,8 +154,6 @@ export function readUint(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readBytes } from './src/read';
  *
  * console.log(readBytes(Uint8Array.of(0x01, 123), 0));
@@ -180,8 +164,6 @@ export function readUint(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readBytes } from './src/read';
  *
  * console.log(readBytes(Uint8Array.of(0x03, 1), 0));
@@ -209,8 +191,6 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readUrl } from './src/read';
  *
  * const url: string = 'https://www.example.com';
@@ -227,8 +207,6 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readUrl } from './src/read';
  *
  * const url: string = 'https://www.example.com?something=else';
@@ -259,8 +237,6 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readLiteral } from './src/read';
  *
  * console.log(readLiteral(
@@ -279,8 +255,6 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readLiteral } from './src/read';
  *
  * console.log(readLiteral(
@@ -316,8 +290,6 @@ export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readDoneLeafPayload } from './src/read';
  *
  * console.log(readDoneLeafPayload(Uint8Array.of(0x00)));
@@ -328,8 +300,6 @@ export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readDoneLeafPayload } from './src/read';
  *
  * console.log(readDoneLeafPayload(Uint8Array.of(0x80)));
@@ -359,8 +329,6 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readPendingLeafPayload } from './src/read';
  *
  * const url: string = 'https://www.example.com';
@@ -376,8 +344,6 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readPendingLeafPayload } from './src/read';
  *
  * const url: string = 'https://www.example.com';
@@ -421,8 +387,6 @@ export function readPendingLeafPayload(payload: Uint8Array): URL {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readLeaf } from './src/read';
  *
  * const url: string = 'https://www.example.com';
@@ -522,8 +486,6 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readEdgeOrLeaf } from './src/read';
  *
  * console.log(readEdgeOrLeaf(
@@ -567,8 +529,6 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readEdgeOrLeaf } from './src/read';
  *
  * console.log(readEdgeOrLeaf(Uint8Array.of(0x77), 0));
@@ -618,8 +578,6 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readTree } from './src/read';
  *
  * console.log(readTree(
@@ -674,8 +632,6 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readFileHash } from './src/read';
  *
  * console.log(readFileHash(
@@ -722,8 +678,6 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readFileHash } from './src/read';
  *
  * console.log(readFileHash(Uint8Array.of(0x77), 0));
@@ -762,8 +716,6 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readVersion } from './src/read';
  *
  * console.log(readVersion(Uint8Array.of(0x01), 0));
@@ -774,8 +726,6 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { readVersion } from './src/read';
  *
  * console.log(readVersion(Uint8Array.of(0x00), 0));
@@ -819,8 +769,6 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { read } from './src/read';
  *
  * console.log(read(Uint8Array.of(
@@ -847,8 +795,6 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { read } from './src/read';
  *
  * console.log(read(Uint8Array.of(

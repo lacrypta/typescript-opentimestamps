@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
+    "alwaysStrict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "exactOptionalPropertyTypes": true,

@@ -15,8 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-'use strict';
-
 import type { Timestamp } from './types';
 
 export type { FileHash, Leaf, MergeMap, MergeSet, Op, Timestamp, Tree, Verifier } from './types';
@@ -39,8 +37,6 @@ import { default as verifiers } from './verifiers';
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(newTree());
@@ -65,8 +61,6 @@ export const newTree = _newTree;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
  *
  * import { info, read } from '@lacrypta/typescript-opentimestamps';
@@ -127,8 +121,6 @@ export const info = _info;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Timestamp, Tree } from '@lacrypta/typescript-opentimestamps';
  *
  * import { newTree, normalize, info } from '@lacrypta/typescript-opentimestamps';
@@ -194,8 +186,6 @@ export const canVerify = _canVerify;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { read } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(read(
@@ -225,8 +215,6 @@ export const canVerify = _canVerify;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { read } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(read(
@@ -267,8 +255,6 @@ export const upgrade = _upgrade;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, is } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(is(123));
@@ -314,8 +300,6 @@ export const is = _is;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, assert } from '@lacrypta/typescript-opentimestamps';
  *
  * assert({
@@ -332,8 +316,6 @@ export const is = _is;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { assert } from '@lacrypta/typescript-opentimestamps';
  *
  * assert(123);
@@ -363,8 +345,6 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, validate } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(validate(
@@ -390,8 +370,6 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { validate } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(validate(123));
@@ -431,8 +409,6 @@ export const validate = _validate;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, write } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(write(

@@ -21,8 +21,6 @@
  * @module
  */
 
-'use strict';
-
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha1 } from '@noble/hashes/sha1';
 import { sha256 } from '@noble/hashes/sha256';
@@ -209,8 +207,6 @@ export const nonFinal: number = 0xff;
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { callOp } from './src/internals';
  *
  * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));
@@ -261,8 +257,6 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { callOps } from './src/internals';
  *
  * console.log(callOps([], Uint8Array.of()));
@@ -296,8 +290,6 @@ export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { compareLeaves } from './src/internals';
  *
  * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 })); // -1
@@ -368,8 +360,6 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { compareOps } from './src/internals';
  *
  * console.log(compareOps(
@@ -417,8 +407,6 @@ export function compareOps(left: Op, right: Op): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { compareEdges, newTree } from './src/internals';
  *
  * console.log(compareEdges(
@@ -462,8 +450,6 @@ export function compareEdges(left: Edge, right: Edge): number {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Tree } from './src/types';
  *
  * import { incorporateTreeToTree, EdgeMap, LeafSet } from './src/internals';
@@ -515,8 +501,6 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Tree } from './src/types';
  *
  * import { incorporateToTree, EdgeMap, LeafSet } from './src/internals';
@@ -576,8 +560,6 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { LeafSet } from './src/internals';
  *
  * const leafSetA: LeafSet = new LeafSet()
@@ -686,8 +668,6 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { LeafSet } from './src/internals';
    *
    * const leafSet: LeafSet = new LeafSet();
@@ -707,8 +687,6 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { LeafSet } from './src/internals';
    *
    * const leafSet: LeafSet = new LeafSet();
@@ -730,8 +708,6 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { LeafSet } from './src/internals';
    *
    * const leafSet: LeafSet = new LeafSet()
@@ -758,8 +734,6 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { LeafSet } from './src/internals';
    *
    * const leafSet: LeafSet = new LeafSet();
@@ -794,8 +768,6 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { LeafSet } from './src/internals';
    *
    * const leafSetA: LeafSet = new LeafSet()
@@ -835,8 +807,6 @@ export class LeafSet implements MergeSet<Leaf> {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree, EdgeMap } from './src/internals';
  *
  * const edgeMapA: EdgeMap = new EdgeMap()
@@ -960,8 +930,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap();
@@ -981,8 +949,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap();
@@ -1004,8 +970,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap();
@@ -1027,8 +991,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap();
@@ -1050,8 +1012,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap()
@@ -1081,8 +1041,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMap: EdgeMap = new EdgeMap();
@@ -1118,8 +1076,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * @example
    * ```typescript
-   * 'use strict';
-   *
    * import { newTree, EdgeMap } from './src/internals';
    *
    * const edgeMapA: EdgeMap = new EdgeMap()
@@ -1154,8 +1110,6 @@ export class EdgeMap implements MergeMap<Op, Tree> {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { newTree } from './src/internals';
  *
  * console.log(newTree());
@@ -1306,8 +1260,6 @@ export function newTree(): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Tree } from './src/types';
  *
  * import { decoalesceOperations, newTree, EdgeMap, LeafSet } from './src/internals';
@@ -1435,8 +1387,6 @@ export function decoalesceOperations(tree: Tree): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { compareLeaves } from './src/internals';
  *
  * console.log(compareLeaves(
@@ -1535,8 +1485,6 @@ export function coalesceOperations(tree: Tree): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { atomizePrependOp } from './src/internals';
  *
  * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));
@@ -1563,8 +1511,6 @@ export function atomizePrependOp(prefix: Uint8Array): Ops {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { atomizeAppendOp } from './src/internals';
  *
  * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));
@@ -1606,8 +1552,6 @@ export function atomizeAppendOp(suffix: Uint8Array): Ops {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import { normalizeOps } from './src/internals';
  *
  * console.log(normalizeOps([
@@ -1675,8 +1619,6 @@ export function normalizeOps(operations: Ops): Ops {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Path } from './src/internals';
  * import type { Op, Tree } from './src/types';
  *
@@ -1725,8 +1667,6 @@ export function pathsToTree(paths: Paths): Tree {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Path } from './src/internals';
  * import type { Tree } from './src/types';
  *
@@ -1792,8 +1732,6 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  *
  * @example
  * ```typescript
- * 'use strict';
- *
  * import type { Timestamp } from './src/types';
  *
  * import { normalize, EdgeMap, LeafSet } from './src/internals';

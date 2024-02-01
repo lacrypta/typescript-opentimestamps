@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import type { Leaf } from '../../src/types';
 
 import { uint8ArrayFromHex, uint8ArrayReversed } from '../../src/utils';
