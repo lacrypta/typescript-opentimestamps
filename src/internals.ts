@@ -213,14 +213,22 @@ export const nonFinal: number = 0xff;
  *
  * import { callOp } from './src/internals';
  *
- * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));                                      // Uint8Array(20) [ 112, 55, ..., 207 ]
- * console.log(callOp({ type: 'ripemd160' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(20) [ 121, 249, ..., 87 ]
- * console.log(callOp({ type: 'sha256' }, Uint8Array.of(1, 2, 3)));                                    // Uint8Array(32) [ 3, 144, ..., 129 ]
- * console.log(callOp({ type: 'keccak256' }, Uint8Array.of(1, 2, 3)));                                 // Uint8Array(32) [ 241, 136, ..., 57 ]
- * console.log(callOp({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
- * console.log(callOp({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));  // Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ]
- * console.log(callOp({ type: 'reverse' }, Uint8Array.of(1, 2, 3)));                                   // Uint8Array(3) [ 3, 2, 1 ]
- * console.log(callOp({ type: 'hexlify' }, Uint8Array.of(1, 2, 3)));                                   // Uint8Array(6) [ 48, 49, 48, 50, 48, 51 ]
+ * console.log(callOp({ type: 'sha1' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(20) [ 112, 55, ..., 207 ]
+ * console.log(callOp({ type: 'ripemd160' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(20) [ 121, 249, ..., 87 ]
+ * console.log(callOp({ type: 'sha256' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(32) [ 3, 144, ..., 129 ]
+ * console.log(callOp({ type: 'keccak256' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(32) [ 241, 136, ..., 57 ]
+ * console.log(callOp({ type: 'append', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * console.log(callOp({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ]
+ * console.log(callOp({ type: 'reverse' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 3, 2, 1 ]
+ * console.log(callOp({ type: 'hexlify' }, Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(6) [ 48, 49, 48, 50, 48, 51 ]
  * ```
  *
  * @param op - The operation to execute.
@@ -257,12 +265,14 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
  *
  * import { callOps } from './src/internals';
  *
- * console.log(callOps([], Uint8Array.of()));  // Uint8Array(0) []
+ * console.log(callOps([], Uint8Array.of()));
+ *   // Uint8Array(0) []
  * console.log(callOps([
  *   { type: 'sha1' },
  *   { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
  *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
- * ], Uint8Array.of()));                       // Uint8Array(26) [ 1, 2, 3, 218, 57, ..., 9, 4, 5, 6 ]
+ * ], Uint8Array.of()));
+ *   // Uint8Array(26) [ 1, 2, 3, 218, 57, ..., 9, 4, 5, 6 ]
  * ```
  *
  * @param ops - The sequence of operations to execute.
@@ -360,23 +370,32 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  * ```typescript
  * 'use strict';
  *
- * import { compareOps } from ''./src/internals';
+ * import { compareOps } from './src/internals';
  *
- * console.log(compareOps({ type: 'sha1' }, { type: 'ripemd160' })); // -1
- * console.log(compareOps({ type: 'sha1' }, { type: 'sha1' }));      //  0
- * console.log(compareOps({ type: 'ripemd160' }, { type: 'sha1' })); //  1
+ * console.log(compareOps(
+ *   { type: 'sha1' },
+ *   { type: 'ripemd160' },
+ * ));  // -1
+ * console.log(compareOps(
+ *   { type: 'sha1' },
+ *   { type: 'sha1' },
+ * ));  //  0
+ * console.log(compareOps(
+ *   { type: 'ripemd160' },
+ *   { type: 'sha1' },
+ * ));  //  1
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
  *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
- * ));                                                               // -3
+ * ));  // -3
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
- * ));                                                               //  0
+ * ));  //  0
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
- * ));                                                               //  3
+ * ));  //  3
  * ```
  *
  * @param left - The first operation to compare.
@@ -449,13 +468,17 @@ export function compareEdges(left: Edge, right: Edge): number {
  *
  * import { incorporateTreeToTree, EdgeMap, LeafSet } from './src/internals';
  *
- * const left: Tree = { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() };
+ * const left: Tree = {
+ *   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+ *   edges: new EdgeMap(),
+ * };
  * const right: Tree = {
  *   leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *   edges: new EdgeMap().add(
  *     { type: 'sha1' },
  *     {
- *       leaves: new LeafSet().add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *       leaves: new LeafSet()
+ *         .add({ type: 'pending', url: new URL('https://www.example.com') }),
  *       edges: new EdgeMap(),
  *     },
  *   ),
@@ -463,8 +486,15 @@ export function compareEdges(left: Edge, right: Edge): number {
  *
  * incorporateTreeToTree(left, right);
  *
- * console.log(left.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
- * console.log(left.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ] ]
+ * console.log(left.leaves.values());
+ *   // [
+ *   //   { type: 'bitcoin', height: 123 },
+ *   //   { type: 'bitcoin', height: 456 }
+ *   // ]
+ * console.log(left.edges.entries());
+ *   // [
+ *   //   [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ]
+ *   // ]
  * ```
  *
  * @param left - The tree to incorporate data _into_.
@@ -491,19 +521,36 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *
  * import { incorporateToTree, EdgeMap, LeafSet } from './src/internals';
  *
- * const tree: Tree = { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() };
+ * const tree: Tree = {
+ *   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+ *   edges: new EdgeMap(),
+ * };
  *
- * incorporateToTree(tree, { type: 'bitcoin', height: 456 });
- * incorporateToTree(tree, [
- *   { type: 'sha1' },
- *   {
- *     leaves: new LeafSet().add({ type: 'pending', url: new URL('https://www.example.com') }),
- *     edges: new EdgeMap(),
- *   },
- * ]);
+ * incorporateToTree(
+ *   tree,
+ *   { type: 'bitcoin', height: 456 }
+ * );
+ * incorporateToTree(
+ *   tree,
+ *   [
+ *     { type: 'sha1' },
+ *     {
+ *       leaves: new LeafSet()
+ *         .add({ type: 'pending', url: new URL('https://www.example.com') }),
+ *       edges: new EdgeMap(),
+ *     },
+ *   ],
+ * );
  *
- * console.log(tree.leaves.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 } ]
- * console.log(tree.edges.entries());  // [ [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ] ]
+ * console.log(tree.leaves.values());
+ *   // [
+ *   //   { type: 'bitcoin', height: 123 },
+ *   //   { type: 'bitcoin', height: 456 }
+ *   // ]
+ * console.log(tree.edges.entries());
+ *   // [
+ *   //   [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ]
+ *   // ]
  * ```
  *
  * @param tree - The tree to incorporate the given parameter _into_.
@@ -543,21 +590,41 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
  *   .add({ type: 'ethereum', height: 456 });
  * const leafSetC: LeafSet = new LeafSet();
  *
- * console.log(leafSetA.size());  // 3
- * console.log(leafSetB.size());  // 3
- * console.log(leafSetC.size());  // 0
+ * console.log(leafSetA.size());
+ *   // 3
+ * console.log(leafSetB.size());
+ *   // 3
+ * console.log(leafSetC.size());
+ *   // 0
  *
- * console.log(leafSetA.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 }, { type: 'ethereum', height: 123 } ]
- * console.log(leafSetB.values());  // [ { type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 456 }, { type: 'ethereum', height: 456 } ]
- * console.log(leafSetC.values());  // []
+ * console.log(leafSetA.values());
+ *   // [
+ *   //   { type: 'bitcoin', height: 123 },
+ *   //   { type: 'litecoin', height: 123 },
+ *   //   { type: 'ethereum', height: 123 }
+ *   // ]
+ * console.log(leafSetB.values());
+ *   // [
+ *   //   { type: 'bitcoin', height: 123 },
+ *   //   { type: 'litecoin', height: 456 },
+ *   //   { type: 'ethereum', height: 456 }
+ *   // ]
+ * console.log(leafSetC.values());
+ *   // []
  *
- * console.log(leafSetA.remove({ type: 'ethereum', height: 123 }));  // LeafSet { mapping: { ... } }
- * console.log(leafSetB.remove({ type: 'ethereum', height: 456 }));  // LeafSet { mapping: { ... } }
- * console.log(leafSetC.remove({ type: 'ethereum', height: 789 }));  // LeafSet { mapping: {} }
+ * console.log(leafSetA.remove({ type: 'ethereum', height: 123 }));
+ *   // LeafSet { mapping: { ... } }
+ * console.log(leafSetB.remove({ type: 'ethereum', height: 456 }));
+ *   // LeafSet { mapping: { ... } }
+ * console.log(leafSetC.remove({ type: 'ethereum', height: 789 }));
+ *   // LeafSet { mapping: {} }
  *
- * console.log(leafSetA.incorporate(leafSetB).size());                        // 3
- * console.log(leafSetB.incorporate(leafSetC).size());                        // 2
- * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());  // 3
+ * console.log(leafSetA.incorporate(leafSetB).size());
+ *   // 3
+ * console.log(leafSetB.incorporate(leafSetC).size());
+ *   // 2
+ * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());
+ *   // 3
  * ```
  *
  */
@@ -569,6 +636,10 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    */
   private readonly mapping: Record<string, Leaf> = {};
+
+  /** @ignore */
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+  constructor() {}
 
   /**
    * The callback that will transform a {@link Leaf} into a `string` (implicitly defining what "equality" between them means).
@@ -642,8 +713,10 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * const leafSet: LeafSet = new LeafSet();
    *
-   * console.log(leafSet.values());                                        // []
-   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).values());  // [ { type: 'bitcoin', height: 123 } ]
+   * console.log(leafSet.values());
+   *   // []
+   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).values());
+   *   // [ { type: 'bitcoin', height: 123 } ]
    * ```
    *
    * @returns The list of leaves in the {@link LeafSet}.
@@ -661,7 +734,9 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * import { LeafSet } from './src/internals';
    *
-   * const leafSet: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 });
+   * const leafSet: LeafSet = new LeafSet()
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 123 });
    *
    * console.log(leafSet.size());                                            // 2
    * console.log(leafSet.remove({ type: 'ethereum', height: 123 }).size());  // 2
@@ -723,13 +798,20 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * import { LeafSet } from './src/internals';
    *
-   * const leafSetA: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 });
-   * const leafSetB: LeafSet = new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 456 });
+   * const leafSetA: LeafSet = new LeafSet()
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 123 });
+   * const leafSetB: LeafSet = new LeafSet()
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 456 });
    * const leafSetC: LeafSet = new LeafSet();
    *
-   * console.log(leafSetA.incorporate(leafSetB).size());                        // 3
-   * console.log(leafSetB.incorporate(leafSetC).size());                        // 2
-   * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());  // 3
+   * console.log(leafSetA.incorporate(leafSetB).size());
+   *   // 3
+   * console.log(leafSetB.incorporate(leafSetC).size());
+   *   // 2
+   * console.log(leafSetC.incorporate(leafSetB).incorporate(leafSetA).size());
+   *   // 3
    * ```
    *
    * @param other - The {@link LeafSet} to incorporate into this one.
@@ -767,21 +849,47 @@ export class LeafSet implements MergeSet<Leaf> {
  *   .add({ type: 'sha256' }, newTree());
  * const edgeMapC: EdgeMap = new EdgeMap();
  *
- * console.log(edgeMapA.size());  // 3
- * console.log(edgeMapB.size());  // 3
- * console.log(edgeMapC.size());  // 0
+ * console.log(edgeMapA.size());
+ *   // 3
+ * console.log(edgeMapB.size());
+ *   // 3
+ * console.log(edgeMapC.size());
+ *   // 0
  *
- * console.log(edgeMapA.values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
- * console.log(edgeMapB.values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }, { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
- * console.log(edgeMapC.values());  // []
+ * console.log(edgeMapA.values());
+ *   // [
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   // ]
+ * console.log(edgeMapB.values());
+ *   // [
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ *   // ]
+ * console.log(edgeMapC.values());
+ *   // []
  *
- * console.log(edgeMapA.remove({ type: 'sha256' }));  // EdgeMap { keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } }, mapping: { ... } }
- * console.log(edgeMapB.remove({ type: 'sha256' }));  // EdgeMap { keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } }, mapping: { ... } }
- * console.log(edgeMapC.remove({ type: 'sha256' }));  // EdgeMap { keySet: {}, mapping: {} }
+ * console.log(edgeMapA.remove({ type: 'sha256' }));
+ *   // EdgeMap {
+ *   //   keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } },
+ *   //   mapping: { ... }
+ *   // }
+ * console.log(edgeMapB.remove({ type: 'sha256' }));
+ *   // EdgeMap {
+ *   //   keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } },
+ *   //   mapping: { ... }
+ *   // }
+ * console.log(edgeMapC.remove({ type: 'sha256' }));
+ *   // EdgeMap { keySet: {}, mapping: {} }
  *
- * console.log(edgeMapA.incorporate(edgeMapB).size());                        // 2
- * console.log(edgeMapB.incorporate(edgeMapC).size());                        // 2
- * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());  // 2
+ * console.log(edgeMapA.incorporate(edgeMapB).size());
+ *   // 2
+ * console.log(edgeMapB.incorporate(edgeMapC).size());
+ *   // 2
+ * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());
+ *   // 2
  * ```
  *
  */
@@ -801,6 +909,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    */
   private readonly mapping: Record<string, Tree> = {};
+
+  /** @ignore */
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+  constructor() {}
 
   /**
    * The callback that will transform an {@link Op} into a `string` (implicitly defining what "equality" between keys means).
@@ -875,8 +987,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.values());                                 // []
-   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).keys());  // [ { type: 'sha1' } ]
+   * console.log(edgeMap.values());
+   *   // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).keys());
+   *   // [ { type: 'sha1' } ]
    * ```
    *
    * @returns The list of {@link Op}s in the {@link EdgeMap}.
@@ -896,8 +1010,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.values());                                   // []
-   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).values());  // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
+   * console.log(edgeMap.values());
+   *   // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).values());
+   *   // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
    * ```
    *
    * @returns The list of {@link Tree}s in the {@link EdgeMap}.
@@ -917,8 +1033,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.values());                                    // []
-   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).entries());  // [ [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ] ]
+   * console.log(edgeMap.values());
+   *   // []
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).entries());
+   *   // [ [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ] ]
    * ```
    *
    * @returns The list of entries in the {@link EdgeMap}.
@@ -936,7 +1054,9 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * import { newTree, EdgeMap } from './src/internals';
    *
-   * const edgeMap: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'ripemd160' }, newTree());
+   * const edgeMap: EdgeMap = new EdgeMap()
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree());
    *
    * console.log(edgeMap.size());                                // 2
    * console.log(edgeMap.remove({ type: 'sha256' }).size());     // 2
@@ -967,22 +1087,22 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.size()); // 0
+   * console.log(edgeMap.size());  // 0
    * console.log(edgeMap
    *   .add({ type: 'sha1' }, newTree())
    *   .size(),
-   * );                           // 1
-   * console.log(edgeMap
-   *   .add({ type: 'sha1' }, newTree())
-   *   .add({ type: 'ripemd160' }, newTree())
-   *   .size(),
-   * );                           // 2
+   * );                            // 1
    * console.log(edgeMap
    *   .add({ type: 'sha1' }, newTree())
    *   .add({ type: 'ripemd160' }, newTree())
+   *   .size(),
+   * );                            // 2
+   * console.log(edgeMap
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree())
    *   .add({ type: 'sha1' }, newTree())
    *   .size(),
-   * );                           // 2
+   * );                            // 2
    * ```
    *
    * @param op - The {@link Op} to add to the {@link EdgeMap}.
@@ -1002,13 +1122,20 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * import { newTree, EdgeMap } from './src/internals';
    *
-   * const edgeMapA: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'ripemd160' }, newTree());
-   * const edgeMapB: EdgeMap = new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree());
+   * const edgeMapA: EdgeMap = new EdgeMap()
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree());
+   * const edgeMapB: EdgeMap = new EdgeMap()
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'sha256' }, newTree());
    * const edgeMapC: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMapA.incorporate(edgeMapB).size());                        // 3
-   * console.log(edgeMapB.incorporate(edgeMapC).size());                        // 2
-   * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());  // 3
+   * console.log(edgeMapA.incorporate(edgeMapB).size());
+   *   // 3
+   * console.log(edgeMapB.incorporate(edgeMapC).size());
+   *   // 2
+   * console.log(edgeMapC.incorporate(edgeMapB).incorporate(edgeMapA).size());
+   *   // 3
    * ```
    *
    * @param other - The {@link EdgeMap} to incorporate into this one.
@@ -1031,7 +1158,11 @@ export class EdgeMap implements MergeMap<Op, Tree> {
  *
  * import { newTree } from './src/internals';
  *
- * console.log(newTree());  // { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ * console.log(newTree());
+ *   // {
+ *   //   edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //   leaves: LeafSet { mapping: {} }
+ *   // }
  * ```
  *
  * @returns The empty tree constructed.
@@ -1179,7 +1310,7 @@ export function newTree(): Tree {
  *
  * import type { Tree } from './src/types';
  *
- * import { decoalesceOperations, EdgeMap, LeafSet, newTree } from './src/internals';
+ * import { decoalesceOperations, newTree, EdgeMap, LeafSet } from './src/internals';
  *
  * const tree: Tree = {
  *   leaves: new LeafSet(),
@@ -1188,20 +1319,33 @@ export function newTree(): Tree {
  *     {
  *       leaves: new LeafSet(),
  *       edges: new EdgeMap()
- *         .add({ type: 'append', operand: Uint8Array.of(2, 3) }, newTree())
- *         .add({ type: 'append', operand: Uint8Array.of(4, 5) }, newTree()),
+ *         .add(
+ *           { type: 'append', operand: Uint8Array.of(2, 3) },
+ *           newTree(),
+ *         )
+ *         .add(
+ *           { type: 'append', operand: Uint8Array.of(4, 5) },
+ *           newTree(),
+ *         ),
  *     },
  *   ),
  * };
  *
- * console.log(tree.edges.keys());                     // [ { type: 'append', operand: Uint8Array(1) [ 1 ] } ]
- * console.log(tree.edges.values()[0]?.edges.keys());  // [ { type: 'append', operand: Uint8Array(2) [ 2, 3 ] },
- *                                                     //   { type: 'append', operand: Uint8Array(2) [ 4, 5 ] } ]
+ * console.log(tree.edges.keys());
+ *   // [ { type: 'append', operand: Uint8Array(1) [ 1 ] } ]
+ * console.log(tree.edges.values()[0]?.edges.keys());
+ *   // [
+ *   //   { type: 'append', operand: Uint8Array(2) [ 2, 3 ] },
+ *   //   { type: 'append', operand: Uint8Array(2) [ 4, 5 ] }
+ *   // ]
  *
  * decoalesceOperations(tree);
  *
- * console.log(tree.edges.keys());                     // [ { type: 'append', operand: Uint8Array(3) [ 1, 2, 3 ] },
- *                                                     //   { type: 'append', operand: Uint8Array(3) [ 1, 4, 5 ] } ]
+ * console.log(tree.edges.keys());
+ *   // [
+ *   //   { type: 'append', operand: Uint8Array(3) [ 1, 2, 3 ] },
+ *   //   { type: 'append', operand: Uint8Array(3) [ 1, 4, 5 ] }
+ *   // ]
  * ```
  *
  * @param tree - The tree to decoalesce operations from.
@@ -1293,34 +1437,74 @@ export function decoalesceOperations(tree: Tree): Tree {
  * ```typescript
  * 'use strict';
  *
- * import type { Tree } from './src/types';
+ * import { compareLeaves } from './src/internals';
  *
- * import { coalesceOperations, newTree, EdgeMap, LeafSet } from './src/internals';
+ * console.log(compareLeaves(
+ *   { type: 'bitcoin', height: 123 },
+ *   { type: 'litecoin', height: 123 },
+ * ));  //   -1
+ * console.log(compareLeaves(
+ *   { type: 'litecoin', height: 123 },
+ *   { type: 'bitcoin', height: 123 },
+ * ));  //    1
+ * console.log(compareLeaves(
+ *   { type: 'bitcoin', height: 123 },
+ *   { type: 'bitcoin', height: 456 },
+ * ));  // -333
+ * console.log(compareLeaves(
+ *   { type: 'bitcoin', height: 456 },
+ *   { type: 'bitcoin', height: 123 },
+ * ));  //  333
  *
- * const tree: Tree = {
- *   leaves: new LeafSet(),
- *   edges: new EdgeMap().add(
- *     { type: 'append', operand: Uint8Array.of(1) },
- *     {
- *       leaves: new LeafSet(),
- *       edges: new EdgeMap().add(
- *         { type: 'append', operand: Uint8Array.of(2) },
- *         {
- *           leaves: new LeafSet(),
- *           edges: new EdgeMap().add({ type: 'append', operand: Uint8Array.of(3) }, newTree()),
- *         },
- *       ),
- *     },
- *   ),
- * };
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com/a') },
+ *   { type: 'pending', url: new URL('https://example.com/b') },
+ * ));  // -1
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com') },
+ *   { type: 'pending', url: new URL('https://example.com') },
+ * ));  //  0
+ * console.log(compareLeaves(
+ *   { type: 'pending', url: new URL('https://example.com/b') },
+ *   { type: 'pending', url: new URL('https://example.com/a') },
+ * ));  //  1
  *
- * console.log(tree.edges.keys());                                        // [ { type: 'append', operand: Uint8Array(1) [ 1 ] } ]
- * console.log(tree.edges.values()[0]?.edges.keys());                     // [ { type: 'append', operand: Uint8Array(1) [ 2 ] } ]
- * console.log(tree.edges.values()[0]?.edges.values()[0]?.edges.keys());  // [ { type: 'append', operand: Uint8Array(1) [ 3 ] } ]
- *
- * coalesceOperations(tree);
- *
- * console.log(tree.edges.keys());  // [ { type: 'append', operand: Uint8Array(3) [ 1, 2, 3 ] } ]
+ * console.log(compareLeaves(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(1, 2, 3),
+ *   },
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(4, 5, 6),
+ *   },
+ * ));  // -3
+ * console.log( compareLeaves(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(),
+ *   },
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(),
+ *   },
+ * ));  //  0
+ * console.log(compareLeaves(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(4, 5, 6),
+ *   },
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(1, 2, 3),
+ *   },
+ * ));  //  3
  * ```
  *
  * @param tree - The tree to coalesce operations on.
@@ -1355,11 +1539,12 @@ export function coalesceOperations(tree: Tree): Tree {
  *
  * import { atomizePrependOp } from './src/internals';
  *
- * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));  // [
- *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
- *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 2 ] },
- *                                                         //   { type: 'prepend', operand: Uint8Array(1) [ 1 ] }
- *                                                         // ]
+ * console.log(atomizePrependOp(Uint8Array.of(1, 2, 3)));
+ *   // [
+ *   //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
+ *   //   { type: 'prepend', operand: Uint8Array(1) [ 2 ] },
+ *   //   { type: 'prepend', operand: Uint8Array(1) [ 1 ] }
+ *   // ]
  * ```
  *
  * @param prefix - The operand to atomize.
@@ -1382,11 +1567,12 @@ export function atomizePrependOp(prefix: Uint8Array): Ops {
  *
  * import { atomizeAppendOp } from './src/internals';
  *
- * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));  // [
- *                                                        //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
- *                                                        //   { type: 'append', operand: Uint8Array(1) [ 2 ] },
- *                                                        //   { type: 'append', operand: Uint8Array(1) [ 3 ] }
- *                                                        // ]
+ * console.log(atomizeAppendOp(Uint8Array.of(1, 2, 3)));
+ *   // [
+ *   //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
+ *   //   { type: 'append', operand: Uint8Array(1) [ 2 ] },
+ *   //   { type: 'append', operand: Uint8Array(1) [ 3 ] }
+ *   // ]
  * ```
  *
  * @param suffix - The operand to atomize.
@@ -1427,12 +1613,13 @@ export function atomizeAppendOp(suffix: Uint8Array): Ops {
  * console.log(normalizeOps([
  *   { type: 'append', operand: Uint8Array.of(1, 2) },
  *   { type: 'prepend', operand: Uint8Array.of(3, 4) },
- * ]));  // [
- *       //   { type: 'prepend', operand: Uint8Array(1) [ 4 ] },
- *       //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
- *       //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
- *       //   { type: 'append', operand: Uint8Array(1) [ 2 ] }
- *       // ]
+ * ]));
+ *   // [
+ *   //   { type: 'prepend', operand: Uint8Array(1) [ 4 ] },
+ *   //   { type: 'prepend', operand: Uint8Array(1) [ 3 ] },
+ *   //   { type: 'append', operand: Uint8Array(1) [ 1 ] },
+ *   //   { type: 'append', operand: Uint8Array(1) [ 2 ] }
+ *   // ]
  * ```
  *
  * @param operations - Operations to normalize.
@@ -1492,18 +1679,27 @@ export function normalizeOps(operations: Ops): Ops {
  *
  * import type { Path } from './src/internals';
  * import type { Op, Tree } from './src/types';
+ *
  * import { pathsToTree } from './src/internals';
  *
- * const path1: Path = { operations: [{ type: 'sha1' }], leaf: { type: 'bitcoin', height: 123 } };
- * const path2: Path = { operations: [{ type: 'sha256' }], leaf: { type: 'bitcoin', height: 456 } };
+ * const path1: Path = {
+ *   operations: [{ type: 'sha1' }],
+ *   leaf: { type: 'bitcoin', height: 123 },
+ * };
+ * const path2: Path = {
+ *   operations: [{ type: 'sha256' }],
+ *   leaf: { type: 'bitcoin', height: 456 },
+ * };
  *
  * const tree: Tree = pathsToTree([path1, path2]);
  *
- * console.log(tree.edges.keys());  // [ { type: 'sha1' }, { type: 'sha256' } ]
+ * console.log(tree.edges.keys());
+ *   // [ { type: 'sha1' }, { type: 'sha256' } ]
  * tree.edges.entries().forEach(([, subTree]: [Op, Tree]): void => {
  *   console.log(subTree.leaves.values());
- * });                              // [ { type: 'bitcoin', height: 123 } ]
- *                                  // [ { type: 'bitcoin', height: 456 } ]
+ * });
+ *   // [ { type: 'bitcoin', height: 123 } ]
+ *   // [ { type: 'bitcoin', height: 456 } ]
  * ```
  *
  * @param paths - The paths to transform.
@@ -1539,17 +1735,29 @@ export function pathsToTree(paths: Paths): Tree {
  * const tree: Tree = {
  *   leaves: new LeafSet(),
  *   edges: new EdgeMap()
- *     .add({ type: 'sha1' }, { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() })
- *     .add({ type: 'sha256' }, { leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }), edges: new EdgeMap() }),
+ *     .add(
+ *       { type: 'sha1' },
+ *       {
+ *         leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+ *         edges: new EdgeMap(),
+ *       },
+ *     )
+ *     .add(
+ *       { type: 'sha256' },
+ *       {
+ *         leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
+ *         edges: new EdgeMap(),
+ *     }),
  * };
  *
  * treeToPaths(tree).forEach((path: Path): void => {
  *   console.log(path.operations);
  *   console.log(path.leaf);
- * });  // [ { type: 'sha1' } ]
- *      // { type: 'bitcoin', height: 123 }
- *      // [ { type: 'sha256' } ]
- *      // { type: 'bitcoin', height: 456 }
+ * });
+ *   // [ { type: 'sha1' } ]
+ *   // { type: 'bitcoin', height: 123 }
+ *   // [ { type: 'sha256' } ]
+ *   // { type: 'bitcoin', height: 456 }
  * ```
  *
  * @param tree - The tree to transform.
@@ -1598,50 +1806,60 @@ export function treeToPaths(tree: Tree, path: Ops = []): Paths {
  *   },
  *   tree: {
  *     leaves: new LeafSet(),
- *     edges: new EdgeMap().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: new LeafSet(),
- *         edges: new EdgeMap()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: new LeafSet(),
- *               edges: new EdgeMap().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: new EdgeMap(),
- *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: new EdgeMap(),
- *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
+ *     edges: new EdgeMap()
+ *       .add(
+ *         { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
+ *         { leaves: new LeafSet(),
+ *           edges: new EdgeMap()
+ *             .add(
+ *               { type: 'reverse' },
+ *               { leaves: new LeafSet(),
+ *                 edges: new EdgeMap()
+ *                   .add(
+ *                     { type: 'append', operand: Uint8Array.of(7, 8, 9) },
+ *                     {
+ *                       edges: new EdgeMap(),
+ *                       leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+ *                     },
+ *                 ),
+ *               },
+ *             )
+ *             .add(
+ *               { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
+ *               {
+ *                 edges: new EdgeMap(),
+ *                 leaves: new LeafSet()
+ *                   .add({ type: 'bitcoin', height: 456 }),
+ *               },
+ *             ),
+ *         },
  *     ),
  *   },
  * })!;
  *
- * console.log(timestamp.tree.leaves.values());                                                        // []
+ * console.log(timestamp.tree.leaves.values());
+ *   // []
  * console.log(timestamp.tree.edges.keys());
  *   // [
  *   //   { type: 'prepend', operand: Uint8Array(3) [ 9, 8, 7 ] },
  *   //   { type: 'prepend', operand: Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ] }
  *   // ]
- * console.log(timestamp.tree.edges.values()[0]?.leaves.values());                                     // []
+ * console.log(timestamp.tree.edges.values()[0]?.leaves.values());
+ *   // []
  * console.log(timestamp.tree.edges.values()[0]?.edges.keys());
  *   // [ { type: 'append', operand: Uint8Array(3) [ 3, 2, 1 ] } ]
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.leaves.values());                  // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.leaves.values());
+ *   // []
  * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.keys());
  *   // [ { type: 'reverse' } ]
  * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.leaves.values());
  *   // [ { type: 'bitcoin', height: 123 } ]
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.edges.keys());  // []
+ * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.edges.keys());
+ *   // []
  * console.log(timestamp.tree.edges.values()[1]?.leaves.values());
  *   // [ { type: 'bitcoin', height: 456 } ]
- * console.log(timestamp.tree.edges.values()[1]?.edges.keys());                                        // []
+ * console.log(timestamp.tree.edges.values()[1]?.edges.keys());
+ *   // []
  * ```
  *
  * @param timestamp - The timestamp to normalize.

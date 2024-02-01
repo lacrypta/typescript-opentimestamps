@@ -291,8 +291,12 @@ export type Op =
        *
        * ```typescript
        * let newMsg: Uint8Array = oldMsg
-       *     .reduce((result: string, value: number): string => result + value.toString(16).padStart(2, '0'), '')
-       *     .toLowerCase();
+       *   .reduce(
+       *     (result: string, value: number): string =>
+       *       result + value.toString(16).padStart(2, '0'),
+       *     '',
+       *   )
+       *   .toLowerCase();
        * ```
        *
        */

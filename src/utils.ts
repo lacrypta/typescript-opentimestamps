@@ -28,7 +28,12 @@
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayToHex(Uint8Array.of(1, 2, 3, 4, 5, 6)));  // 010203040506
+ * 'use strict';
+ *
+ * import { uint8ArrayToHex } from './src/utils';
+ *
+ * console.log(uint8ArrayToHex(Uint8Array.of(1, 2, 3, 4, 5, 6)));
+ *   // 010203040506
  * ```
  *
  * @param data - Data to serialize as hex.
@@ -45,13 +50,24 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayFromHex('010203040506'));  // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * 'use strict';
+ *
+ * import { uint8ArrayFromHex } from './src/utils';
+ *
+ * console.log(uint8ArrayFromHex('010203040506'));
+ *   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayFromHex('102030405')));   // Uncaught Error: Hex value should be of even length, found 9
- * console.log(uint8ArrayFromHex('102030405x')));  // Uncaught Error: Malformed hex string
+ * 'use strict';
+ *
+ * import { uint8ArrayFromHex } from './src/utils';
+ *
+ * console.log(uint8ArrayFromHex('102030405'));
+ *   // Uncaught Error: Hex value should be of even length, found 9
+ * console.log(uint8ArrayFromHex('102030405x'));
+ *   // Uncaught Error: Malformed hex string
  * ```
  *
  * @param hex - Hex string to deserialize.
@@ -78,9 +94,22 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayEquals(Uint8Array.of(), Uint8Array.of()));                // true
- * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 3)));  // true
- * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 4)));  // false
+ * 'use strict';
+ *
+ * import { uint8ArrayEquals } from './src/utils';
+ *
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(),
+ *   Uint8Array.of(),
+ * )); // true
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2, 3),
+ * )); // true
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2, 4),
+ * )); // false
  * ```
  *
  * @param left - The first array to compare.
@@ -98,12 +127,31 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayCompare(Uint8Array.of(), Uint8Array.of()));             //  0
- * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of()));      //  3
- * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2)));  //  1
- * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2)));        // -1
- * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2, 3)));     // -2
- * ```
+ * 'use strict';
+ *
+ * import { uint8ArrayCompare } from './src/utils';
+ *
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(),
+ *   Uint8Array.of(),
+ * ));  //  0
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(),
+ * ));  //  3
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2),
+ * ));  //  1
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1),
+ *   Uint8Array.of(1, 2),
+ * ));  // -1
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1),
+ *   Uint8Array.of(1, 2, 3),
+ * ));  // -2
+ *  * ```
  *
  * @param left - The first array to compare.
  * @param right - The second array to compare.
@@ -124,9 +172,16 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayConcat());                                    // Uint8Array(0) []
- * console.log(uint8ArrayConcat(Uint8Array.of(1, 2, 3)));              // Uint8Array(3) [ 1, 2, 3 ]
- * console.log(uint8ArrayConcat(Uint8Array.of(1), Uint8Array.of(2)));  // Uint8Array(2) [ 1, 2 ]
+ * 'use strict';
+ *
+ * import { uint8ArrayConcat } from './src/utils';
+ *
+ * console.log(uint8ArrayConcat());
+ *   // Uint8Array(0) []
+ * console.log(uint8ArrayConcat(Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 1, 2, 3 ]
+ * console.log(uint8ArrayConcat(Uint8Array.of(1), Uint8Array.of(2)));
+ *   // Uint8Array(2) [ 1, 2 ]
  * ```
  *
  * @param arrays - The arrays to concatenate.
@@ -151,8 +206,14 @@ export function uint8ArrayConcat(...arrays: Uint8Array[]): Uint8Array {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayReversed(Uint8Array.of()));         // Uint8Array(0) []
- * console.log(uint8ArrayReversed(Uint8Array.of(1, 2, 3)));  // Uint8Array(3) [ 3, 2, 1 ]
+ * 'use strict';
+ *
+ * import { uint8ArrayReversed } from './src/utils';
+ *
+ * console.log(uint8ArrayReversed(Uint8Array.of()));
+ *   // Uint8Array(0) []
+ * console.log(uint8ArrayReversed(Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 3, 2, 1 ]
  * ```
  *
  * @param array - The array to reverse.
@@ -171,19 +232,27 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * fetchBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * 'use strict';
+ *
+ * import { fetchBody } from './src/utils';
+ *
+ * fetchBody(new URL('http://example.org'))
+ *   .then((body: Uint8Array): void => { console.log(...body); });
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * fetchBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * fetchBody(new URL('http://example.com')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * 'use strict';
+ *
+ * import { fetchBody } from './src/utils';
+ *
+ * fetchBody(new URL('something://else'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * fetchBody(new URL('http://example.com'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -213,19 +282,27 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
  *
  * @example
  * ```typescript
- * retrieveGetBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * 'use strict';
+ *
+ * import { retrieveGetBody } from './src/utils';
+ *
+ * retrieveGetBody(new URL('http://example.org'))
+ *   .then((body: Uint8Array): void => { console.log(...body); })
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * retrieveGetBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrieveGetBody(new URL('http://example.com')).catch((e: unknown) => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * 'use strict';
+ *
+ * import { retrieveGetBody } from './src/utils';
+ *
+ * retrieveGetBody(new URL('something://else'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * retrieveGetBody(new URL('http://example.com'))
+ *   .catch((e: unknown) => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -247,19 +324,33 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
  *
  * @example
  * ```typescript
- * retrievePostBody(new URL('http://example.org'), Uint8Array.of()).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * 'use strict';
+ *
+ * import { retrievePostBody } from './src/utils';
+ *
+ * retrievePostBody(
+ *   new URL('http://example.org'),
+ *   Uint8Array.of(),
+ * ).then((body: Uint8Array): void => { console.log(...body); });
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * retrievePostBody(new URL('something://else'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrievePostBody(new URL('http://example.com'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * 'use strict';
+ *
+ * import { retrievePostBody } from './src/utils';
+ *
+ * retrievePostBody(
+ *   new URL('something://else'),
+ *   Uint8Array.of(),
+ * ).catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * retrievePostBody(
+ *   new URL('http://example.com'),
+ *   Uint8Array.of(),
+ * ).catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -283,7 +374,12 @@ export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint
  *
  * @example
  * ```typescript
- * console.log(textEncoder);  // { encoding: 'utf-8' }
+ * 'use strict';
+ *
+ * import { textEncoder } from './src/utils';
+ *
+ * console.log(textEncoder);
+ *   // { encoding: 'utf-8' }
  * ```
  */
 export const textEncoder: TextEncoder = new TextEncoder();
@@ -293,7 +389,12 @@ export const textEncoder: TextEncoder = new TextEncoder();
  *
  * @example
  * ```typescript
- * console.log(textDecoder);  // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
+ * 'use strict';
+ *
+ * import { textDecoder } from './src/utils';
+ *
+ * console.log(textDecoder);
+ *   // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
  * ```
  */
 export const textDecoder: TextDecoder = new TextDecoder();

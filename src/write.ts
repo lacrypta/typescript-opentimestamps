@@ -50,10 +50,14 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  *
  * import { writeUint } from './src/write';
  *
- * console.log(writeUint(0));         // Uint8Array(1) [ 0 ]
- * console.log(writeUint(1));         // Uint8Array(1) [ 1 ]
- * console.log(writeUint(1234));      // Uint8Array(2) [ 210, 9 ]
- * console.log(writeUint(12345678));  // Uint8Array(4) [ 206, 194, 241, 5 ]
+ * console.log(writeUint(0));
+ *   // Uint8Array(1) [ 0 ]
+ * console.log(writeUint(1));
+ *   // Uint8Array(1) [ 1 ]
+ * console.log(writeUint(1234));
+ *   // Uint8Array(2) [ 210, 9 ]
+ * console.log(writeUint(12345678));
+ *   // Uint8Array(4) [ 206, 194, 241, 5 ]
  * ```
  *
  * @example
@@ -62,9 +66,12 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  *
  * import { writeUint } from './src/write';
  *
- * console.log(writeUint(-1));       // Error: Expected safe non-negative value
- * console.log(writeUint(NaN));      // Error: Expected safe non-negative value
- * console.log(writeUint(Math.PI));  // Error: Expected safe non-negative value
+ * console.log(writeUint(-1));
+ *   // Error: Expected safe non-negative value
+ * console.log(writeUint(NaN));
+ *   // Error: Expected safe non-negative value
+ * console.log(writeUint(Math.PI));
+ *   // Error: Expected safe non-negative value
  * ```
  *
  * @param value - The value to write.
@@ -97,8 +104,10 @@ export function writeUint(value: number): Uint8Array {
  *
  * import { writeBytes } from './src/write';
  *
- * console.log(writeBytes(Uint8Array.of()));            // Uint8Array(1) [ 0 ]
- * console.log(writeBytes(Uint8Array.of(1, 2, 3, 4)));  // Uint8Array(5) [ 4, 1, 2, 3, 4 ]
+ * console.log(writeBytes(Uint8Array.of()));
+ *   // Uint8Array(1) [ 0 ]
+ * console.log(writeBytes(Uint8Array.of(1, 2, 3, 4)));
+ *   // Uint8Array(5) [ 4, 1, 2, 3, 4 ]
  * ```
  *
  * @param bytes - The value to write.
@@ -122,39 +131,51 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
  *
  * console.log(writeFileHash({
  *   algorithm: 'sha1',
- *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                        11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  * }));
  *   // Uint8Array(21) [
- *   //   2,
- *   //   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+ *   //    2,
+ *   //    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *   //   11, 12, 13, 14, 15, 16, 17, 18, 19, 20
  *   // ]
  * console.log(writeFileHash({
  *   algorithm: 'ripemd160',
- *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                        11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  * }));
  *   // Uint8Array(21) [
- *   //   3,
- *   //   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+ *   //    3,
+ *   //    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *   //   11, 12, 13, 14, 15, 16, 17, 18, 19, 20
  *   // ]
  * console.log(writeFileHash({
  *   algorithm: 'sha256',
- *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
- *                        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32),
+ *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,
+ *                         9, 10, 11, 12, 13, 14, 15, 16,
+ *                        17, 18, 19, 20, 21, 22, 23, 24,
+ *                        25, 26, 27, 28, 29, 30, 31, 32),
  * }));
  *   // Uint8Array(33) [
- *   //   8,
- *   //    1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
- *   //   17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+ *   //    8,
+ *   //    1,  2,  3,  4,  5,  6,  7,  8,
+ *   //    9, 10, 11, 12, 13, 14, 15, 16,
+ *   //   17, 18, 19, 20, 21, 22, 23, 24,
+ *   //   25, 26, 27, 28, 29, 30, 31, 32
  *   // ]
  * console.log(writeFileHash({
  *   algorithm: 'keccak256',
- *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
- *                        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32),
+ *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,
+ *                         9, 10, 11, 12, 13, 14, 15, 16,
+ *                        17, 18, 19, 20, 21, 22, 23, 24,
+ *                        25, 26, 27, 28, 29, 30, 31, 32),
  * }));
  *   // Uint8Array(33) [
  *   //   103,
- *   //    1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
- *   //   17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+ *   //     1,  2,  3,  4,  5,  6,  7,  8,
+ *   //     9, 10, 11, 12, 13, 14, 15, 16,
+ *   //    17, 18, 19, 20, 21, 22, 23, 24,
+ *   //    25, 26, 27, 28, 29, 30, 31, 32
  *   // ]
  * ```
  *
@@ -187,15 +208,19 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
  * console.log(writeLeaf({ type: 'ethereum', height: 123 }));
  *   // Uint8Array(11) [ 0, 48, 254, 128, 135, 181, 199, 234, 215, 1, 123 ]
  * console.log(writeLeaf({ type: 'pending', url: new URL('https://www.example.com') }));
- *   // Uint8Array(35) [   0, 131, 223, 227,  13,  46, 249,  12, 142,  25,  24,
- *   //                  104, 116, 116, 112, 115,  58,  47,  47, 119, 119, 119,
- *   //                   46, 101, 120,  97, 109, 112, 108, 101,  46,  99, 111,
- *   //                  109, 47 ]
- * console.log(writeLeaf({
- *   type: 'unknown',
- *   header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
- *   payload: Uint8Array.of(1, 2, 3),
- * }));
+ *   // Uint8Array(35) [
+ *   //     0, 131, 223, 227,  13,  46, 249,  12, 142,  25,  24,
+ *   //   104, 116, 116, 112, 115,  58,  47,  47, 119, 119, 119,
+ *   //    46, 101, 120,  97, 109, 112, 108, 101,  46,  99, 111,
+ *   //   109, 47
+ *   // ]
+ * console.log(writeLeaf(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(1, 2, 3),
+ *   },
+ * ));
  *   // Uint8Array(13) [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 3, 1, 2, 3 ]
  * ```
  *
@@ -294,32 +319,48 @@ export function writeEdge(edge: Edge): Uint8Array {
  * ```typescript
  * 'use strict';
  *
- * import { EdgeMap, LeafSet, newTree } from './src/internals';
+ * import { newTree, EdgeMap, LeafSet } from './src/internals';
  * import { writeTree } from './src/write';
  *
  * console.log(writeTree(newTree()));
  *   // Uint8Array(0) []
- * console.log(writeTree({ edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }));
+ * console.log(writeTree(
+ *   {
+ *     edges: new EdgeMap(),
+ *     leaves: new LeafSet()
+ *       .add({ type: 'bitcoin', height: 123 }),
+ *   },
+ * ));
  *   // Uint8Array(11) [ 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123 ]
- * console.log(writeTree({
- *   edges: new EdgeMap(),
- *   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
- * }));
- *   // Uint8Array(23) [ 255, 0,   5, 136, 150,  13, 115, 215, 25, 1,   1, 123,
- *   //                    0, 6, 134, 154,  13, 115, 215,  27, 69, 1, 123 ]
- * console.log(
- *   writeTree({
- *     edges: new EdgeMap().add({ type: 'sha1' }, newTree()),
- *     leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
- *   }),
- * );
+ * console.log(writeTree(
+ *   {
+ *     edges: new EdgeMap(),
+ *     leaves: new LeafSet()
+ *       .add({ type: 'bitcoin', height: 123 })
+ *       .add({ type: 'litecoin', height: 123 }),
+ *   }
+ * ));
+ *   // Uint8Array(23) [
+ *   //   255, 0,   5, 136, 150,  13, 115, 215, 25, 1,   1, 123,
+ *   //     0, 6, 134, 154,  13, 115, 215,  27, 69, 1, 123
+ *   // ]
+ * console.log(writeTree(
+ *   {
+ *     edges: new EdgeMap()
+ *       .add({ type: 'sha1' }, newTree()),
+ *     leaves: new LeafSet()
+ *       .add({ type: 'bitcoin', height: 123 }),
+ *   },
+ * ));
  *   // Uint8Array(13) [ 255, 0, 5, 136, 150, 13, 115, 215, 25, 1, 1, 123, 2 ]
- * console.log(
- *   writeTree({
- *     edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+ * console.log(writeTree(
+ *   {
+ *     edges: new EdgeMap()
+ *       .add({ type: 'sha1' }, newTree())
+ *       .add({ type: 'sha256' }, newTree()),
  *     leaves: new LeafSet(),
- *   }),
- * );
+ *   },
+ * ));
  *   // Uint8Array(3) [ 255, 2, 8 ]
  * ```
  *
@@ -374,19 +415,24 @@ export function writeTree(tree: Tree): Uint8Array {
  * import { newTree } from './src/internals';
  * import { write } from './src/write';
  *
- * console.log(write({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: newTree(),
- * }));
- *   // Uint8Array(53) [
- *   //    0,  79, 112, 101, 110,  84, 105, 109, 101, 115, 116,  97, 109, 112, 115,  0,  0, 80,
- *   //  114, 111, 111, 102,   0, 191, 137, 226, 232, 132, 232, 146, 148,   1,   2,  1,  2,  3,
- *   //    4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18, 19, 20
- *   // ]
+ * console.log(write(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
+ *   }),
+ * );
+ * // Uint8Array(53) [
+ * //    0,  79, 112, 101, 110,  84, 105, 109, 101, 115, 116,  97, 109,
+ * //  112, 115,   0,   0,  80, 114, 111, 111, 102,   0, 191, 137, 226,
+ * //  232, 132, 232, 146, 148,   1,   2,   1,   2,   3,   4,   5,   6,
+ * //    7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
+ * //   20
+ * // ]
  * ```
  *
  * @param timestamp - The value to write.

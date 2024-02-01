@@ -39,7 +39,8 @@ import { validateCalendarUrl } from './validation';
  *
  * import { getBytes } from './src/read';
  *
- * console.log(getBytes(2, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // [ Uint8Array(2) [ 6, 7 ], 7 ]
+ * console.log(getBytes(2, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // [ Uint8Array(2) [ 6, 7 ], 7 ]
  * ```
  *
  * @example
@@ -48,7 +49,8 @@ import { validateCalendarUrl } from './validation';
  *
  * import { getBytes } from './src/read';
  *
- * console.log(getBytes(8, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // Error: Unexpected EOF reading bytes at position 5
+ * console.log(getBytes(8, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // Error: Unexpected EOF reading bytes at position 5
  * ```
  *
  * @param length - The number of bytes to extract.
@@ -75,7 +77,8 @@ export function getBytes(length: number, data: Uint8Array, index: number): [Uint
  *
  * import { getByte } from './src/read';
  *
- * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // [ 6, 6 ]
+ * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // [ 6, 6 ]
  * ```
  *
  * @example
@@ -84,7 +87,8 @@ export function getBytes(length: number, data: Uint8Array, index: number): [Uint
  *
  * import { getByte } from './src/read';
  *
- * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 15));  // Error: Unexpected EOF reading bytes at position 15
+ * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 15));
+ *   // Error: Unexpected EOF reading bytes at position 15
  * ```
  *
  * @param data - The data substrate to use.
@@ -120,9 +124,12 @@ export function getByte(data: Uint8Array, index: number): [number, number] {
  *
  * import { readUint } from './src/read';
  *
- * console.log(readUint(Uint8Array.of(0x00), 0));        // [ 0, 1 ]
- * console.log(readUint(Uint8Array.of(0x80, 0x00), 0));  // [ 0, 2 ]
- * console.log(readUint(Uint8Array.of(0x80, 0x01), 0));  // [ 128, 2 ]
+ * console.log(readUint(Uint8Array.of(0x00), 0));
+ *   // [ 0, 1 ]
+ * console.log(readUint(Uint8Array.of(0x80, 0x00), 0));
+ *   // [ 0, 2 ]
+ * console.log(readUint(Uint8Array.of(0x80, 0x01), 0));
+ *   // [ 128, 2 ]
  * ```
  *
  * @example
@@ -131,7 +138,8 @@ export function getByte(data: Uint8Array, index: number): [number, number] {
  *
  * import { readUint } from './src/read';
  *
- * console.log(readUint(Uint8Array.of(0x80), 0));  // Error: Unexpected EOF reading bytes at position 1
+ * console.log(readUint(Uint8Array.of(0x80), 0));
+ *   // Error: Unexpected EOF reading bytes at position 1
  * ```
  *
  * @param data - The data substrate to use.
@@ -164,8 +172,10 @@ export function readUint(data: Uint8Array, index: number): [number, number] {
  *
  * import { readBytes } from './src/read';
  *
- * console.log(readBytes(Uint8Array.of(0x01, 123), 0));      // [ Uint8Array(1) [ 123 ], 2 ]
- * console.log(readBytes(Uint8Array.of(0x02, 1, 2, 3), 0));  // [ Uint8Array(2) [ 1, 2 ], 3 ]
+ * console.log(readBytes(Uint8Array.of(0x01, 123), 0));
+ *   // [ Uint8Array(1) [ 123 ], 2 ]
+ * console.log(readBytes(Uint8Array.of(0x02, 1, 2, 3), 0));
+ *   // [ Uint8Array(2) [ 1, 2 ], 3 ]
  * ```
  *
  * @example
@@ -174,7 +184,8 @@ export function readUint(data: Uint8Array, index: number): [number, number] {
  *
  * import { readBytes } from './src/read';
  *
- * console.log(readBytes(Uint8Array.of(0x03, 1), 0));  // Error: Unexpected EOF reading bytes at position 1
+ * console.log(readBytes(Uint8Array.of(0x03, 1), 0));
+ *   // Error: Unexpected EOF reading bytes at position 1
  * ```
  *
  * @param data - The data substrate to use.
@@ -204,7 +215,14 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readUrl(Uint8Array.of(url.length, ...new TextEncoder().encode(url)), 0));  // [ URL { ... }, 24 ]
+ * console.log(readUrl(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   ),
+ *   0,
+ * ));
+ *   // [ URL { ... }, 24 ]
  * ```
  *
  * @example
@@ -215,7 +233,14 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * const url: string = 'https://www.example.com?something=else';
  *
- * console.log(readUrl(Uint8Array.of(url.length, ...new TextEncoder().encode(url)), 0));  // Error: Invalid URL
+ * console.log(readUrl(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   ),
+ *   0,
+ * ));
+ *   // Error: Invalid URL
  * ```
  *
  * @param data - The data substrate to use.
@@ -238,8 +263,18 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
  *
  * import { readLiteral } from './src/read';
  *
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 0, Uint8Array.of(1, 2)));  // [ Uint8Array(2) [ 1, 2 ], 2 ]
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 1, Uint8Array.of(2, 3)));  // [ Uint8Array(2) [ 2, 3 ], 3 ]
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   0,
+ *   Uint8Array.of(1, 2),
+ * ));
+ *   // [ Uint8Array(2) [ 1, 2 ], 2 ]
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   1,
+ *   Uint8Array.of(2, 3),
+ * ));
+ *   // [ Uint8Array(2) [ 2, 3 ], 3 ]
  * ```
  *
  * @example
@@ -248,7 +283,12 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
  *
  * import { readLiteral } from './src/read';
  *
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 0, Uint8Array.of(3, 4)));  // Error: Literal mismatch (expected 0304 but found 0102) at position 0
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   0,
+ *   Uint8Array.of(3, 4),
+ * ));
+ *   // Error: Literal mismatch (expected 0304 but found 0102) at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -280,8 +320,10 @@ export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array
  *
  * import { readDoneLeafPayload } from './src/read';
  *
- * console.log(readDoneLeafPayload(Uint8Array.of(0x00)));        // 0
- * console.log(readDoneLeafPayload(Uint8Array.of(0x80, 0x00)));  // 0
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x00)));
+ *   // 0
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x80, 0x00)));
+ *   // 0
  * ```
  *
  * @example
@@ -290,8 +332,10 @@ export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array
  *
  * import { readDoneLeafPayload } from './src/read';
  *
- * console.log(readDoneLeafPayload(Uint8Array.of(0x80)));        // Error: Unexpected EOF reading bytes at position 1
- * console.log(readDoneLeafPayload(Uint8Array.of(0x00, 0x00)));  // Error: Garbage at end of attestation payload
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x80)));
+ *   // Error: Unexpected EOF reading bytes at position 1
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x00, 0x00)));
+ *   // Error: Garbage at end of attestation payload
  * ```
  *
  * @param payload - Payload data to read.
@@ -321,7 +365,12 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readPendingLeafPayload(Uint8Array.of(url.length, ...new TextEncoder().encode(url))));
+ * console.log(readPendingLeafPayload(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   )
+ * ));
  *   // URL { ... }
  * ```
  *
@@ -331,7 +380,17 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  *
  * import { readPendingLeafPayload } from './src/read';
  *
- * console.log(readPendingLeafPayload(Uint8Array.of(url.length, ...new TextEncoder().encode(url), 1, 2, 3)));
+ * const url: string = 'https://www.example.com';
+ *
+ * console.log(readPendingLeafPayload(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *     1,
+ *     2,
+ *     3,
+ *   ),
+ * ));
  *   // Error: Garbage at end of Pending attestation payload
  * ```
  *
@@ -368,17 +427,59 @@ export function readPendingLeafPayload(payload: Uint8Array): URL {
  *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readLeaf(Uint8Array.of(0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0)); // [ { type: 'bitcoin', height: 123 }, 10 ]
- * console.log(readLeaf(Uint8Array.of(0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45, 1, 123), 0)); // [ { type: 'litecoin', height: 123 }, 10 ]
- * console.log(readLeaf(Uint8Array.of(0x30, 0xfe, 0x80, 0x87, 0xb5, 0xc7, 0xea, 0xd7, 1, 123), 0)); // [ { type: 'ethereum', height: 123 }, 10 ]
  * console.log(readLeaf(
- *   Uint8Array.of(0x83, 0xdf, 0xe3, 0x0d, 0x2e, 0xf9, 0x0c, 0x8e, url.length + 1, url.length, ...new TextEncoder().encode(url)),
+ *   Uint8Array.of(
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
  *   0,
- * ));  // [ { type: 'pending', url: URL { ... } }, 33 ]
+ * ));
+ *   // [ { type: 'bitcoin', height: 123 }, 10 ]
  * console.log(readLeaf(
- *   Uint8Array.of(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 4, 3, 1, 2, 3),
+ *   Uint8Array.of(
+ *     0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45,
+ *     1,
+ *     123,
+ *   ),
  *   0,
- * ));  // [ { type: 'unknown', header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ], payload: Uint8Array(4) [ 3, 1, 2, 3 ] }, 13 ]
+ * ));
+ *   // [ { type: 'litecoin', height: 123 }, 10 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x30, 0xfe, 0x80, 0x87, 0xb5, 0xc7, 0xea, 0xd7,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { type: 'ethereum', height: 123 }, 10 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x83, 0xdf, 0xe3, 0x0d, 0x2e, 0xf9, 0x0c, 0x8e,
+ *     url.length + 1,
+ *     url.length,
+ *     ...new TextEncoder().encode(url)
+ *   ),
+ *   0,
+ * ));
+ *   // [ { type: 'pending', url: URL { ... } }, 33 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+ *     4,
+ *     3, 1, 2, 3
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   {
+ *   //     type: 'unknown',
+ *   //     header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+ *   //     payload: Uint8Array(4) [ 3, 1, 2, 3 ]
+ *   //   },
+ *   //   13
+ *   // ]
  * ```
  *
  * @param data - The data substrate to use.
@@ -425,11 +526,42 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * import { readEdgeOrLeaf } from './src/read';
  *
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
  *   // [ { type: 'bitcoin', height: 123 }, 11 ]
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x02, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
- *   // [ [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ], 12 ]
- * console.log(readEdgeOrLeaf(Uint8Array.of(0xf0, 3, 1, 2, 3, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0x02,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ],
+ *   //   12
+ *   // ]
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0xf0,
+ *     3,
+ *     1, 2, 3,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
  *   // [ [ { type: 'append', operand: [Uint8Array] }, { edges: [EdgeMap], leaves: [LeafSet] } ], 16 ]
  * ```
  *
@@ -439,7 +571,8 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * import { readEdgeOrLeaf } from './src/read';
  *
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x77), 0));  // Error: Unknown operation 77 at position 0
+ * console.log(readEdgeOrLeaf(Uint8Array.of(0x77), 0));
+ *   // Error: Unknown operation 77 at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -489,11 +622,27 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
  *
  * import { readTree } from './src/read';
  *
- * console.log(readTree(Uint8Array.of(
- *   0xff, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123,
- *   0x00, 0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45, 1, 123,
- * ), 0));
- *   // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: [Object] } }, 23 ]
+ * console.log(readTree(
+ *   Uint8Array.of(
+ *     0xff,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *     0x00,
+ *     0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: [Object] }
+ *   //   },
+ *   //   23
+ *   // ]
  * ```
  *
  * @param data - The data substrate to use.
@@ -529,22 +678,46 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * import { readFileHash } from './src/read';
  *
- * console.log(readFileHash(Uint8Array.of(0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- * ), 0));  // [ { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, 21 ]
- * console.log(readFileHash(Uint8Array.of(0x03,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- * ), 0));  // [ { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }, 21 ]
- * console.log(readFileHash(Uint8Array.of(0x08,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- * ), 0));  // [ { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }, 33 ]
- * console.log(readFileHash(Uint8Array.of(0x67,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- * ), 0));  // [ { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }, 33 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x02,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, 21 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x03,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }, 21 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x08,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }, 33 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x67,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }, 33 ]
  * ```
  *
  * @example
@@ -553,7 +726,8 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * import { readFileHash } from './src/read';
  *
- * console.log(readFileHash(Uint8Array.of(0x77), 0));  // Error: Unknown hashing algorithm 77 at position 0
+ * console.log(readFileHash(Uint8Array.of(0x77), 0));
+ *   // Error: Unknown hashing algorithm 77 at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -592,8 +766,10 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
  *
  * import { readVersion } from './src/read';
  *
- * console.log(readVersion(Uint8Array.of(0x01), 0));        // [ 1, 1 ]
- * console.log(readVersion(Uint8Array.of(0x81, 0x00), 0));  // [ 1, 2 ]
+ * console.log(readVersion(Uint8Array.of(0x01), 0));
+ *   // [ 1, 1 ]
+ * console.log(readVersion(Uint8Array.of(0x81, 0x00), 0));
+ *   // [ 1, 2 ]
  * ```
  *
  * @example
@@ -602,8 +778,10 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
  *
  * import { readVersion } from './src/read';
  *
- * console.log(readVersion(Uint8Array.of(0x00), 0));  // Error: Unrecognized version (expected 1 but found 0) at position 0
- * console.log(readVersion(Uint8Array.of(0x02), 0));  // Error: Unrecognized version (expected 1 but found 2) at position 0
+ * console.log(readVersion(Uint8Array.of(0x00), 0));
+ *   // Error: Unrecognized version (expected 1 but found 0) at position 0
+ * console.log(readVersion(Uint8Array.of(0x02), 0));
+ *   // Error: Unrecognized version (expected 1 but found 2) at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -661,7 +839,9 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *   // {
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
- *   //   tree: { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: [Object] } }
+ *   //   tree: {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: [Object] } }
  *   // }
  * ```
  *
@@ -689,7 +869,8 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *   7,
  *   8,
  *   9,
- * )));  // Error: Garbage at EOF
+ * )));
+ *   // Error: Garbage at EOF
  * ```
  *
  * @param data - The data substrate to use.

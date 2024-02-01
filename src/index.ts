@@ -43,7 +43,11 @@ import { default as verifiers } from './verifiers';
  *
  * import { newTree } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(newTree());  // { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ * console.log(newTree());
+ *   // {
+ *   //   edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //   leaves: LeafSet { mapping: {} }
+ *   // }
  * ```
  *
  * @returns The empty tree constructed.
@@ -61,64 +65,43 @@ export const newTree = _newTree;
  *
  * @example
  * ```typescript
+ * 'use strict';
+ *
  * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
  *
- * import { info, EdgeMap, LeafSet } from '@lacrypta/typescript-opentimestamps';
+ * import { info, read } from '@lacrypta/typescript-opentimestamps';
  *
- * const timestamp: Timestamp = {
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: {
- *     leaves: new LeafSet(),
- *     edges: new EdgeMap().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: new LeafSet(),
- *         edges: new EdgeMap()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: new LeafSet(),
- *               edges: new EdgeMap().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: new EdgeMap(),
- *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: new EdgeMap(),
- *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
- *     ),
- *   },
- * };
+ * const timestamp: Timestamp = read(Uint8Array.of(
+ *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65,
+ *   0x73, 0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50,
+ *   0x72, 0x6f, 0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8,
+ *   0x84, 0xe8, 0x92, 0x94, 0x01, 0x02, 0x01, 0x02, 0x03,
+ *   0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+ *   0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0xf1,
+ *   0x03, 0x01, 0x02, 0x03, 0xff, 0xf1, 0x03, 0x04, 0x05,
+ *   0x06, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19,
+ *   0x01, 0x02, 0xc8, 0x03, 0xf2, 0xf0, 0x03, 0x07, 0x08,
+ *   0x09, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19,
+ *   0x01, 0x01, 0x7b
+ * ));
  *
  * console.log(info(timestamp));
  *   // msg = sha1(FILE)
- *   // msg = prepend(msg, 010203)
  *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 070809)
+ *   //     msg = append(msg, 030201070809)
  *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
+ *   //  -> msg = prepend(msg, 040506010203)
  *   //     bitcoinVerify(msg, 456)
  * console.log(info(timestamp, true));
  *   // # version: 1
  *   // msg = sha1(FILE)
  *   //     = 0102030405060708090a0b0c0d0e0f1011121314
- *   // msg = prepend(msg, 010203)
- *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
  *   //  -> msg = reverse(msg)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
- *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201
+ *   //     msg = append(msg, 030201070809)
  *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
  *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
+ *   //  -> msg = prepend(msg, 040506010203)
  *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
  *   //     bitcoinVerify(msg, 456)
  * ```
@@ -146,62 +129,46 @@ export const info = _info;
  * ```typescript
  * 'use strict';
  *
- * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
+ * import type { Timestamp, Tree } from '@lacrypta/typescript-opentimestamps';
  *
- * import { normalize, EdgeMap, LeafSet } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree, normalize, info } from '@lacrypta/typescript-opentimestamps';
  *
- * const timestamp: Timestamp = normalize({
+ * const tree1: Tree = newTree();
+ * const tree2: Tree = newTree();
+ * const tree3: Tree = newTree();
+ * const tree4: Tree = newTree();
+ * const tree5: Tree = newTree();
+ *
+ * tree1.leaves.add({ type: 'bitcoin', height: 456 });
+ * tree2.leaves.add({ type: 'bitcoin', height: 123 });
+ * tree3.edges.add({ type: 'append', operand: Uint8Array.of(7, 8, 9) }, tree2);
+ * tree4.edges.add({ type: 'reverse' }, tree3).add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, tree1);
+ * tree5.edges.add({ type: 'prepend', operand: Uint8Array.of(1, 2, 3) }, tree4);
+ *
+ * const timestamp: Timestamp = {
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- *   tree: {
- *     leaves: new LeafSet(),
- *     edges: new EdgeMap().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: new LeafSet(),
- *         edges: new EdgeMap()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: new LeafSet(),
- *               edges: new EdgeMap().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: new EdgeMap(),
- *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: new EdgeMap(),
- *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
- *     ),
- *   },
- * })!;
+ *   tree: tree5,
+ * };
  *
- * console.log(timestamp.tree.leaves.values());                                                        // []
- * console.log(timestamp.tree.edges.keys());
- *   // [
- *   //   { type: 'prepend', operand: Uint8Array(3) [ 9, 8, 7 ] },
- *   //   { type: 'prepend', operand: Uint8Array(6) [ 4, 5, 6, 1, 2, 3 ] }
- *   // ]
- * console.log(timestamp.tree.edges.values()[0]?.leaves.values());                                     // []
- * console.log(timestamp.tree.edges.values()[0]?.edges.keys());
- *   // [ { type: 'append', operand: Uint8Array(3) [ 3, 2, 1 ] } ]
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.leaves.values());                  // []
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.keys());
- *   // [ { type: 'reverse' } ]
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.leaves.values());
- *   // [ { type: 'bitcoin', height: 123 } ]
- * console.log(timestamp.tree.edges.values()[0]?.edges.values()[0]?.edges.values()[0]?.edges.keys());  // []
- * console.log(timestamp.tree.edges.values()[1]?.leaves.values());
- *   // [ { type: 'bitcoin', height: 456 } ]
- * console.log(timestamp.tree.edges.values()[1]?.edges.keys());                                        // []
+ * console.log(info(timestamp));
+ *   // msg = sha1(FILE)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506)
+ *   //     bitcoinVerify(msg, 456)
+ * console.log(info(normalize(timestamp)!));
+ *   // msg = sha1(FILE)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 030201070809)
+ *   //     bitcoinVerify(msg, 123)
+ *   //  -> msg = prepend(msg, 040506010203)
+ *   //     bitcoinVerify(msg, 456)
  * ```
  *
  * @param timestamp - The timestamp to normalize.
@@ -231,23 +198,28 @@ export const canVerify = _canVerify;
  *
  * import { read } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(read(Uint8Array.of(
- *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
- *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
- *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
- *   1,
- *   0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- *   0x00,
- *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
- *   1,
- *   123,
- * )));
+ * console.log(read(
+ *   Uint8Array.of(
+ *     0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+ *     0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
+ *     0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
+ *     1,
+ *     0x02,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ * ));
  *   // {
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
- *   //   tree: { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: [Object] } }
+ *   //   tree: {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: [Object] }
+ *   //   }
  *   // }
  * ```
  *
@@ -257,25 +229,28 @@ export const canVerify = _canVerify;
  *
  * import { read } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(read(Uint8Array.of(
- *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
- *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
- *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
- *   1,
- *   0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- *   0x00,
- *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
- *   1,
- *   123,
- *   4,
- *   5,
- *   6,
- *   7,
- *   8,
- *   9,
- * )));  // Error: Garbage at EOF
+ * console.log(read(
+ *   Uint8Array.of(
+ *     0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+ *     0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
+ *     0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
+ *     1,
+ *     0x02,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *     4,
+ *     5,
+ *     6,
+ *     7,
+ *     8,
+ *     9,
+ *   ),
+ * ));
+ *   // Error: Garbage at EOF
  * ```
  *
  * @param data - The data substrate to use.
@@ -296,26 +271,34 @@ export const upgrade = _upgrade;
  *
  * import { newTree, is } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(is(123));             // false
- * console.log(is({}));              // false
- * console.log(is({ version: 1 }));  // false
- * console.log(is({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
- *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * console.log(is(123));
+ *   // false
+ * console.log(is({}));
+ *   // false
+ * console.log(is({ version: 1 }));
+ *   // false
+ * console.log(is(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
  *   },
- * }));                              // false
- * console.log(is({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
- *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * ));
+ *   // false
+ * console.log(is(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
  *   },
- *   tree: newTree(),
- * }));                              // true
+ * )); // true
  * ```
  *
  * @param timestamp - Datum to check.
@@ -340,10 +323,11 @@ export const is = _is;
  *   fileHash: {
  *     algorithm: 'sha1',
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
- *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *                           11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: newTree(),
- * });  // OK
+ * });
+ *   // OK
  * ```
  *
  * @example
@@ -352,9 +336,12 @@ export const is = _is;
  *
  * import { assert } from '@lacrypta/typescript-opentimestamps';
  *
- * assert(123);             // Error: Expected non-null object
- * assert({});              // Error: Expected key .version
- * assert({ version: 1 });  // Error: Expected key .fileHash
+ * assert(123);
+ *   // Error: Expected non-null object
+ * assert({});
+ *   // Error: Expected key .version
+ * assert({ version: 1 });
+ *   // Error: Expected key .fileHash
  * assert({
  *   version: 1,
  *   fileHash: {
@@ -362,7 +349,8 @@ export const is = _is;
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
  *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- * });                               // Error: Expected key .tree
+ * });
+ *   // Error: Expected key .tree
  * ```
  *
  * @param timestamp - Datum to assert.
@@ -379,19 +367,24 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  *
  * import { newTree, validate } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(validate({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
- *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * console.log(validate(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
  *   },
- *   tree: newTree(),
- * }));
+ * ));
  *   // {
  *   //   version: 1,
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
- *   //   tree: { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ *   //   tree: {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: {} }
+ *   //   }
  *   // }
  * ```
  *
@@ -401,9 +394,12 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  *
  * import { validate } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(validate(123));             // Error: Expected non-null object
- * console.log(validate({}));              // Error: Expected key .version
- * console.log(validate({ version: 1 }));  // Error: Expected key .fileHash
+ * console.log(validate(123));
+ *   // Error: Expected non-null object
+ * console.log(validate({}));
+ *   // Error: Expected key .version
+ * console.log(validate({ version: 1 }));
+ *   // Error: Expected key .fileHash
  * console.log(validate({
  *   version: 1,
  *   fileHash: {
@@ -411,7 +407,8 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
  *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- * }));                                    // Error: Expected key .tree
+ * }));
+ *   // Error: Expected key .tree
  * ```
  *
  * @param timestamp - Data to validate.
@@ -436,20 +433,25 @@ export const validate = _validate;
  * ```typescript
  * 'use strict';
  *
- * import { newTree, write, validate } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree, write } from '@lacrypta/typescript-opentimestamps';
  *
- * console.log(write({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * console.log(write(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
  *   },
- *   tree: newTree(),
- * }));
+ * ));
  *   // Uint8Array(53) [
- *   //    0,  79, 112, 101, 110,  84, 105, 109, 101, 115, 116,  97, 109, 112, 115,  0,  0, 80,
- *   //  114, 111, 111, 102,   0, 191, 137, 226, 232, 132, 232, 146, 148,   1,   2,  1,  2,  3,
- *   //    4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18, 19, 20
+ *   //   0,  79, 112, 101, 110,  84, 105, 109, 101, 115, 116,
+ *   //  97, 109, 112, 115,   0,   0,  80, 114, 111, 111, 102,
+ *   //   0, 191, 137, 226, 232, 132, 232, 146, 148,   1,   2,
+ *   //   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,
+ *   //  12,  13,  14,  15,  16,  17,  18,  19,  20
  *   // ]
  * ```
  *
