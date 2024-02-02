@@ -89,5 +89,71 @@ describe('Shrink', (): void => {
     ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp }): void => {
       expect(timestampToString(shrink(timestamp, 'bitcoin'))).toStrictEqual(timestampToString(expected));
     });
+
+    it.each([
+      {
+        timestamp: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+          },
+        } as Timestamp,
+        expected: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          },
+        } as Timestamp,
+        name: 'should shrink to lowest height',
+      },
+      {
+        timestamp: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 789 }).add({ type: 'bitcoin', height: 456 }),
+          },
+        } as Timestamp,
+        expected: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
+          },
+        } as Timestamp,
+        name: 'should shrink to lowest height (again)',
+      },
+      {
+        timestamp: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
+              .add({ type: 'pending', url: new URL('http://www.example.com') })
+              .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() }),
+          },
+        } as Timestamp,
+        expected: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
+              .add({ type: 'pending', url: new URL('http://www.example.com') })
+              .add({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() }),
+          },
+        } as Timestamp,
+        name: 'should return timestamp unchanged if no shrinking possible',
+      },
+    ])('$name', ({ timestamp, expected }: { timestamp: Timestamp; expected: Timestamp }): void => {
+      expect(timestampToString(shrink(timestamp, 'bitcoin', true))).toStrictEqual(timestampToString(expected));
+    });
   });
 });

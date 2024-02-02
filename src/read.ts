@@ -820,10 +820,11 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  * ```
  *
  * @param data - The data substrate to use.
+ * @param normalizeResult - Whether to normalize the result prior to returning it or not (via {@link normalize}).
  * @returns The read and normalized Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */
-export function read(data: Uint8Array): Timestamp {
+export function read(data: Uint8Array, normalizeResult: boolean = false): Timestamp {
   const idx: number = readLiteral(data, 0, magicHeader)[1];
   const [version, idx2]: [number, number] = readVersion(data, idx);
   const [fileHash, idx3]: [FileHash, number] = readFileHash(data, idx2);
@@ -833,5 +834,6 @@ export function read(data: Uint8Array): Timestamp {
     throw new Error('Garbage at EOF');
   }
 
-  return normalize({ version, fileHash, tree })!;
+  const result: Timestamp = { version, fileHash, tree };
+  return normalizeResult ? normalize(result)! : result;
 }

@@ -263,5 +263,98 @@ describe('Upgrade', (): void => {
         ).resolves.toStrictEqual({ timestamp: timestampToString(expected.timestamp), errors: expected.errors });
       },
     );
+
+    it.each([
+      {
+        timestamp: {
+          version: 1,
+          fileHash: {
+            algorithm: 'sha1',
+            value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+          },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'pending', url: new URL('http://www.example.com') }),
+          },
+        } as Timestamp,
+        calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
+        expected: {
+          timestamp: {
+            version: 1,
+            fileHash: {
+              algorithm: 'sha1',
+              value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+            },
+            tree: { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
+          },
+          errors: [],
+        } as { timestamp: Timestamp; errors: Error[] },
+        name: 'should deal with simple timestamp',
+      },
+      {
+        timestamp: {
+          version: 1,
+          fileHash: {
+            algorithm: 'sha1',
+            value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+          },
+          tree: {
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+          },
+        } as Timestamp,
+        calendarResponse: uint8ArrayFromHex('000588960d73d71901017b'),
+        expected: {
+          timestamp: {
+            version: 1,
+            fileHash: {
+              algorithm: 'sha1',
+              value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+            },
+            tree: {
+              edges: new EdgeMap(),
+              leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+            },
+          },
+          errors: [],
+        } as { timestamp: Timestamp; errors: Error[] },
+        name: 'should deal with complete timestamp',
+      },
+    ])(
+      '$name',
+      ({
+        timestamp,
+        calendarResponse,
+        expected,
+      }: {
+        timestamp: Timestamp;
+        calendarResponse: Uint8Array;
+        expected: { timestamp: Timestamp; errors: Error[] };
+      }): void => {
+        jest
+          .spyOn(globalThis, 'fetch')
+          .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
+            return Promise.resolve(new Response(calendarResponse, { status: 200 }));
+          });
+
+        void expect(
+          upgrade(timestamp, true).then(
+            ({
+              timestamp: resultTimestamp,
+              errors: resultErrors,
+            }: {
+              timestamp: Timestamp;
+              errors: Error[];
+            }): { timestamp: string; errors: Error[] } => {
+              return { timestamp: timestampToString(resultTimestamp), errors: resultErrors };
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (_reason: any): void => {
+              throw new Error('unexpected');
+            },
+          ),
+        ).resolves.toStrictEqual({ timestamp: timestampToString(expected.timestamp), errors: expected.errors });
+      },
+    );
   });
 });

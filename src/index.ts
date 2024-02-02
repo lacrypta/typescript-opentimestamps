@@ -420,6 +420,7 @@ export const canVerify = _canVerify;
  * ```
  *
  * @param data - The data substrate to use.
+ * @param normalizeResult - Whether to normalize the result prior to returning it or not (via {@link normalize}).
  * @returns The read and normalized Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */

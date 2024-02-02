@@ -74,14 +74,18 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
   return [pathsToTree(paths), errors];
 }
 
-export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
+export async function upgrade(
+  timestamp: Timestamp,
+  normalizeResult: boolean = false,
+): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
+  const result: Timestamp = {
+    version: timestamp.version,
+    fileHash: timestamp.fileHash,
+    tree,
+  };
   return {
-    timestamp: normalize({
-      version: timestamp.version,
-      fileHash: timestamp.fileHash,
-      tree,
-    })!,
+    timestamp: normalizeResult ? normalize(result)! : result,
     errors,
   };
 }

@@ -715,7 +715,7 @@ describe('Read', (): void => {
         | { data: Uint8Array; expected: Timestamp; error: null }
         | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
-          expect(timestampToString(read(data))).toStrictEqual(timestampToString(expected));
+          expect(timestampToString(read(data, true))).toStrictEqual(timestampToString(expected));
         } else {
           expect((): void => {
             read(data);
