@@ -82,6 +82,59 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
 }
 
 /**
+ * Serialize the given {@link !Uint8Array} to a base64 string.
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayToBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayToBase64(Uint8Array.of(1, 2, 3, 4, 5, 6)));
+ *   // AQIDBAUG
+ * ```
+ *
+ * @param data - Data to serialize as base64.
+ * @returns The resulting base64 string.
+ */
+export function uint8ArrayToBase64(data: Uint8Array): string {
+  let sData: string = '';
+  data.forEach((x: number): void => {
+    sData += String.fromCharCode(x);
+  });
+  return btoa(sData);
+}
+
+/**
+ * Deserialize the given base64 string into a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayFromBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUG'));
+ *   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * ```
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayFromBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUG['));
+ *   // DOMException [InvalidCharacterError]: Invalid character
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUGa'));
+ *   // DOMException [InvalidCharacterError]: The string to be decoded is not correctly encoded.
+ * ```
+ *
+ * @param base64 - Base64 string to deserialize.
+ * @returns The deserialized data.
+ * @throws {@link !DOMException} if the given base64 string contains invalid characters.
+ * @throws {@link !DOMException} if the given base64 string is not correctly encoded.
+ */
+export function uint8ArrayFromBase64(base64: string): Uint8Array {
+  return Uint8Array.from(atob(base64), (c: string): number => c.charCodeAt(0));
+}
+
+/**
  * Determine whether two {@link !Uint8Array}s are indeed equal to each other.
  *
  * @example

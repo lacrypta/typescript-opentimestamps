@@ -58,7 +58,8 @@
     "doc:api": "typedoc --options ./etc/typedoc.api.json",
     "doc:internal": "typedoc --options ./etc/typedoc.internal.json",
     "clean": "rm -rf dist",
-    "test": "jest --runInBand --config=./etc/jest.config.js",
+    "test": "jest --runInBand --config=./etc/jest.unit.config.js",
+    "test:regression": "jest --runInBand --config=./etc/jest.regression.config.js",
     "reset": "pnpm clean && rm -rf node_modules && rm -f pnpm-lock.yaml"
   },
   "devDependencies": {

@@ -23,8 +23,10 @@ import {
   uint8ArrayCompare,
   uint8ArrayConcat,
   uint8ArrayEquals,
+  uint8ArrayFromBase64,
   uint8ArrayFromHex,
   uint8ArrayReversed,
+  uint8ArrayToBase64,
   uint8ArrayToHex,
 } from '../../src/utils';
 
@@ -86,6 +88,69 @@ describe('Utils', (): void => {
         } else {
           expect((): void => {
             uint8ArrayFromHex(hex);
+          }).toThrow(error);
+        }
+      },
+    );
+  });
+
+  describe('uint8ArrayToBase64()', (): void => {
+    it.each([
+      {
+        array: Uint8Array.of(),
+        expected: '',
+        name: 'should return empty string for empty input',
+      },
+      {
+        array: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21),
+        expected: 'AQIDBAUGBwgJCgsMDQ4PEBESExQV',
+        name: 'should correctly convert to base64',
+      },
+    ])('$name', ({ array, expected }: { array: Uint8Array; expected: string }): void => {
+      expect(uint8ArrayToBase64(array)).toEqual(expected);
+    });
+  });
+
+  describe('uint8ArrayFromBase64()', (): void => {
+    it.each([
+      {
+        base64: '',
+        expected: Uint8Array.of(),
+        error: null,
+        name: 'should return empty array for empty string',
+      },
+      {
+        base64: 'abcde',
+        expected: null,
+        error: new DOMException('The string to be decoded is not correctly encoded.'),
+        name: 'should fail for mis-encoded string',
+      },
+      {
+        base64: 'abc[',
+        expected: null,
+        error: new DOMException('Invalid character'),
+        name: 'should fail for non-base64 string',
+      },
+      {
+        base64: 'AQIDBAUGBwgJCgsMDQ4PEBESExQV',
+        expected: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21),
+        error: null,
+        name: 'should correctly convert from base64',
+      },
+    ])(
+      '$name',
+      ({
+        base64,
+        expected,
+        error,
+      }:
+        | { base64: string; expected: Uint8Array; error: null }
+        | { base64: string; expected: null; error: DOMException }): void => {
+        if (null === error) {
+          expect(uint8ArrayFromBase64(base64)).toStrictEqual(expected);
+        } else {
+          expect((): void => {
+            uint8ArrayFromBase64(base64);
           }).toThrow(error);
         }
       },

@@ -1,5 +1,5 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {},
-  "include": ["../test/**/*", "../src/**/*", "./jest.config.js"]
+  "include": ["../test/**/*", "../src/**/*", "./jest.unit.config.js"]
 }
