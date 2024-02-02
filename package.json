@@ -27,6 +27,13 @@
   "types": "./dist/types/index.d.ts",
   "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",
+  "browser": "./dist/esm/index.js",
+  "esnext": "./dist/esm/index.js",
+  "es2015": "./dist/esm/index.js",
+  "esm": "./dist/esm/index.js",
+  "module-browser": "./dist/esm/index.js",
+  "source": "./dist/esm/index.js",
+  "modules.root": "esm",
   "unpkg": "./dist/umd/index.min.js",
   "jsdelivr": "./dist/umd/index.min.js",
   "exports": {
