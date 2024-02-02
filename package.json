@@ -45,7 +45,7 @@
   "type": "module",
   "scripts": {
     "prepare": "husky install",
-    "postinstall": "mkdir -p ./dist/cjs && ln -sfr ./dist/umd/index.min.js ./dist/cjs/index.min.cjs && ln -sfr ./dist/umd/index.js ./dist/cjs/index.cjs",
+    "postinstall": "mkdir -p ./dist/cjs && ln -sf ../umd/index.min.js ./dist/cjs/index.min.cjs && ln -sf ../umd/index.js ./dist/cjs/index.cjs",
     "mdlint": "markdownlint . .github -i node_modules -c ./etc/.markdownlint.jsonc",
     "mdlint:fix": "pnpm run mdlint --fix",
     "lint": "eslint src test --config ./etc/.eslintrc.json --no-error-on-unmatched-pattern",
