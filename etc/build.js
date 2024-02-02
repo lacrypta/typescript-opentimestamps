@@ -1,18 +1,18 @@
-#!/usr/bin/env node
-
 import { writeFileSync } from 'fs';
 
 import { build } from 'esbuild';
 import { umdWrapper } from 'esbuild-plugin-umd-wrapper';
 
+const name = 'opentimestamps';
+
 const umdWrapperOptions = {
-  libraryName: 'opentimestamps',
+  libraryName: name,
 };
 
 const buildOptions = {
   bundle: true,
   entryPoints: ['./src/index.ts'],
-  globalName: 'opentimestamps',
+  globalName: name,
   logLevel: 'debug',
   metafile: true,
   platform: 'neutral',
@@ -28,6 +28,7 @@ const results = await Promise.all([
     outfile: './dist/esm/index.js',
     packages: 'external',
   }),
+  //
   build({
     ...buildOptions,
     format: 'esm',
@@ -49,4 +50,4 @@ const results = await Promise.all([
   }),
 ]);
 
-writeFileSync('./dist/meta.json', JSON.stringify(results[0].metafile));
+writeFileSync('./dist/meta.json', JSON.stringify(results[0].metafile, null, 2));
