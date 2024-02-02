@@ -21,8 +21,7 @@
   "files": [
     "dist/types",
     "dist/esm",
-    "dist/umd",
-    "dist/cjs"
+    "dist/umd"
   ],
   "types": "./dist/types/index.d.ts",
   "main": "./dist/esm/index.js",
@@ -54,7 +53,8 @@
     "prettier": "prettier etc src test --config ./etc/.prettierrc.json --no-error-on-unmatched-pattern --check",
     "prettier:fix": "pnpm run prettier --write",
     "format": "pnpm run prettier:fix && pnpm run lint:fix && pnpm run mdlint:fix",
-    "build": "node ./etc/build && pnpm run build:types",
+    "build": "pnpm run build:code && pnpm run build:types",
+    "build:code": "node ./etc/build && pnpm run postinstall",
     "build:types": "tsc --build --verbose ./etc/tsconfig.build.json",
     "analyze": "node ./etc/analyze",
     "doc": "pnpm doc:api && pnpm run doc:internal",
