@@ -5,13 +5,13 @@
   "keywords": [
     "OpenTimestamps"
   ],
-  "repository": "github:lacrypta/typescript-opentimestamps",
+  "license": "AGPL-3.0-or-later",
   "homepage": "https://lacrypta.ar",
   "bugs": {
     "url": "https://github.com/lacrypta/typescript-opentimestamps/issues",
     "email": "bugs@lacrypta.ar"
   },
-  "license": "AGPL-3.0-or-later",
+  "repository": "github:lacrypta/typescript-opentimestamps",
   "author": {
     "name": "La Crypta",
     "url": "https://lacrypta.ar",
@@ -24,19 +24,19 @@
     "dist/umd",
     "dist/cjs"
   ],
-  "sideEffects": false,
-  "type": "module",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",
   "unpkg": "./dist/umd/index.min.js",
   "jsdelivr": "./dist/umd/index.min.js",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "umd": "./dist/umd/index.js",
+    "types": "./dist/types/index.d.ts",
     "default": "./dist/esm/index.js",
-    "types": "./dist/types/index.d.ts"
+    "require": "./dist/cjs/index.cjs",
+    "umd": "./dist/umd/index.js"
   },
+  "sideEffects": false,
+  "type": "module",
   "scripts": {
     "prepare": "husky install",
     "postinstall": "mkdir -p ./dist/cjs && ln -sf ./dist/umd/index.min.js ./dist/cjs/index.min.cjs && ln -sf ./dist/umd/index.js ./dist/cjs/index.cjs",
