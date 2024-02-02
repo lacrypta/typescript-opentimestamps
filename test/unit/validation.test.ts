@@ -14,20 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
+import type { FileHash } from '../../src/types';
 
-import { incorporateTreeToTree } from '../src/internals';
-import { FileHash, Leaf, Op, Tree } from '../src/types';
-import { MergeMap, MergeSet, uint8ArrayFromHex } from '../src/utils';
+import { newTree, EdgeMap, LeafSet } from '../../src/internals';
+import { uint8ArrayFromHex } from '../../src/utils';
 import {
   assert,
   is,
+  validate,
   validateCalendarUrl,
   validateFileHash,
   validateFileHashValue,
   validateLeaf,
   validateNonNegativeInteger,
   validateNonNullObject,
+  validateObjectHasAlgorithmKey,
   validateObjectHasEdgesKey,
   validateObjectHasHeaderKey,
   validateObjectHasHeightKey,
@@ -36,16 +37,14 @@ import {
   validateObjectHasPayloadKey,
   validateObjectHasTypeKey,
   validateObjectHasUrlKey,
-  validateObjectHasAlgorithmKey,
   validateObjectHasValueKey,
   validateOneOfStrings,
   validateOp,
-  validate,
   validateTree,
-  validateURL,
   validateUint8Array,
+  validateURL,
   validateVersion,
-} from '../src/validation';
+} from '../../src/validation';
 
 describe('Validation', (): void => {
   describe('validateNonNullObject()', (): void => {
@@ -422,17 +421,12 @@ describe('Validation', (): void => {
       },
       {
         obj: { leaves: {} },
-        error: new Error('Expected MergeSet'),
-        name: 'should fail when .leaves key is not MergeSet',
+        error: new Error('Expected LeafSet'),
+        name: 'should fail when .leaves key is not LeafSet',
       },
       {
         obj: {
-          leaves: new MergeSet<Leaf>(
-            (_key: Leaf): string => '',
-            (_left: Leaf, _right: Leaf): Leaf => {
-              return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-            },
-          ),
+          leaves: new LeafSet(),
         },
         error: null,
         name: 'should pass when well-formed .leaves key',
@@ -462,17 +456,12 @@ describe('Validation', (): void => {
       },
       {
         obj: { edges: {} },
-        error: new Error('Expected MergeMap'),
-        name: 'should fail when .edges key is not MergeMap',
+        error: new Error('Expected EdgeMap'),
+        name: 'should fail when .edges key is not EdgeMap',
       },
       {
         obj: {
-          edges: new MergeMap<Op, Tree>(
-            (_key: Op): string => '',
-            (left: Tree, right: Tree): Tree => {
-              return incorporateTreeToTree(left, right);
-            },
-          ),
+          edges: new EdgeMap(),
         },
         error: null,
         name: 'should pass when well-formed .edges key',
@@ -769,46 +758,23 @@ describe('Validation', (): void => {
       },
       {
         obj: {
-          leaves: new MergeSet<Leaf>(
-            (_key: Leaf): string => '',
-            (_left: Leaf, _right: Leaf): Leaf => {
-              return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-            },
-          ),
+          leaves: new LeafSet(),
         },
         error: new Error('Expected key .edges'),
         name: 'should fail when missing .edges key',
       },
       {
         obj: {
-          leaves: new MergeSet<Leaf>(
-            (_key: Leaf): string => '',
-            (_left: Leaf, _right: Leaf): Leaf => {
-              return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-            },
-          ),
+          leaves: new LeafSet(),
           edges: null,
         },
         error: new Error('Expected non-null object'),
         name: 'should fail when .edges is null',
       },
       {
-        obj: {
-          leaves: new MergeSet<Leaf>(
-            (_key: Leaf): string => '',
-            (_left: Leaf, _right: Leaf): Leaf => {
-              return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-            },
-          ),
-          edges: new MergeMap<Op, Tree>(
-            (_key: Op): string => '',
-            (left: Tree, right: Tree): Tree => {
-              return incorporateTreeToTree(left, right);
-            },
-          ),
-        },
+        obj: newTree(),
         error: null,
-        name: 'should pass when .edges is null',
+        name: 'should pass when OK',
       },
     ])('$name', ({ obj, error }: { obj: object; error: Error | null }): void => {
       if (null === error) {
@@ -1116,20 +1082,7 @@ describe('Validation', (): void => {
             algorithm: 'sha256',
             value: uint8ArrayFromHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
           },
-          tree: {
-            leaves: new MergeSet<Leaf>(
-              (_key: Leaf): string => '',
-              (_left: Leaf, _right: Leaf): Leaf => {
-                return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-              },
-            ),
-            edges: new MergeMap<Op, Tree>(
-              (_key: Op): string => '',
-              (left: Tree, right: Tree): Tree => {
-                return incorporateTreeToTree(left, right);
-              },
-            ),
-          },
+          tree: newTree(),
         },
         error: null,
         name: 'should pass for well-formed timestamp',
@@ -1196,20 +1149,7 @@ describe('Validation', (): void => {
             algorithm: 'sha256',
             value: uint8ArrayFromHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
           },
-          tree: {
-            leaves: new MergeSet<Leaf>(
-              (_key: Leaf): string => '',
-              (_left: Leaf, _right: Leaf): Leaf => {
-                return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-              },
-            ),
-            edges: new MergeMap<Op, Tree>(
-              (_key: Op): string => '',
-              (left: Tree, right: Tree): Tree => {
-                return incorporateTreeToTree(left, right);
-              },
-            ),
-          },
+          tree: newTree(),
         },
         error: null,
         name: 'should pass for well-formed timestamp',
@@ -1278,20 +1218,7 @@ describe('Validation', (): void => {
             algorithm: 'sha256',
             value: uint8ArrayFromHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
           },
-          tree: {
-            leaves: new MergeSet<Leaf>(
-              (_key: Leaf): string => '',
-              (_left: Leaf, _right: Leaf): Leaf => {
-                return { type: 'unknown', header: Uint8Array.of(), payload: Uint8Array.of() };
-              },
-            ),
-            edges: new MergeMap<Op, Tree>(
-              (_key: Op): string => '',
-              (left: Tree, right: Tree): Tree => {
-                return incorporateTreeToTree(left, right);
-              },
-            ),
-          },
+          tree: newTree(),
         },
         expected: true,
         name: 'should pass for well-formed timestamp',

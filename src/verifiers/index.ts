@@ -14,15 +14,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import type { Verifier } from '../types';
 
 import { default as verifyViaBlockchainInfo } from './blockchain.info';
 import { default as verifyViaBlockstream } from './blockstream';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
 
 export default { verifyViaBlockchainInfo, verifyViaBlockstream } satisfies Record<string, Verifier>;

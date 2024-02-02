@@ -21,10 +21,8 @@
  * @module
  */
 
-'use strict';
-
-import type { FileHash, Leaf, Timestamp, Tree } from './types';
 import type { Edge } from './internals';
+import type { FileHash, Leaf, Timestamp, Tree } from './types';
 
 import { incorporateToTree, magicHeader, newTree, nonFinal, normalize, Tag } from './internals';
 import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
@@ -35,12 +33,18 @@ import { validateCalendarUrl } from './validation';
  *
  * @example
  * ```typescript
- * console.log(getBytes(2, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // [ Uint8Array(2) [ 6, 7 ], 7 ]
+ * import { getBytes } from './src/read';
+ *
+ * console.log(getBytes(2, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // [ Uint8Array(2) [ 6, 7 ], 7 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(getBytes(8, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // Error: Unexpected EOF reading bytes at position 5
+ * import { getBytes } from './src/read';
+ *
+ * console.log(getBytes(8, Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // Error: Unexpected EOF reading bytes at position 5
  * ```
  *
  * @param length - The number of bytes to extract.
@@ -63,12 +67,18 @@ export function getBytes(length: number, data: Uint8Array, index: number): [Uint
  *
  * @example
  * ```typescript
- * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));  // [ 6, 6 ]
+ * import { getByte } from './src/read';
+ *
+ * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 5));
+ *   // [ 6, 6 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 15));  // Error: Unexpected EOF reading bytes at position 15
+ * import { getByte } from './src/read';
+ *
+ * console.log(getByte(Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9), 15));
+ *   // Error: Unexpected EOF reading bytes at position 15
  * ```
  *
  * @param data - The data substrate to use.
@@ -100,14 +110,22 @@ export function getByte(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * console.log(readUint(Uint8Array.of(0x00), 0));        // [ 0, 1 ]
- * console.log(readUint(Uint8Array.of(0x80, 0x00), 0));  // [ 0, 2 ]
- * console.log(readUint(Uint8Array.of(0x80, 0x01), 0));  // [ 128, 2 ]
+ * import { readUint } from './src/read';
+ *
+ * console.log(readUint(Uint8Array.of(0x00), 0));
+ *   // [ 0, 1 ]
+ * console.log(readUint(Uint8Array.of(0x80, 0x00), 0));
+ *   // [ 0, 2 ]
+ * console.log(readUint(Uint8Array.of(0x80, 0x01), 0));
+ *   // [ 128, 2 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readUint(Uint8Array.of(0x80), 0));  // Error: Unexpected EOF reading bytes at position 1
+ * import { readUint } from './src/read';
+ *
+ * console.log(readUint(Uint8Array.of(0x80), 0));
+ *   // Error: Unexpected EOF reading bytes at position 1
  * ```
  *
  * @param data - The data substrate to use.
@@ -136,13 +154,20 @@ export function readUint(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * console.log(readBytes(Uint8Array.of(0x01, 123), 0));      // [ Uint8Array(1) [ 123 ], 2 ]
- * console.log(readBytes(Uint8Array.of(0x02, 1, 2, 3), 0));  // [ Uint8Array(2) [ 1, 2 ], 3 ]
+ * import { readBytes } from './src/read';
+ *
+ * console.log(readBytes(Uint8Array.of(0x01, 123), 0));
+ *   // [ Uint8Array(1) [ 123 ], 2 ]
+ * console.log(readBytes(Uint8Array.of(0x02, 1, 2, 3), 0));
+ *   // [ Uint8Array(2) [ 1, 2 ], 3 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readBytes(Uint8Array.of(0x03, 1), 0));  // Error: Unexpected EOF reading bytes at position 1
+ * import { readBytes } from './src/read';
+ *
+ * console.log(readBytes(Uint8Array.of(0x03, 1), 0));
+ *   // Error: Unexpected EOF reading bytes at position 1
  * ```
  *
  * @param data - The data substrate to use.
@@ -166,16 +191,34 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * @example
  * ```typescript
+ * import { readUrl } from './src/read';
+ *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readUrl(Uint8Array.of(url.length, ...new TextEncoder().encode(url)), 0));  // [ URL { ... }, 24 ]
+ * console.log(readUrl(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   ),
+ *   0,
+ * ));
+ *   // [ URL { ... }, 24 ]
  * ```
  *
  * @example
  * ```typescript
+ * import { readUrl } from './src/read';
+ *
  * const url: string = 'https://www.example.com?something=else';
  *
- * console.log(readUrl(Uint8Array.of(url.length, ...new TextEncoder().encode(url)), 0));  // Error: Invalid URL
+ * console.log(readUrl(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   ),
+ *   0,
+ * ));
+ *   // Error: Invalid URL
  * ```
  *
  * @param data - The data substrate to use.
@@ -194,13 +237,32 @@ export function readUrl(data: Uint8Array, index: number): [URL, number] {
  *
  * @example
  * ```typescript
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 0, Uint8Array.of(1, 2)));  // [ Uint8Array(2) [ 1, 2 ], 2 ]
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 1, Uint8Array.of(2, 3)));  // [ Uint8Array(2) [ 2, 3 ], 3 ]
+ * import { readLiteral } from './src/read';
+ *
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   0,
+ *   Uint8Array.of(1, 2),
+ * ));
+ *   // [ Uint8Array(2) [ 1, 2 ], 2 ]
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   1,
+ *   Uint8Array.of(2, 3),
+ * ));
+ *   // [ Uint8Array(2) [ 2, 3 ], 3 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readLiteral(Uint8Array.of(1, 2, 3, 4), 0, Uint8Array.of(3, 4)));  // Error: Literal mismatch (expected 0304 but found 0102) at position 0
+ * import { readLiteral } from './src/read';
+ *
+ * console.log(readLiteral(
+ *   Uint8Array.of(1, 2, 3, 4),
+ *   0,
+ *   Uint8Array.of(3, 4),
+ * ));
+ *   // Error: Literal mismatch (expected 0304 but found 0102) at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -228,14 +290,22 @@ export function readLiteral(data: Uint8Array, index: number, literal: Uint8Array
  *
  * @example
  * ```typescript
- * console.log(readDoneLeafPayload(Uint8Array.of(0x00)));        // 0
- * console.log(readDoneLeafPayload(Uint8Array.of(0x80, 0x00)));  // 0
+ * import { readDoneLeafPayload } from './src/read';
+ *
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x00)));
+ *   // 0
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x80, 0x00)));
+ *   // 0
  * ```
  *
  * @example
  * ```typescript
- * console.log(readDoneLeafPayload(Uint8Array.of(0x80)));        // Error: Unexpected EOF reading bytes at position 1
- * console.log(readDoneLeafPayload(Uint8Array.of(0x00, 0x00)));  // Error: Garbage at end of attestation payload
+ * import { readDoneLeafPayload } from './src/read';
+ *
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x80)));
+ *   // Error: Unexpected EOF reading bytes at position 1
+ * console.log(readDoneLeafPayload(Uint8Array.of(0x00, 0x00)));
+ *   // Error: Garbage at end of attestation payload
  * ```
  *
  * @param payload - Payload data to read.
@@ -259,15 +329,34 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  *
  * @example
  * ```typescript
+ * import { readPendingLeafPayload } from './src/read';
+ *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readPendingLeafPayload(Uint8Array.of(url.length, ...new TextEncoder().encode(url))));
+ * console.log(readPendingLeafPayload(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *   )
+ * ));
  *   // URL { ... }
  * ```
  *
  * @example
  * ```typescript
- * console.log(readPendingLeafPayload(Uint8Array.of(url.length, ...new TextEncoder().encode(url), 1, 2, 3)));
+ * import { readPendingLeafPayload } from './src/read';
+ *
+ * const url: string = 'https://www.example.com';
+ *
+ * console.log(readPendingLeafPayload(
+ *   Uint8Array.of(
+ *     url.length,
+ *     ...new TextEncoder().encode(url),
+ *     1,
+ *     2,
+ *     3,
+ *   ),
+ * ));
  *   // Error: Garbage at end of Pending attestation payload
  * ```
  *
@@ -298,19 +387,63 @@ export function readPendingLeafPayload(payload: Uint8Array): URL {
  *
  * @example
  * ```typescript
+ * import { readLeaf } from './src/read';
+ *
  * const url: string = 'https://www.example.com';
  *
- * console.log(readLeaf(Uint8Array.of(0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0)); // [ { type: 'bitcoin', height: 123 }, 10 ]
- * console.log(readLeaf(Uint8Array.of(0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45, 1, 123), 0)); // [ { type: 'litecoin', height: 123 }, 10 ]
- * console.log(readLeaf(Uint8Array.of(0x30, 0xfe, 0x80, 0x87, 0xb5, 0xc7, 0xea, 0xd7, 1, 123), 0)); // [ { type: 'ethereum', height: 123 }, 10 ]
  * console.log(readLeaf(
- *   Uint8Array.of(0x83, 0xdf, 0xe3, 0x0d, 0x2e, 0xf9, 0x0c, 0x8e, url.length + 1, url.length, ...new TextEncoder().encode(url)),
+ *   Uint8Array.of(
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
  *   0,
- * ));  // [ { type: 'pending', url: URL { ... } }, 33 ]
+ * ));
+ *   // [ { type: 'bitcoin', height: 123 }, 10 ]
  * console.log(readLeaf(
- *   Uint8Array.of(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 4, 3, 1, 2, 3),
+ *   Uint8Array.of(
+ *     0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45,
+ *     1,
+ *     123,
+ *   ),
  *   0,
- * ));  // [ { type: 'unknown', header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ], payload: Uint8Array(4) [ 3, 1, 2, 3 ] }, 13 ]
+ * ));
+ *   // [ { type: 'litecoin', height: 123 }, 10 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x30, 0xfe, 0x80, 0x87, 0xb5, 0xc7, 0xea, 0xd7,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { type: 'ethereum', height: 123 }, 10 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x83, 0xdf, 0xe3, 0x0d, 0x2e, 0xf9, 0x0c, 0x8e,
+ *     url.length + 1,
+ *     url.length,
+ *     ...new TextEncoder().encode(url)
+ *   ),
+ *   0,
+ * ));
+ *   // [ { type: 'pending', url: URL { ... } }, 33 ]
+ * console.log(readLeaf(
+ *   Uint8Array.of(
+ *     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+ *     4,
+ *     3, 1, 2, 3
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   {
+ *   //     type: 'unknown',
+ *   //     header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+ *   //     payload: Uint8Array(4) [ 3, 1, 2, 3 ]
+ *   //   },
+ *   //   13
+ *   // ]
  * ```
  *
  * @param data - The data substrate to use.
@@ -353,17 +486,53 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * @example
  * ```typescript
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
+ * import { readEdgeOrLeaf } from './src/read';
+ *
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
  *   // [ { type: 'bitcoin', height: 123 }, 11 ]
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x02, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
- *   // [ [ { type: 'sha1' }, { edges: [MergeMap], leaves: [MergeSet] } ], 12 ]
- * console.log(readEdgeOrLeaf(Uint8Array.of(0xf0, 3, 1, 2, 3, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123), 0));
- *   // [ [ { type: 'append', operand: [Uint8Array] }, { edges: [MergeMap], leaves: [MergeSet] } ], 16 ]
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0x02,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ],
+ *   //   12
+ *   // ]
+ * console.log(readEdgeOrLeaf(
+ *   Uint8Array.of(
+ *     0xf0,
+ *     3,
+ *     1, 2, 3,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [ [ { type: 'append', operand: [Uint8Array] }, { edges: [EdgeMap], leaves: [LeafSet] } ], 16 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readEdgeOrLeaf(Uint8Array.of(0x77), 0));  // Error: Unknown operation 77 at position 0
+ * import { readEdgeOrLeaf } from './src/read';
+ *
+ * console.log(readEdgeOrLeaf(Uint8Array.of(0x77), 0));
+ *   // Error: Unknown operation 77 at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -409,10 +578,29 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
  *
  * @example
  * ```typescript
- * console.log(readTree(Uint8Array.of(
- *   0xff, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01, 1, 123,
- *   0x00, 0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45, 1, 123,
- * ), 0));  // [ { edges: MergeMap {}, leaves: MergeSet { ... } }, 23 ]
+ * import { readTree } from './src/read';
+ *
+ * console.log(readTree(
+ *   Uint8Array.of(
+ *     0xff,
+ *     0x00,
+ *     0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     1,
+ *     123,
+ *     0x00,
+ *     0x06, 0x86, 0x9a, 0x0d, 0x73, 0xd7, 0x1b, 0x45,
+ *     1,
+ *     123,
+ *   ),
+ *   0,
+ * ));
+ *   // [
+ *   //   {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: [Object] }
+ *   //   },
+ *   //   23
+ *   // ]
  * ```
  *
  * @param data - The data substrate to use.
@@ -444,27 +632,56 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * @example
  * ```typescript
- * console.log(readFileHash(Uint8Array.of(0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- * ), 0));  // [ { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, 21 ]
- * console.log(readFileHash(Uint8Array.of(0x03,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- * ), 0));  // [ { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }, 21 ]
- * console.log(readFileHash(Uint8Array.of(0x08,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- * ), 0));  // [ { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }, 33 ]
- * console.log(readFileHash(Uint8Array.of(0x67,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
- * ), 0));  // [ { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }, 33 ]
+ * import { readFileHash } from './src/read';
+ *
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x02,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, 21 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x03,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+ *     0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }, 21 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x08,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }, 33 ]
+ * console.log(readFileHash(
+ *   Uint8Array.of(
+ *     0x67,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+ *     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+ *   ),
+ *   0,
+ * ));
+ *   // [ { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }, 33 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readFileHash(Uint8Array.of(0x77), 0));  // Error: Unknown hashing algorithm 77 at position 0
+ * import { readFileHash } from './src/read';
+ *
+ * console.log(readFileHash(Uint8Array.of(0x77), 0));
+ *   // Error: Unknown hashing algorithm 77 at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -499,14 +716,22 @@ export function readFileHash(data: Uint8Array, index: number): [FileHash, number
  *
  * @example
  * ```typescript
- * console.log(readVersion(Uint8Array.of(0x01), 0));        // [ 1, 1 ]
- * console.log(readVersion(Uint8Array.of(0x81, 0x00), 0));  // [ 1, 2 ]
+ * import { readVersion } from './src/read';
+ *
+ * console.log(readVersion(Uint8Array.of(0x01), 0));
+ *   // [ 1, 1 ]
+ * console.log(readVersion(Uint8Array.of(0x81, 0x00), 0));
+ *   // [ 1, 2 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(readVersion(Uint8Array.of(0x00), 0));  // Error: Unrecognized version (expected 1 but found 0) at position 0
- * console.log(readVersion(Uint8Array.of(0x02), 0));  // Error: Unrecognized version (expected 1 but found 2) at position 0
+ * import { readVersion } from './src/read';
+ *
+ * console.log(readVersion(Uint8Array.of(0x00), 0));
+ *   // Error: Unrecognized version (expected 1 but found 0) at position 0
+ * console.log(readVersion(Uint8Array.of(0x02), 0));
+ *   // Error: Unrecognized version (expected 1 but found 2) at position 0
  * ```
  *
  * @param data - The data substrate to use.
@@ -521,10 +746,6 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
   }
   return [version, idx];
 }
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  * Read a {@link Timestamp} from the given data substrate.
@@ -548,7 +769,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * @example
  * ```typescript
- * import { read } from '@lacrypta/typescript-opentimestamps';
+ * import { read } from './src/read';
  *
  * console.log(read(Uint8Array.of(
  *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
@@ -567,15 +788,14 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
  *   //   tree: {
- *   //     edges: MergeMap { },
- *   //     leaves: MergeSet { ... }
- *   //   }
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: [Object] } }
  *   // }
  * ```
  *
  * @example
  * ```typescript
- * import { read } from '@lacrypta/typescript-opentimestamps';
+ * import { read } from './src/read';
  *
  * console.log(read(Uint8Array.of(
  *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
@@ -595,62 +815,16 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *   7,
  *   8,
  *   9,
- * )));  // Error: Garbage at EOF
- * ```
- *
- * @example
- * ```typescript
- * console.log(read(Uint8Array.of(
- *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
- *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
- *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
- *   1,
- *   0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- *   0x00,
- *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
- *   1,
- *   123,
  * )));
- *   // {
- *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
- *   //   version: 1,
- *   //   tree: {
- *   //     edges: MergeMap { },
- *   //     leaves: MergeSet { ... }
- *   //   }
- *   // }
- * ```
- *
- * @example
- * ```typescript
- * console.log(read(Uint8Array.of(
- *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x73,
- *   0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50, 0x72, 0x6f,
- *   0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8, 0x84, 0xe8, 0x92, 0x94,
- *   1,
- *   0x02,
- *   0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
- *   0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33,
- *   0x00,
- *   0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
- *   1,
- *   123,
- *   4,
- *   5,
- *   6,
- *   7,
- *   8,
- *   9,
- * )));  // Error: Garbage at EOF
+ *   // Error: Garbage at EOF
  * ```
  *
  * @param data - The data substrate to use.
+ * @param normalizeResult - Whether to normalize the result prior to returning it or not (via {@link normalize}).
  * @returns The read and normalized Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */
-export function read(data: Uint8Array): Timestamp {
+export function read(data: Uint8Array, normalizeResult: boolean = false): Timestamp {
   const idx: number = readLiteral(data, 0, magicHeader)[1];
   const [version, idx2]: [number, number] = readVersion(data, idx);
   const [fileHash, idx3]: [FileHash, number] = readFileHash(data, idx2);
@@ -660,5 +834,6 @@ export function read(data: Uint8Array): Timestamp {
     throw new Error('Garbage at EOF');
   }
 
-  return normalize({ version, fileHash, tree })!;
+  const result: Timestamp = { version, fileHash, tree };
+  return normalizeResult ? normalize(result)! : result;
 }

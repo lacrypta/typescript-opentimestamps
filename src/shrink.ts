@@ -14,18 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
-import type { Leaf, Timestamp } from './types';
 import type { Path } from './internals';
+import type { Leaf, Timestamp } from './types';
 
-import { treeToPaths, pathsToTree, normalize } from './internals';
+import { normalize, pathsToTree, treeToPaths } from './internals';
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
-export function shrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
+export function shrink(
+  timestamp: Timestamp,
+  chain: 'bitcoin' | 'litecoin' | 'ethereum',
+  normalizeResult: boolean = false,
+): Timestamp {
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
     .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
     .reduce((left: Path | undefined, right: Path): Path => {
@@ -43,10 +41,11 @@ export function shrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'et
   if (undefined === shrunkenPath) {
     return timestamp;
   } else {
-    return normalize({
+    const result: Timestamp = {
       fileHash: timestamp.fileHash,
       version: timestamp.version,
       tree: pathsToTree([shrunkenPath]),
-    })!;
+    };
+    return normalizeResult ? normalize(result)! : result;
   }
 }

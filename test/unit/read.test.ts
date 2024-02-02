@@ -14,15 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
+import type { Edge } from '../../src/internals';
+import type { FileHash, Leaf, Timestamp, Tree } from '../../src/types';
 
-import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
-import type { Edge } from '../src/internals';
-
-import { newEdges, newLeaves } from '../src/internals';
+import { EdgeMap, LeafSet } from '../../src/internals';
 import {
   getByte,
   getBytes,
+  read,
   readBytes,
   readDoneLeafPayload,
   readEdgeOrLeaf,
@@ -30,15 +29,14 @@ import {
   readLeaf,
   readLiteral,
   readPendingLeafPayload,
-  read,
   readTree,
   readUint,
   readUrl,
   readVersion,
-} from '../src/read';
-import { uint8ArrayFromHex } from '../src/utils';
+} from '../../src/read';
+import { uint8ArrayFromHex } from '../../src/utils';
 
-import { leafOrEdgeToString, timestampToString, treeToString } from './helpers';
+import { leafOrEdgeToString, timestampToString, treeToString } from '../helpers';
 
 const textEncoder: TextEncoder = new TextEncoder();
 
@@ -458,7 +456,7 @@ describe('Read', (): void => {
       {
         data: Uint8Array.of(0x02, 0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
         expected: [
-          [{ type: 'sha1' }, { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }],
+          [{ type: 'sha1' }, { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }],
           12,
         ] as [Edge, number],
         error: null,
@@ -469,7 +467,7 @@ describe('Read', (): void => {
         expected: [
           [
             { type: 'append', operand: Uint8Array.of(1, 2, 3) },
-            { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+            { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
           ],
           16,
         ] as [Edge, number],
@@ -503,7 +501,7 @@ describe('Read', (): void => {
     it.each([
       {
         data: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
-        expected: [{ edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) }, 11] as [
+        expected: [{ edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) }, 11] as [
           Tree,
           number,
         ],
@@ -524,8 +522,8 @@ describe('Read', (): void => {
         ),
         expected: [
           {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
           },
           23,
         ] as [Tree, number],
@@ -681,7 +679,7 @@ describe('Read', (): void => {
         expected: {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
-          tree: { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+          tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
         } as Timestamp,
         error: null,
         name: 'should read simple tree timestamp',
@@ -718,6 +716,45 @@ describe('Read', (): void => {
         | { data: Uint8Array; expected: null; error: Error }): void => {
         if (null === error) {
           expect(timestampToString(read(data))).toStrictEqual(timestampToString(expected));
+        } else {
+          expect((): void => {
+            read(data);
+          }).toThrow(error);
+        }
+      },
+    );
+
+    it.each([
+      {
+        data: Uint8Array.of(
+          ...uint8ArrayFromHex('004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294'),
+          1,
+          0x02,
+          ...uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+          0x00,
+          ...uint8ArrayFromHex('0588960d73d71901'),
+          1,
+          123,
+        ),
+        expected: {
+          version: 1,
+          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+          tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+        } as Timestamp,
+        error: null,
+        name: 'should read simple tree timestamp',
+      },
+    ])(
+      '$name',
+      ({
+        data,
+        expected,
+        error,
+      }:
+        | { data: Uint8Array; expected: Timestamp; error: null }
+        | { data: Uint8Array; expected: null; error: Error }): void => {
+        if (null === error) {
+          expect(timestampToString(read(data, true))).toStrictEqual(timestampToString(expected));
         } else {
           expect((): void => {
             read(data);

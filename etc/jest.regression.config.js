@@ -1,11 +1,7 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   clearMocks: true,
-  collectCoverage: true,
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts', '<rootDir>/test/**/*.ts'],
-  coveragePathIgnorePatterns: ['\\.test\\.ts'],
-  coverageDirectory: '<rootDir>/dist/.coverage',
-  coverageProvider: 'babel',
+  collectCoverage: false,
   logHeapUsage: true,
   passWithNoTests: true,
   preset: 'ts-jest',
@@ -14,7 +10,7 @@ module.exports = {
   restoreMocks: false,
   rootDir: '..',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/test/**/*.test.ts'],
+  testMatch: ['<rootDir>/test/regression/**/*.test.ts'],
   transform: {
     '\\.ts$': 'ts-jest',
   },

@@ -14,13 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
+import type { Timestamp } from '../../src/types';
 
-import type { Timestamp } from '../src';
-
-import { newEdges, newLeaves } from '../src/internals';
-import { canShrink, canUpgrade, canVerify } from '../src/predicates';
-import { uint8ArrayFromHex } from '../src/utils';
+import { EdgeMap, LeafSet } from '../../src/internals';
+import { canShrink, canUpgrade, canVerify } from '../../src/predicates';
+import { uint8ArrayFromHex } from '../../src/utils';
 
 describe('Predicates', (): void => {
   describe('canShrink()', (): void => {
@@ -30,8 +28,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'bitcoin', height: 456 }),
           },
         } as Timestamp,
         expected: true,
@@ -42,8 +40,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'litecoin', height: 123 })
               .add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
@@ -56,8 +54,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         expected: false,
@@ -75,8 +73,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         expected: false,
@@ -87,8 +85,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'litecoin', height: 123 })
               .add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
@@ -101,8 +99,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'pending', url: new URL('http://www.example.com/a') })
               .add({ type: 'pending', url: new URL('http://www.example.com/b') }),
           },
@@ -122,8 +120,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+            edges: new EdgeMap(),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
           },
         } as Timestamp,
         expected: true,
@@ -134,8 +132,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'litecoin', height: 123 })
               .add({ type: 'pending', url: new URL('http://www.example.com') }),
           },
@@ -148,8 +146,8 @@ describe('Predicates', (): void => {
           version: 1,
           fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
           tree: {
-            edges: newEdges(),
-            leaves: newLeaves()
+            edges: new EdgeMap(),
+            leaves: new LeafSet()
               .add({ type: 'pending', url: new URL('http://www.example.com/a') })
               .add({ type: 'pending', url: new URL('http://www.example.com/b') }),
           },

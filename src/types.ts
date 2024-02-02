@@ -21,13 +21,111 @@
  * @module
  */
 
-'use strict';
+/**
+ * An interface for an iteration over the standard {@link !Set} generic class, that's supposed to allow for identical elements to be identified and merged together.
+ *
+ * @typeParam V - The type of the contained elements.
+ */
+export interface MergeSet<V> {
+  /**
+   * Return the number of elements in the {@link MergeSet}.
+   *
+   * @returns The number of elements in the {@link MergeSet}.
+   */
+  size(): number;
 
-import { MergeMap, MergeSet } from './utils';
+  /**
+   * Return a list of _values_ stored in a {@link MergeSet}.
+   *
+   * @returns The list of values in the {@link MergeSet}.
+   */
+  values(): V[];
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
+  /**
+   * Remove the given value from the {@link MergeSet}.
+   *
+   * @param value - The value to remove.
+   * @returns The original {@link MergeSet} with the given {@link value} removed, for chaining.
+   */
+  remove(value: V): this;
+
+  /**
+   * Add the given value to the {@link MergeSet}.
+   *
+   * @param value - The value to add to the {@link MergeSet}.
+   * @returns The original {@link MergeSet} with the given {@link value} added, for chaining.
+   */
+  add(value: V): this;
+
+  /**
+   * Add _all_ elements of the given {@link MergeSet} to the current one.
+   *
+   * @param other - The {@link MergeSet} to incorporate into this one.
+   * @returns The original {@link MergeSet} with the given other {@link MergeSet} incorporated, for chaining.
+   */
+  incorporate(other: MergeSet<V>): this;
+}
+
+/**
+ * An interface for an iteration over the standard {@link !Map} generic class, that allows for identical keys to be identified and their associated values be merged together.
+ *
+ * @typeParam K - The type of the contained keys.
+ * @typeParam V - The type of the contained values.
+ */
+export interface MergeMap<K, V> {
+  /**
+   * Return the number of elements in the {@link MergeMap}.
+   *
+   * @returns The number of elements in the {@link MergeMap}.
+   */
+  size(): number;
+
+  /**
+   * Return a list of _Keys_ stored in a {@link MergeMap}.
+   *
+   * @returns The list of keys in the {@link MergeMap}.
+   */
+  keys(): K[];
+
+  /**
+   * Return a list of _values_ stored in a {@link MergeMap}.
+   *
+   * @returns The list of values in the {@link MergeMap}.
+   */
+  values(): V[];
+
+  /**
+   * Return a list of _entries_ (ie. key / value pairs) stored in a {@link MergeMap}.
+   *
+   * @returns The list of entries in the {@link MergeMap}.
+   */
+  entries(): [K, V][];
+
+  /**
+   * Remove the given key from the {@link MergeMap}.
+   *
+   * @param key - The key to remove.
+   * @returns The original {@link MergeMap} with the given {@link key} removed, for chaining.
+   */
+  remove(key: K): this;
+
+  /**
+   * Add the given key / value pair to the {@link MergeMap}.
+   *
+   * @param key - The key to add to the {@link MergeMap}.
+   * @param value - The value to add to the {@link MergeMap}.
+   * @returns The original {@link MergeMap} with the given {@link key} / {@link value} pair added, for chaining.
+   */
+  add(key: K, value: V): this;
+
+  /**
+   * Add _all_ key / value pairs of the given {@link MergeMap} to the current one.
+   *
+   * @param other - The {@link MergeMap} to incorporate into this one.
+   * @returns The original {@link MergeMap} with the given other {@link MergeMap} incorporated, for chaining.
+   */
+  incorporate(other: MergeMap<K, V>): this;
+}
 
 /**
  * A "Leaf" represents an attestation on a blockchain or a pending attestation on a Calendar.
@@ -191,8 +289,12 @@ export type Op =
        *
        * ```typescript
        * let newMsg: Uint8Array = oldMsg
-       *     .reduce((result: string, value: number): string => result + value.toString(16).padStart(2, '0'), '')
-       *     .toLowerCase();
+       *   .reduce(
+       *     (result: string, value: number): string =>
+       *       result + value.toString(16).padStart(2, '0'),
+       *     '',
+       *   )
+       *   .toLowerCase();
        * ```
        *
        */

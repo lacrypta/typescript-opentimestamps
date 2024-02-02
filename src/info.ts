@@ -21,10 +21,8 @@
  * @module
  */
 
-'use strict';
-
-import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 import type { Edge } from './internals';
+import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
 import { callOp, compareEdges, compareLeaves } from './internals';
 import { uint8ArrayToHex } from './utils';
@@ -34,6 +32,8 @@ import { uint8ArrayToHex } from './utils';
  *
  * @example
  * ```typescript
+ * import { indent } from './src/info';
+ *
  * console.log(indent(''));
  *   // ->
  * console.log(indent('something'));
@@ -66,6 +66,8 @@ export function indent(text: string): string {
  *
  * @example
  * ```typescript
+ * import { infoLeaf } from './src/info';
+ *
  * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
  * console.log(infoLeaf({ type: 'litecoin', height: 456 }));  // litecoinVerify(msg, 456)
  * console.log(infoLeaf({ type: 'ethereum', height: 789 }));  // ethereumVerify(msg, 789)
@@ -100,9 +102,12 @@ export function infoLeaf(leaf: Leaf): string {
  *
  * @example
  * ```typescript
+ * import { infoEdge } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
+ *
  * console.log(infoEdge(
  *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *     { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *   ],
  *   undefined,
  * ));
@@ -110,7 +115,7 @@ export function infoLeaf(leaf: Leaf): string {
  *   // bitcoinVerify(msg, 123)
  * console.log(infoEdge(
  *   [ { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *     { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *     { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *   ],
  *   Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
  * ));
@@ -154,26 +159,31 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
+ * import type { Tree } from './src/types';
+ *
+ * import { infoTree } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
+ *
  * const tree: Tree = {
- *   leaves: newLeaves(),
- *   edges: newEdges().add(
+ *   leaves: new LeafSet(),
+ *   edges: new EdgeMap().add(
  *     { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
  *     {
- *       leaves: newLeaves(),
- *       edges: newEdges()
+ *       leaves: new LeafSet(),
+ *       edges: new EdgeMap()
  *         .add(
  *           { type: 'reverse' },
  *           {
- *             leaves: newLeaves(),
- *             edges: newEdges().add(
+ *             leaves: new LeafSet(),
+ *             edges: new EdgeMap().add(
  *               { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *               { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+ *               { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
  *             ),
  *           },
  *         )
  *         .add(
  *           { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *           { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 456 }) },
+ *           { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }) },
  *         ),
  *     },
  *   ),
@@ -229,6 +239,10 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  *
  * @example
  * ```typescript
+ * import type { FileHash } from './src/types';
+ *
+ * import { infoFileHash } from './src/info';
+ *
  * const fileHash: FileHash = {
  *   algorithm: 'sha1',
  *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
@@ -252,10 +266,6 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
   return resultParts.join('\n');
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
 /**
  * Generate a human-readable string form the given {@link Timestamp}.
  *
@@ -267,7 +277,10 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *
  * @example
  * ```typescript
- * import { Timestamp, info, newEdges, newLeaves } from '@lacrypta/typescript-opentimestamps';
+ * import type { Timestamp } from './src/types';
+ *
+ * import { info } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
  *
  * const timestamp: Timestamp = {
  *   version: 1,
@@ -276,86 +289,26 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
  *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
+ *     leaves: new LeafSet(),
+ *     edges: new EdgeMap().add(
  *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
+ *       { leaves: new LeafSet(),
+ *         edges: new EdgeMap()
  *           .add(
  *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
+ *             { leaves: new LeafSet(),
+ *               edges: new EdgeMap().add(
  *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
+ *                 { edges: new EdgeMap(),
+ *                   leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
  *                 },
  *               ),
  *             },
  *           )
  *           .add(
  *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
- *             },
- *           ),
- *       },
- *     ),
- *   },
- * };
- *
- * console.log(info(timestamp));
- *   // msg = sha1(FILE)
- *   // msg = prepend(msg, 010203)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //     bitcoinVerify(msg, 456)
- * console.log(info(timestamp, true));
- *   // # version: 1
- *   // msg = sha1(FILE)
- *   //     = 0102030405060708090a0b0c0d0e0f1011121314
- *   // msg = prepend(msg, 010203)
- *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
- *   //  -> msg = reverse(msg)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
- *   //     msg = append(msg, 070809)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
- *   //     bitcoinVerify(msg, 456)
- * ```
- *
- * @example
- * ```typescript
- * const timestamp: Timestamp = {
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: {
- *     leaves: newLeaves(),
- *     edges: newEdges().add(
- *       { type: 'prepend', operand: Uint8Array.of(1, 2, 3) },
- *       { leaves: newLeaves(),
- *         edges: newEdges()
- *           .add(
- *             { type: 'reverse' },
- *             { leaves: newLeaves(),
- *               edges: newEdges().add(
- *                 { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *                 { edges: newEdges(),
- *                   leaves: newLeaves().add({ type: 'bitcoin', height: 123 }),
- *                 },
- *               ),
- *             },
- *           )
- *           .add(
- *             { type: 'prepend', operand: Uint8Array.of(4, 5, 6) },
- *             { edges: newEdges(),
- *               leaves: newLeaves().add({ type: 'bitcoin', height: 456 }),
+ *             { edges: new EdgeMap(),
+ *               leaves: new LeafSet().add({ type: 'bitcoin', height: 456 }),
  *             },
  *           ),
  *       },

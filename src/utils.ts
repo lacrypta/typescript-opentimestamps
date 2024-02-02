@@ -21,14 +21,15 @@
  * @module
  */
 
-'use strict';
-
 /**
  * Serialize the given {@link !Uint8Array} to a hex string.
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayToHex(Uint8Array.of(1, 2, 3, 4, 5, 6)));  // 010203040506
+ * import { uint8ArrayToHex } from './src/utils';
+ *
+ * console.log(uint8ArrayToHex(Uint8Array.of(1, 2, 3, 4, 5, 6)));
+ *   // 010203040506
  * ```
  *
  * @param data - Data to serialize as hex.
@@ -45,13 +46,20 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayFromHex('010203040506'));  // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * import { uint8ArrayFromHex } from './src/utils';
+ *
+ * console.log(uint8ArrayFromHex('010203040506'));
+ *   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayFromHex('102030405')));   // Uncaught Error: Hex value should be of even length, found 9
- * console.log(uint8ArrayFromHex('102030405x')));  // Uncaught Error: Malformed hex string
+ * import { uint8ArrayFromHex } from './src/utils';
+ *
+ * console.log(uint8ArrayFromHex('102030405'));
+ *   // Uncaught Error: Hex value should be of even length, found 9
+ * console.log(uint8ArrayFromHex('102030405x'));
+ *   // Uncaught Error: Malformed hex string
  * ```
  *
  * @param hex - Hex string to deserialize.
@@ -74,13 +82,77 @@ export function uint8ArrayFromHex(hex: string): Uint8Array {
 }
 
 /**
+ * Serialize the given {@link !Uint8Array} to a base64 string.
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayToBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayToBase64(Uint8Array.of(1, 2, 3, 4, 5, 6)));
+ *   // AQIDBAUG
+ * ```
+ *
+ * @param data - Data to serialize as base64.
+ * @returns The resulting base64 string.
+ */
+export function uint8ArrayToBase64(data: Uint8Array): string {
+  let sData: string = '';
+  data.forEach((x: number): void => {
+    sData += String.fromCharCode(x);
+  });
+  return btoa(sData);
+}
+
+/**
+ * Deserialize the given base64 string into a {@link !Uint8Array}.
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayFromBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUG'));
+ *   // Uint8Array(6) [ 1, 2, 3, 4, 5, 6 ]
+ * ```
+ *
+ * @example
+ * ```typescript
+ * import { uint8ArrayFromBase64 } from './src/utils';
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUG['));
+ *   // DOMException [InvalidCharacterError]: Invalid character
+ *
+ * console.log(uint8ArrayFromBase64('AQIDBAUGa'));
+ *   // DOMException [InvalidCharacterError]: The string to be decoded is not correctly encoded.
+ * ```
+ *
+ * @param base64 - Base64 string to deserialize.
+ * @returns The deserialized data.
+ * @throws {@link !DOMException} if the given base64 string contains invalid characters.
+ * @throws {@link !DOMException} if the given base64 string is not correctly encoded.
+ */
+export function uint8ArrayFromBase64(base64: string): Uint8Array {
+  return Uint8Array.from(atob(base64), (c: string): number => c.charCodeAt(0));
+}
+
+/**
  * Determine whether two {@link !Uint8Array}s are indeed equal to each other.
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayEquals(Uint8Array.of(), Uint8Array.of()));                // true
- * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 3)));  // true
- * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 4)));  // false
+ * import { uint8ArrayEquals } from './src/utils';
+ *
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(),
+ *   Uint8Array.of(),
+ * )); // true
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2, 3),
+ * )); // true
+ * console.log(uint8ArrayEquals(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2, 4),
+ * )); // false
  * ```
  *
  * @param left - The first array to compare.
@@ -98,12 +170,29 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayCompare(Uint8Array.of(), Uint8Array.of()));             //  0
- * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of()));      //  3
- * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2)));  //  1
- * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2)));        // -1
- * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2, 3)));     // -2
- * ```
+ * import { uint8ArrayCompare } from './src/utils';
+ *
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(),
+ *   Uint8Array.of(),
+ * ));  //  0
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(),
+ * ));  //  3
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1, 2, 3),
+ *   Uint8Array.of(1, 2),
+ * ));  //  1
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1),
+ *   Uint8Array.of(1, 2),
+ * ));  // -1
+ * console.log(uint8ArrayCompare(
+ *   Uint8Array.of(1),
+ *   Uint8Array.of(1, 2, 3),
+ * ));  // -2
+ *  * ```
  *
  * @param left - The first array to compare.
  * @param right - The second array to compare.
@@ -124,9 +213,14 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayConcat());                                    // Uint8Array(0) []
- * console.log(uint8ArrayConcat(Uint8Array.of(1, 2, 3)));              // Uint8Array(3) [ 1, 2, 3 ]
- * console.log(uint8ArrayConcat(Uint8Array.of(1), Uint8Array.of(2)));  // Uint8Array(2) [ 1, 2 ]
+ * import { uint8ArrayConcat } from './src/utils';
+ *
+ * console.log(uint8ArrayConcat());
+ *   // Uint8Array(0) []
+ * console.log(uint8ArrayConcat(Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 1, 2, 3 ]
+ * console.log(uint8ArrayConcat(Uint8Array.of(1), Uint8Array.of(2)));
+ *   // Uint8Array(2) [ 1, 2 ]
  * ```
  *
  * @param arrays - The arrays to concatenate.
@@ -151,8 +245,12 @@ export function uint8ArrayConcat(...arrays: Uint8Array[]): Uint8Array {
  *
  * @example
  * ```typescript
- * console.log(uint8ArrayReversed(Uint8Array.of()));         // Uint8Array(0) []
- * console.log(uint8ArrayReversed(Uint8Array.of(1, 2, 3)));  // Uint8Array(3) [ 3, 2, 1 ]
+ * import { uint8ArrayReversed } from './src/utils';
+ *
+ * console.log(uint8ArrayReversed(Uint8Array.of()));
+ *   // Uint8Array(0) []
+ * console.log(uint8ArrayReversed(Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 3, 2, 1 ]
  * ```
  *
  * @param array - The array to reverse.
@@ -171,19 +269,23 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *
  * @example
  * ```typescript
- * fetchBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * import { fetchBody } from './src/utils';
+ *
+ * fetchBody(new URL('http://example.org'))
+ *   .then((body: Uint8Array): void => { console.log(...body); });
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * fetchBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * fetchBody(new URL('http://example.com')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * import { fetchBody } from './src/utils';
+ *
+ * fetchBody(new URL('something://else'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * fetchBody(new URL('http://example.com'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -213,19 +315,23 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
  *
  * @example
  * ```typescript
- * retrieveGetBody(new URL('http://example.org')).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * import { retrieveGetBody } from './src/utils';
+ *
+ * retrieveGetBody(new URL('http://example.org'))
+ *   .then((body: Uint8Array): void => { console.log(...body); })
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * retrieveGetBody(new URL('something://else')).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrieveGetBody(new URL('http://example.com')).catch((e: unknown) => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * import { retrieveGetBody } from './src/utils';
+ *
+ * retrieveGetBody(new URL('something://else'))
+ *   .catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * retrieveGetBody(new URL('http://example.com'))
+ *   .catch((e: unknown) => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -247,19 +353,29 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
  *
  * @example
  * ```typescript
- * retrievePostBody(new URL('http://example.org'), Uint8Array.of()).then((body: Uint8Array): void => {
- *   console.log(...body);
- * });  // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
+ * import { retrievePostBody } from './src/utils';
+ *
+ * retrievePostBody(
+ *   new URL('http://example.org'),
+ *   Uint8Array.of(),
+ * ).then((body: Uint8Array): void => { console.log(...body); });
+ *   // 60 33 100 111 99 116 121 112 101 32 ... 62 10 60 47 104 116 109 108 62 10
  * ```
  *
  * @example
  * ```typescript
- * retrievePostBody(new URL('something://else'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
- * retrievePostBody(new URL('http://example.com'), Uint8Array.of()).catch((e: unknown): void => {
- *   console.log(e);
- * });  // TypeError: fetch failed ...
+ * import { retrievePostBody } from './src/utils';
+ *
+ * retrievePostBody(
+ *   new URL('something://else'),
+ *   Uint8Array.of(),
+ * ).catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
+ * retrievePostBody(
+ *   new URL('http://example.com'),
+ *   Uint8Array.of(),
+ * ).catch((e: unknown): void => { console.log(e); });
+ *   // TypeError: fetch failed ...
  * ```
  *
  * @param url - The {@link !URL} to fetch.
@@ -283,7 +399,10 @@ export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint
  *
  * @example
  * ```typescript
- * console.log(textEncoder);  // { encoding: 'utf-8' }
+ * import { textEncoder } from './src/utils';
+ *
+ * console.log(textEncoder);
+ *   // { encoding: 'utf-8' }
  * ```
  */
 export const textEncoder: TextEncoder = new TextEncoder();
@@ -293,565 +412,10 @@ export const textEncoder: TextEncoder = new TextEncoder();
  *
  * @example
  * ```typescript
- * console.log(textDecoder);  // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
+ * import { textDecoder } from './src/utils';
+ *
+ * console.log(textDecoder);
+ *   // TextDecoder { encoding: 'utf-8', fatal: false, ignoreBOM: false }
  * ```
  */
 export const textDecoder: TextDecoder = new TextDecoder();
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
-/**
- * The type of the callback that will transform an element into a string (implicitly defining what "equality" between elements means) in a {@link MergeSet} or equivalent keys for {@link MergeMap}s.
- *
- * @typeParam T - The type of the {@link MergeSet} contained elements or {@link MergeMap} keys.
- * @param key - The element to transform into a string for mapping purposes.
- * @returns The string representation of the given element.
- */
-export type ToKey<T> = (key: T) => string;
-
-/**
- * The type of the callback that will be used to combine two equivalent elements within the {@link MergeSet} or equivalent values in a {@link MergeMap}.
- *
- * @typeParam T - The type of the {@link MergeSet} contained elements or {@link MergeMap} values.
- * @param left - The already existing element in the {@link MergeSet} or value in the {@link MergeMap}.
- * @param right - The element one seeks to add to the {@link MergeSet} or the value one seeks to add to the {@link MergeMap}.
- * @returns The combined element to replace the already existing element or value.
- */
-export type Combine<T> = (left: T, right: T) => T;
-
-/**
- * An iteration over the standard {@link !Set} generic class, that allows for identical elements to be identified and merged together.
- *
- * A `MergeSet` allows the user to specify _how_ two elements should be compared for equality, and _what_ to do when equal
- * elements are added to the same `MergeSet`.
- *
- * This is realized via the {@link toKey} and {@link combine} constructor parameters:
- *
- * - **{@link toKey}:** takes an elements and returns a `string` that represents it unequivocally (ie. two elements returning the same
- *   `string` will be taken to be equal themselves).
- * - **{@link combine}:** takes two elements and returns the result of _combining_ them into a single element (this is used to store a single
- *   copy of every element in the `MergeSet`)
- *
- * @example
- * ```typescript
- * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
- *
- * const toKey: ToKey<string> = (key: string): string => key;
- * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
- *
- * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
- *
- * aMergeSet.add('a').add('a').add('b').add('c').add('d');
- * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
- * aMergeSet.remove('a');
- * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
- * console.log(aMergeSet.size());    // 3
- *
- * const anotherMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
- * anotherMergeSet.add('w').add('x').add('y').add('z');
- *
- * aMergeSet.incorporate(anotherMergeSet);
- * console.log(aMergeSet.values());  // [ 'b', 'c', 'd', 'w', 'x', 'y', 'z' ]
- * console.log(aMergeSet.size());    // 7
- * ```
- *
- * @typeParam V - The type of the contained elements.
- */
-export class MergeSet<V> {
-  /**
-   * The {@link MergeSet} is implemented via a {@link !Record} that maps "keys" (derived using the {@link toKey} parameter) to actual values.
-   *
-   * This is the main storage mapping used to implement the {@link MergeSet}.
-   *
-   */
-  private readonly mapping: Record<string, V>;
-
-  /**
-   * The callback that will transform an element into a `string` (implicitly defining what "equality" between elements means).
-   *
-   */
-  private readonly toKey: ToKey<V>;
-
-  /**
-   * The callback that will be used to combine two equivalent elements within the {@link MergeSet}.
-   *
-   */
-  private readonly combine: Combine<V>;
-
-  /**
-   * The {@link MergeSet} constructor.
-   *
-   * This constructor takes as parameters the key-generation and combination callbacks to use.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   * ```
-   *
-   * @typeParam V - The type of the contained elements.
-   * @param toKey - The callback that will transform an element into a string (implicitly defining what "equality" between elements means).
-   * @param combine - The callback that will be used to combine two equivalent elements within the {@link MergeSet}.
-   */
-  constructor(toKey: ToKey<V>, combine: Combine<V>) {
-    this.mapping = {};
-    this.toKey = toKey;
-    this.combine = combine;
-  }
-
-  /**
-   * Perform the addition "heavy-lifting" within a {@link MergeSet}.
-   *
-   * @param key - The `string` key to use (previously passed through {@link toKey}).
-   * @param value - The actual value to add.
-   * @returns The {@link MergeSet} instance, for chaining.
-   */
-  private doAdd(key: string, value: V): this {
-    this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, value) : value;
-    return this;
-  }
-
-  /**
-   * Return the number of elements in the {@link MergeSet}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   *
-   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
-   * console.log(aMergeSet.size());    // 4
-   * ```
-   *
-   * @returns The number of elements in the {@link MergeSet}.
-   */
-  public size(): number {
-    return this.values().length;
-  }
-
-  /**
-   * Return a list of _values_ stored in a {@link MergeSet}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   *
-   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
-   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
-   * ```
-   *
-   * @returns The list of values in the {@link MergeSet}.
-   */
-  public values(): V[] {
-    return Object.values(this.mapping);
-  }
-
-  /**
-   * Remove the given value from the {@link MergeSet}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   *
-   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
-   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
-   *
-   * aMergeSet.remove('a');
-   * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
-   * ```
-   *
-   * @param value - The value to remove.
-   * @returns The original {@link MergeSet} with the given {@link value} removed, for chaining.
-   */
-  public remove(value: V): this {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.mapping[this.toKey(value)];
-    return this;
-  }
-
-  /**
-   * Add the given value to the {@link MergeSet}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   *
-   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
-   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd' ]
-   *
-   * aMergeSet.add('d');
-   * console.log(aMergeSet.values());  // [ 'b', 'c', 'd' ]
-   * ```
-   *
-   * @param value - The value to add to the {@link MergeSet}.
-   * @returns The original {@link MergeSet} with the given {@link value} added, for chaining.
-   */
-  public add(value: V): this {
-    return this.doAdd(this.toKey(value), value);
-  }
-
-  /**
-   * Add _all_ elements of the given {@link MergeSet} to the current one.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeSet } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<string> = (key: string): string => key;
-   * const combine: Combine<string> = (left: string, right: string): string => `${left}:${right}`;
-   *
-   * const aMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   * aMergeSet.add('a').add('a').add('b').add('c').add('d');
-   *
-   * const anotherMergeSet: MergeSet<string> = new MergeSet<string>(toKey, combine);
-   * anotherMergeSet.add('w').add('x').add('y').add('z');
-   *
-   * aMergeSet.incorporate(anotherMergeSet);
-   * console.log(aMergeSet.values());  // [ 'a:a', 'b', 'c', 'd', 'w', 'x', 'y', 'z' ]
-   * ```
-   *
-   * @param other - The {@link MergeSet} to incorporate into this one.
-   * @returns The original {@link MergeSet} with the given other {@link MergeSet} incorporated, for chaining.
-   */
-  public incorporate(other: typeof this): this {
-    Object.entries(other.mapping).forEach(([key, value]: [string, V]): void => {
-      this.doAdd(key, value);
-    });
-    return this;
-  }
-}
-
-/**
- * An iteration over the standard {@link !Map} generic class, that allows for identical keys to be identified and their associated values be merged together.
- *
- * A `MergeMap` allows the user to specify _how_ two keys should be compared for equality, and _what_ to do with the corresponding values when equal
- * keys are added to the same `MergeMap`.
- *
- * This is realized via the {@link toKey} and {@link combine} constructor parameters:
- *
- * - **{@link toKey}:** takes a key and returns a `string` that represents it unequivocally (ie. two keys returning the same
- *   `string` will be taken to be equal themselves).
- * - **{@link combine}:** takes two values and returns the result of _combining_ them into a single value (this is used to store a single
- *   copy of every key / value pair in the `MergeMap`)
- *
- * @example
- * ```typescript
- * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
- *
- * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
- * const combine: Combine<string> = (left: string, right: string): string =>
- *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
- *
- * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
- *
- * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
- * aMergeMap.add(4, 'd');
- *
- * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
- * console.log(aMergeMap.keys());     // [ 1, 2, 3, 4 ]
- * console.log(aMergeMap.values());   // [ '(a:aa)', 'b', 'c', 'd' ]
- * console.log(aMergeMap.size());     // 4
- *
- * aMergeMap.remove(4);
- *
- * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
- * console.log(aMergeMap.keys());     // [ 1, 2, 3 ]
- * console.log(aMergeMap.values());   // [ '(a:aa)', 'b', 'c' ]
- * console.log(aMergeMap.size());     // 3
- *
- * const anotherMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
- * anotherMergeMap.add(1, 'w').add(2, 'x').add(3, 'y').add(4, 'z');
- * aMergeMap.incorporate(anotherMergeMap);
- *
- * console.log(aMergeMap.entries());  // [ [ 1, '((a:aa):w)' ], [ 2, '(b:x)' ], [ 3, '(c:y)' ], [ 4, 'z' ] ]
- * console.log(aMergeMap.keys());     // [ 1, 2, 3, 4 ]
- * console.log(aMergeMap.values());   // [ '((a:aa):w)', '(b:x)', '(c:y)', 'z' ]
- * console.log(aMergeMap.size());     // 4
- * ```
- *
- * @typeParam K - The type of the contained keys.
- * @typeParam V - The type of the contained values.
- */
-export class MergeMap<K, V> {
-  /**
-   * The {@link MergeSet} is implemented via a pair of {@link !Record}s; the first one maps "keys" (derived using the {@link toKey} parameter) to actual keys.
-   *
-   * This is the main key-mapping used to implement the {@link MergeMap}.
-   *
-   */
-  private readonly keySet: Record<string, K>;
-
-  /**
-   * The {@link MergeSet} is implemented via a pair of {@link !Record}s; the second one maps "keys" (derived using the {@link toKey} parameter) to actual values.
-   *
-   * This is the main value-mapping used to implement the {@link MergeMap}.
-   *
-   */
-  private readonly mapping: Record<string, V>;
-
-  /**
-   * The callback that will transform a key into a `string` (implicitly defining what "equality" between keys means).
-   *
-   */
-  private readonly toKey: ToKey<K>;
-
-  /**
-   * The callback that will be used to combine two equivalent values within the {@link MergeMap}.
-   *
-   */
-  private readonly combine: Combine<V>;
-
-  /**
-   * The {@link MergeMap} constructor.
-   *
-   * This constructor takes as parameters the key-generation and combination callbacks to use.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   * ```
-   *
-   * @typeParam K - The type of the contained keys.
-   * @typeParam V - The type of the contained values.
-   * @param toKey - The callback that will transform a key into a string (implicitly defining what "equality" between keys means).
-   * @param combine - The callback that will be used to combine two equivalent values within the {@link MergeMap}.
-   */
-  constructor(toKey: ToKey<K>, combine: Combine<V>) {
-    this.keySet = {};
-    this.mapping = {};
-    this.toKey = toKey;
-    this.combine = combine;
-  }
-
-  /**
-   * Perform the addition "heavy-lifting" within a {@link MergeMap}.
-   *
-   * @param key - The key to use.
-   * @param value - The actual value to add.
-   * @returns The {@link MergeMap} instance, for chaining.
-   */
-  private doAdd(key: K, value: V): this {
-    const sKey: string = this.toKey(key);
-    this.keySet[sKey] = key;
-    this.mapping[sKey] = sKey in this.mapping ? this.combine(this.mapping[sKey]!, value) : value;
-    return this;
-  }
-
-  /**
-   * Return the number of elements in the {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   *
-   * console.log(aMergeMap.size());  // 3
-   * ```
-   *
-   * @returns The number of elements in the {@link MergeMap}.
-   */
-  public size(): number {
-    return this.values().length;
-  }
-
-  /**
-   * Return a list of _Keys_ stored in a {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   *
-   * console.log(aMergeMap.keys());  // [ 1, 2, 3 ]
-   * ```
-   *
-   * @returns The list of keys in the {@link MergeMap}.
-   */
-  public keys(): K[] {
-    return Object.values(this.keySet);
-  }
-
-  /**
-   * Return a list of _values_ stored in a {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   *
-   * console.log(aMergeMap.values());  // [ '(a:aa)', 'b', 'c' ]
-   * ```
-   *
-   * @returns The list of values in the {@link MergeMap}.
-   */
-  public values(): V[] {
-    return Object.values(this.mapping);
-  }
-
-  /**
-   * Return a list of _entries_ (ie. key / value pairs) stored in a {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   *
-   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
-   * ```
-   *
-   * @returns The list of entries in the {@link MergeMap}.
-   */
-  public entries(): [K, V][] {
-    return this.keys().map((key: K): [K, V] => [key, this.mapping[this.toKey(key)]!]);
-  }
-
-  /**
-   * Remove the given key from the {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c').add(4, 'd');
-   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
-   *
-   * aMergeMap.remove(4);
-   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
-   * ```
-   *
-   * @param key - The key to remove.
-   * @returns The original {@link MergeMap} with the given {@link key} removed, for chaining.
-   */
-  public remove(key: K): this {
-    const sKey: string = this.toKey(key);
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.mapping[sKey];
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.keySet[sKey];
-    return this;
-  }
-
-  /**
-   * Add the given key / value pair to the {@link MergeMap}.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   *
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ] ]
-   *
-   * aMergeMap.add(4, 'd');
-   * console.log(aMergeMap.entries());  // [ [ 1, '(a:aa)' ], [ 2, 'b' ], [ 3, 'c' ], [ 4, 'd' ] ]
-   * ```
-   *
-   * @param key - The key to add to the {@link MergeMap}.
-   * @param value - The value to add to the {@link MergeMap}.
-   * @returns The original {@link MergeMap} with the given {@link key} / {@link value} pair added, for chaining.
-   */
-  public add(key: K, value: V): this {
-    return this.doAdd(key, value);
-  }
-
-  /**
-   * Add _all_ key / value pairs of the given {@link MergeMap} to the current one.
-   *
-   * @example
-   * ```typescript
-   * import { Merge, MergeMap } from '@lacrypta/typescript-opentimestamps';
-   *
-   * const toKey: ToKey<number> = (key: number): string => (key % 10).toString();
-   * const combine: Combine<string> = (left: string, right: string): string =>
-   *   left < right ? `(${left}:${right})` : `(${right}:${left})`;
-   *
-   * const aMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   * aMergeMap.add(1, 'a').add(1, 'aa').add(2, 'b').add(3, 'c');
-   *
-   * const anotherMergeMap: MergeMap<number, string> = new MergeMap<number, string>(toKey, combine);
-   * anotherMergeMap.add(1, 'w').add(2, 'x').add(3, 'y').add(4, 'z');
-   *
-   * aMergeMap.incorporate(anotherMergeMap);
-   * console.log(aMergeMap.entries());  // [ [ 1, '((a:aa):w)' ], [ 2, '(b:x)' ], [ 3, '(c:y)' ], [ 4, 'z' ] ]
-   * ```
-   *
-   * @param other - The {@link MergeMap} to incorporate into this one.
-   * @returns The original {@link MergeMap} with the given other {@link MergeMap} incorporated, for chaining.
-   */
-  public incorporate(other: typeof this): this {
-    other.entries().forEach(([key, value]: [K, V]): void => {
-      this.doAdd(key, value);
-    });
-    return this;
-  }
-}

@@ -14,16 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
-import type { Timestamp, Verifier } from './types';
 import type { Path } from './internals';
+import type { Timestamp, Verifier } from './types';
 
-import { treeToPaths, callOps } from './internals';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
+import { callOps, treeToPaths } from './internals';
 
 export async function verify(
   timestamp: Timestamp,

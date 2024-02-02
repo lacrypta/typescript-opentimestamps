@@ -14,14 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import { sha256 } from '@noble/hashes/sha256';
 import { randomBytes } from '@noble/hashes/utils';
 
 import type { FileHash, Timestamp, Tree } from './types';
 
-import { incorporateTreeToTree, newEdges, newLeaves, newTree, normalize } from './internals';
+import { incorporateTreeToTree, newTree, normalize, EdgeMap, LeafSet } from './internals';
 import { readTree } from './read';
 import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
@@ -33,15 +31,12 @@ export const defaultCalendarUrls: URL[] = [
   new URL('https://btc.calendar.catallaxy.com'),
 ];
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
 export async function submit(
   algorithm: string,
   value: Uint8Array,
   fudge?: Uint8Array,
   calendarUrls?: URL[],
+  normalizeResult: boolean = false,
 ): Promise<{ timestamp: Timestamp | undefined; errors: Error[] }> {
   const fileHash: FileHash = validateFileHashValue(algorithm, value);
   calendarUrls ??= defaultCalendarUrls;
@@ -77,21 +72,22 @@ export async function submit(
   );
 
   const resultTree: Tree = {
-    leaves: newLeaves(),
-    edges: newEdges().add({ type: 'sha256' }, stampedTree),
+    leaves: new LeafSet(),
+    edges: new EdgeMap().add({ type: 'sha256' }, stampedTree),
   };
 
   const fudgedTree: Tree =
     0 === fudge.length
       ? resultTree
-      : { leaves: newLeaves(), edges: newEdges().add({ type: 'append', operand: fudge }, resultTree) };
+      : { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'append', operand: fudge }, resultTree) };
 
+  const result: Timestamp = {
+    version: 1,
+    fileHash,
+    tree: fudgedTree,
+  };
   return {
-    timestamp: normalize({
-      version: 1,
-      fileHash,
-      tree: fudgedTree,
-    }),
+    timestamp: normalizeResult ? normalize(result) : result,
     errors: stampingErrors,
   };
 }

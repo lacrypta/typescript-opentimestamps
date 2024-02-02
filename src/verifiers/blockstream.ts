@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import type { Leaf, Verifier } from '../types';
 
 import {
@@ -26,10 +24,6 @@ import {
   uint8ArrayReversed,
   uint8ArrayToHex,
 } from '../utils';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
 
 export default (async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {

@@ -14,12 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
+import type { Edge, EdgeMap, LeafSet } from '../src/internals';
 import type { Leaf, Op, Timestamp, Tree } from '../src/types';
-import type { Edge } from '../src/internals';
 
-import { MergeMap, MergeSet, uint8ArrayToHex } from '../src/utils';
+import { uint8ArrayToHex } from '../src/utils';
 
 export function opToString(op: Op): string {
   switch (op.type) {
@@ -55,12 +53,12 @@ export function leafOrEdgeToString(leafOrEdge: Leaf | Edge): string {
   }
 }
 
-export function mergeSetToString(ms: MergeSet<Leaf>): string {
-  return ms.values().map(leafToString).join(',');
+export function leafSetToString(leafSet: LeafSet): string {
+  return leafSet.values().map(leafToString).join(',');
 }
 
-export function mergeMapToString(mm: MergeMap<Op, Tree>): string {
-  return mm
+export function edgeMapToString(edgeMap: EdgeMap): string {
+  return edgeMap
     .entries()
     .map(([op, subTree]: [Op, Tree]): string => {
       return `${opToString(op)}=>{${treeToString(subTree)}}`;
@@ -69,7 +67,7 @@ export function mergeMapToString(mm: MergeMap<Op, Tree>): string {
 }
 
 export function treeToString(tree: Tree): string {
-  return `[${mergeSetToString(tree.leaves)}](${mergeMapToString(tree.edges)})`;
+  return `[${leafSetToString(tree.leaves as LeafSet)}](${edgeMapToString(tree.edges as EdgeMap)})`;
 }
 
 export function timestampToString(timestamp: Timestamp): string {

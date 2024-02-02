@@ -14,12 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
-import type { Timestamp, Tree } from './types';
 import type { Path, Paths } from './internals';
+import type { Timestamp, Tree } from './types';
 
-import { callOps, normalize, pathsToTree, treeToPaths } from './internals';
+import { callOps, normalize, treeToPaths, pathsToTree } from './internals';
 import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
@@ -76,18 +74,18 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
   return [pathsToTree(paths), errors];
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
-export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
+export async function upgrade(
+  timestamp: Timestamp,
+  normalizeResult: boolean = false,
+): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
+  const result: Timestamp = {
+    version: timestamp.version,
+    fileHash: timestamp.fileHash,
+    tree,
+  };
   return {
-    timestamp: normalize({
-      version: timestamp.version,
-      fileHash: timestamp.fileHash,
-      tree,
-    })!,
+    timestamp: normalizeResult ? normalize(result)! : result,
     errors,
   };
 }

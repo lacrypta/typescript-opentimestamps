@@ -14,15 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
+import type { Timestamp } from '../../src/types';
 
-import type { Timestamp } from '../src/types';
+import { newTree, EdgeMap, LeafSet } from '../../src/internals';
+import { defaultCalendarUrls, submit } from '../../src/submit';
+import { uint8ArrayFromHex } from '../../src/utils';
 
-import { newEdges, newLeaves } from '../src/internals';
-import { defaultCalendarUrls, submit } from '../src/submit';
-import { uint8ArrayFromHex } from '../src/utils';
-
-import { timestampToString } from './helpers';
+import { timestampToString } from '../helpers';
 
 describe('Submit', (): void => {
   describe('defaultCalendarUrls', (): void => {
@@ -93,11 +91,11 @@ describe('Submit', (): void => {
               value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             },
             tree: {
-              edges: newEdges().add(
+              edges: new EdgeMap().add(
                 { type: 'sha256' },
-                { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+                { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
               ),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           } as Timestamp,
           errors: [],
@@ -133,9 +131,13 @@ describe('Submit', (): void => {
           });
 
         void expect(
-          submit('sha1', uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'), Uint8Array.of(), [
-            new URL('https://www.example.com'),
-          ]).then(
+          submit(
+            'sha1',
+            uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+            Uint8Array.of(),
+            [new URL('https://www.example.com')],
+            true,
+          ).then(
             ({
               timestamp,
               errors,
@@ -196,17 +198,17 @@ describe('Submit', (): void => {
               value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             },
             tree: {
-              edges: newEdges().add(
+              edges: new EdgeMap().add(
                 { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
                 {
-                  leaves: newLeaves(),
-                  edges: newEdges().add(
+                  leaves: new LeafSet(),
+                  edges: new EdgeMap().add(
                     { type: 'sha256' },
-                    { edges: newEdges(), leaves: newLeaves().add({ type: 'bitcoin', height: 123 }) },
+                    { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
                   ),
                 },
               ),
-              leaves: newLeaves(),
+              leaves: new LeafSet(),
             },
           } as Timestamp,
           errors: [],
@@ -247,6 +249,7 @@ describe('Submit', (): void => {
             uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
             Uint8Array.of(1, 2, 3, 4, 5, 6),
             [new URL('https://www.example.com')],
+            true,
           ).then(
             ({
               timestamp,
@@ -264,6 +267,130 @@ describe('Submit', (): void => {
           ),
         ).resolves.toStrictEqual({
           timestamp: undefined === expected.timestamp ? undefined : timestampToString(expected.timestamp),
+          errors: expected.errors,
+        });
+      },
+    );
+
+    const theTimestamp: Timestamp = {
+      version: 1,
+      fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+      tree: {
+        leaves: new LeafSet(),
+        edges: new EdgeMap().add(
+          { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
+          { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha256' }, newTree()) },
+        ),
+      },
+    };
+
+    it.each([
+      {
+        responseBody: null,
+        responseError: 'something',
+        expected: {
+          timestamp: theTimestamp,
+          errors: [new Error('Error (https://www.example.com/): Unknown fetch() error')],
+        },
+        name: 'should accumulate unknown fetch errors (non-normalizing)',
+      },
+      {
+        responseBody: null,
+        responseError: new Error('something'),
+        expected: {
+          timestamp: theTimestamp,
+          errors: [new Error('Error (https://www.example.com/): something')],
+        },
+        name: 'should accumulate fetch errors (non-normalizing)',
+      },
+      {
+        responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123, 456),
+        responseError: null,
+        expected: {
+          timestamp: theTimestamp,
+          errors: [new Error('Error (https://www.example.com/): Garbage at end of calendar response')],
+        },
+        name: 'should accumulate body errors (non-normalizing)',
+      },
+      {
+        responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
+        responseError: null,
+        expected: {
+          timestamp: {
+            version: 1,
+            fileHash: {
+              algorithm: 'sha1',
+              value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+            },
+            tree: {
+              edges: new EdgeMap().add(
+                { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
+                {
+                  leaves: new LeafSet(),
+                  edges: new EdgeMap().add(
+                    { type: 'sha256' },
+                    { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+                  ),
+                },
+              ),
+              leaves: new LeafSet(),
+            },
+          } as Timestamp,
+          errors: [],
+        },
+        name: 'should return merged timestamp (non-normalizing)',
+      },
+    ])(
+      '$name',
+      ({
+        responseBody,
+        responseError,
+        expected,
+      }:
+        | {
+            responseBody: Uint8Array;
+            responseError: null;
+            expected: { timestamp: Timestamp; errors: Error[] };
+          }
+        | {
+            responseBody: null;
+            responseError: Error | string;
+            expected: { timestamp: Timestamp; errors: Error[] };
+          }): void => {
+        jest
+          .spyOn(globalThis, 'fetch')
+          .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
+            if (null === responseError) {
+              return Promise.resolve(new Response(responseBody, { status: 200 }));
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-throw-literal
+              throw responseError;
+            }
+          });
+
+        void expect(
+          submit(
+            'sha1',
+            uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+            Uint8Array.of(1, 2, 3, 4, 5, 6),
+            [new URL('https://www.example.com')],
+          ).then(
+            ({
+              timestamp,
+              errors,
+            }: {
+              timestamp: Timestamp | undefined;
+              errors: Error[];
+            }): { timestamp: string | undefined; errors: Error[] } => {
+              return { timestamp: undefined === timestamp ? undefined : timestampToString(timestamp), errors };
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (_reason: any): void => {
+              throw new Error('unexpected');
+            },
+          ),
+        ).resolves.toStrictEqual({
+          timestamp: timestampToString(expected.timestamp),
           errors: expected.errors,
         });
       },

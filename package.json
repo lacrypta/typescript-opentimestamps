@@ -54,11 +54,12 @@
     "doc:api": "typedoc --options ./etc/typedoc.api.json",
     "doc:internal": "typedoc --options ./etc/typedoc.internal.json",
     "clean": "rm -rf dist",
-    "test": "jest --runInBand --config=./etc/jest.config.js",
+    "test": "jest --runInBand --config=./etc/jest.unit.config.js",
+    "test:regression": "jest --runInBand --config=./etc/jest.regression.config.js",
     "reset": "pnpm clean && rm -rf node_modules && rm -f pnpm-lock.yaml"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.11",
+    "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "esbuild": "^0.20.0",
@@ -67,7 +68,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
-    "husky": "^9.0.7",
+    "husky": "^9.0.10",
     "jest": "^29.7.0",
     "markdownlint-cli": "^0.39.0",
     "prettier": "^3.2.4",

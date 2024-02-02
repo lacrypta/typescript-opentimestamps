@@ -21,24 +21,28 @@
  * @module
  */
 
-'use strict';
-
 import type { FileHash, Leaf, Op, Timestamp, Tree } from './types';
 
-import { MergeMap, MergeSet } from './utils';
+import { EdgeMap, LeafSet } from './internals';
 
 /**
  * Validate that the given datum is a non-`null` object.
  *
  * @example
  * ```typescript
+ * import { validateNonNullObject } from './src/validation';
+ *
  * console.log(validateNonNullObject({}));  // {}
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateNonNullObject(123));   // Error: Expected non-null object
- * console.log(validateNonNullObject(null));  // Error: Expected non-null object
+ * import { validateNonNullObject } from './src/validation';
+ *
+ * console.log(validateNonNullObject(123));
+ *   // Error: Expected non-null object
+ * console.log(validateNonNullObject(null));
+ *   // Error: Expected non-null object
  * ```
  *
  * @param obj - Data to validate.
@@ -59,12 +63,18 @@ export function validateNonNullObject(obj: unknown): object {
  *
  * @example
  * ```typescript
- * console.log(validateUint8Array(Uint8Array.of(1, 2, 3)));  // Uint8Array(3) [ 1, 2, 3 ]
+ * import { validateUint8Array } from './src/validation';
+ *
+ * console.log(validateUint8Array(Uint8Array.of(1, 2, 3)));
+ *   // Uint8Array(3) [ 1, 2, 3 ]
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateUint8Array({}));  // Error: Expected Uint8Array
+ * import { validateUint8Array } from './src/validation';
+ *
+ * console.log(validateUint8Array({}));
+ *   // Error: Expected Uint8Array
  * ```
  *
  * @param array - Data to validate.
@@ -86,12 +96,18 @@ export function validateUint8Array(array: unknown): Uint8Array {
  *
  * @example
  * ```typescript
- * console.log(validateURL(new URL('http://example.com')));  // URL { ... }
+ * import { validateURL } from './src/validation';
+ *
+ * console.log(validateURL(new URL('http://example.com')));
+ *   // URL { ... }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateURL({}));  // Error: Expected URL
+ * import { validateURL } from './src/validation';
+ *
+ * console.log(validateURL({}));
+ *   // Error: Expected URL
  * ```
  *
  * @param url - Data to validate.
@@ -120,14 +136,22 @@ export function validateURL(url: unknown): URL {
  *
  * @example
  * ```typescript
- * console.log(validateCalendarUrl('https://www.example.com/something'));  // https://www.example.com/something
+ * import { validateCalendarUrl } from './src/validation';
+ *
+ * console.log(validateCalendarUrl('https://www.example.com/something'));
+ *   // https://www.example.com/something
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateCalendarUrl(123));                                   // Error: Expected string
- * console.log(validateCalendarUrl('http://www.example.com'));              // Error: Invalid URL
- * console.log(validateCalendarUrl('https://www.example.com?some=thing'));  // Error: Invalid URL
+ * import { validateCalendarUrl } from './src/validation';
+ *
+ * console.log(validateCalendarUrl(123));
+ *   // Error: Expected string
+ * console.log(validateCalendarUrl('http://www.example.com'));
+ *   // Error: Invalid URL
+ * console.log(validateCalendarUrl('https://www.example.com?some=thing'));
+ *   // Error: Invalid URL
  * ```
  *
  * @param url - Data to validate.
@@ -150,15 +174,23 @@ export function validateCalendarUrl(url: unknown): string {
  *
  * @example
  * ```typescript
+ * import { validateNonNegativeInteger } from './src/validation';
+ *
  * console.log(validateNonNegativeInteger(1234));  // 1234
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateNonNegativeInteger('something'));  // Error: Expected number
- * console.log(validateNonNegativeInteger(12.34));        // Error: Expected safe-integer
- * console.log(validateNonNegativeInteger(NaN));          // Error: Expected safe-integer
- * console.log(validateNonNegativeInteger(-1234));        // Error: Expected non-negative integer
+ * import { validateNonNegativeInteger } from './src/validation';
+ *
+ * console.log(validateNonNegativeInteger('something'));
+ *   // Error: Expected number
+ * console.log(validateNonNegativeInteger(12.34));
+ *   // Error: Expected safe-integer
+ * console.log(validateNonNegativeInteger(NaN));
+ *   // Error: Expected safe-integer
+ * console.log(validateNonNegativeInteger(-1234));
+ *   // Error: Expected non-negative integer
  * ```
  *
  * @param num - Data to validate.
@@ -185,12 +217,18 @@ export function validateNonNegativeInteger(num: unknown): number {
  *
  * @example
  * ```typescript
- * console.log(validateOneOfStrings('something', ['something', 'else', 'entirely']));  // something
+ * import { validateOneOfStrings } from './src/validation';
+ *
+ * console.log(validateOneOfStrings('something', ['something', 'else', 'entirely']));
+ *   // something
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateOneOfStrings('something', ['else', 'entirely']));  // Error: Expected one of [else, entirely]
+ * import { validateOneOfStrings } from './src/validation';
+ *
+ * console.log(validateOneOfStrings('something', ['else', 'entirely']));
+ *   // Error: Expected one of [else, entirely]
  * ```
  *
  * @param value - `string` to validate.
@@ -210,13 +248,20 @@ export function validateOneOfStrings(value: string, options: string[]): string {
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasTypeKey({ type: 'something' }));  // { type: 'something' }
+ * import { validateObjectHasTypeKey } from './src/validation';
+ *
+ * console.log(validateObjectHasTypeKey({ type: 'something' }));
+ *   // { type: 'something' }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasTypeKey({}));             // Error: Expected key .type
- * console.log(validateObjectHasTypeKey({ type: 123 }));  // Error: Expected string
+ * import { validateObjectHasTypeKey } from './src/validation';
+ *
+ * console.log(validateObjectHasTypeKey({}));
+ *   // Error: Expected key .type
+ * console.log(validateObjectHasTypeKey({ type: 123 }));
+ *   // Error: Expected string
  * ```
  *
  * @param obj - `object` to validate.
@@ -241,12 +286,18 @@ export function validateObjectHasTypeKey(obj: object): { type: string } {
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasHeightKey({ height: 123 }));  // { height: 123 }
+ * import { validateObjectHasHeightKey } from './src/validation';
+ *
+ * console.log(validateObjectHasHeightKey({ height: 123 }));
+ *   // { height: 123 }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasHeightKey({}));  // Error: Expected key .height
+ * import { validateObjectHasHeightKey } from './src/validation';
+ *
+ * console.log(validateObjectHasHeightKey({}));
+ *   // Error: Expected key .height
  * ```
  *
  * @param obj - `object` to validate.
@@ -268,12 +319,18 @@ export function validateObjectHasHeightKey(obj: object): { height: number } {
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasUrlKey({ url: new URL('https://www.example.com') }));  // { url: URL { ... } }
+ * import { validateObjectHasUrlKey } from './src/validation';
+ *
+ * console.log(validateObjectHasUrlKey({ url: new URL('https://www.example.com') }));
+ *   // { url: URL { ... } }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasUrlKey({}));  // Error: Expected key .url
+ * import { validateObjectHasUrlKey } from './src/validation';
+ *
+ * console.log(validateObjectHasUrlKey({}));
+ *   // Error: Expected key .url
  * ```
  *
  * @param obj - `object` to validate.
@@ -295,13 +352,20 @@ export function validateObjectHasUrlKey(obj: object): { url: URL } {
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasHeaderKey({ header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8) }));  // { header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ] }
+ * import { validateObjectHasHeaderKey } from './src/validation';
+ *
+ * console.log(validateObjectHasHeaderKey({ header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8) }));
+ *   // { header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasHeaderKey({}));                                     // Error: Expected key .header
- * console.log(validateObjectHasHeaderKey({ header: Uint8Array.of(1, 2, 3, 4) }));  // Error: Expected 8 byte header
+ * import { validateObjectHasHeaderKey } from './src/validation';
+ *
+ * console.log(validateObjectHasHeaderKey({}));
+ *   // Error: Expected key .header
+ * console.log(validateObjectHasHeaderKey({ header: Uint8Array.of(1, 2, 3, 4) }));
+ *   // Error: Expected 8 byte header
  * ```
  *
  * @param obj - `object` to validate.
@@ -327,12 +391,18 @@ export function validateObjectHasHeaderKey(obj: object): { header: Uint8Array } 
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasPayloadKey({ payload: Uint8Array.of() }));  // { payload: Uint8Array(0) [] }
+ * import { validateObjectHasPayloadKey } from './src/validation';
+ *
+ * console.log(validateObjectHasPayloadKey({ payload: Uint8Array.of() }));
+ *   // { payload: Uint8Array(0) [] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasPayloadKey({}));  // Error: Expected key .payload
+ * import { validateObjectHasPayloadKey } from './src/validation';
+ *
+ * console.log(validateObjectHasPayloadKey({}));
+ *   // Error: Expected key .payload
  * ```
  *
  * @param obj - `object` to validate.
@@ -354,12 +424,18 @@ export function validateObjectHasPayloadKey(obj: object): { payload: Uint8Array 
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasOperandKey({ operand: Uint8Array.of() }));  // { operand: Uint8Array(0) [] }
+ * import { validateObjectHasOperandKey } from './src/validation';
+ *
+ * console.log(validateObjectHasOperandKey({ operand: Uint8Array.of() }));
+ *   // { operand: Uint8Array(0) [] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasOperandKey({}));  // Error: Expected key .operand
+ * import { validateObjectHasOperandKey } from './src/validation';
+ *
+ * console.log(validateObjectHasOperandKey({}));
+ *   // Error: Expected key .operand
  * ```
  *
  * @param obj - `object` to validate.
@@ -383,36 +459,39 @@ export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array 
  *
  * @example
  * ```typescript
- * import { Leaf, MergeSet } from '@lacrypta/typescript-opentimestamps';
+ * import { LeafSet } from './src/internals';
+ * import { validateObjectHasLeavesKey } from './src/validation';
  *
- * console.log(validateObjectHasLeavesKey({ leaves: new MergeSet<Leaf>(
- *   (_key: Leaf): string => '',
- *   (left: Leaf, _right: Leaf): Leaf => left
- * ) }));  // { leaves: MergeSet { ... } }
+ * console.log(validateObjectHasLeavesKey({ leaves: new LeafSet() }));
+ *   // { leaves: LeafSet { ... } }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasLeavesKey({}));               // Error: Expected key .leaves
- * console.log(validateObjectHasLeavesKey({ leaves: 123 }));  // Error: Expected MergeSet
+ * import { validateObjectHasLeavesKey } from './src/validation';
+ *
+ * console.log(validateObjectHasLeavesKey({}));
+ *   // Error: Expected key .leaves
+ * console.log(validateObjectHasLeavesKey({ leaves: 123 }));
+ *   // Error: Expected LeafSet
  * ```
  *
  * @param obj - `object` to validate.
  * @returns The validated `object`.
  * @throws {@link !Error} If the given `object` has no `.leaves` key.
- * @throws {@link !Error} If `obj.leaves` is not a {@link MergeSet}.
+ * @throws {@link !Error} If `obj.leaves` is not a {@link LeafSet}.
  */
-export function validateObjectHasLeavesKey(obj: object): { leaves: MergeSet<Leaf> } {
+export function validateObjectHasLeavesKey(obj: object): { leaves: LeafSet } {
   if (!('leaves' in obj)) {
     throw new Error('Expected key .leaves');
   }
   const leaves: object = validateNonNullObject(obj.leaves);
-  if (leaves.constructor !== MergeSet) {
-    throw new Error('Expected MergeSet');
+  if (leaves.constructor !== LeafSet) {
+    throw new Error('Expected LeafSet');
   }
-  (leaves as MergeSet<unknown>).values().forEach(validateLeaf);
+  (leaves as LeafSet).values().forEach(validateLeaf);
 
-  return obj as { leaves: MergeSet<Leaf> };
+  return obj as { leaves: LeafSet };
 }
 
 /**
@@ -426,37 +505,40 @@ export function validateObjectHasLeavesKey(obj: object): { leaves: MergeSet<Leaf
  *
  * @example
  * ```typescript
- * import { MergeMap, Op, Tree } from '@lacrypta/typescript-opentimestamps';
+ * import { EdgeMap } from './src/internals';
+ * import { validateObjectHasEdgesKey } from './src/validation';
  *
- * console.log(validateObjectHasEdgesKey({ edges: new MergeMap<Op, Tree>(
- *   (_key: Op): string => '',
- *   (left: Tree, _right: Tree): Tree => left
- * ) }));  // { edges: MergeMap { ... } }
+ * console.log(validateObjectHasEdgesKey({ edges: new EdgeMap() }));
+ *   // { edges: EdgeMap { ... } }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasEdgesKey({}));              // Error: Expected key .edges
- * console.log(validateObjectHasEdgesKey({ edges: 123 }));  // Error: Expected MergeMap
+ * import { validateObjectHasEdgesKey } from './src/validation';
+ *
+ * console.log(validateObjectHasEdgesKey({}));
+ *   // Error: Expected key .edges
+ * console.log(validateObjectHasEdgesKey({ edges: 123 }));
+ *   // Error: Expected EdgeMap
  * ```
  *
  * @param obj - `object` to validate.
  * @returns The validated `object`.
  * @throws {@link !Error} If the given `object` has no `.edges` key.
- * @throws {@link !Error} If `obj.edges` is not a {@link MergeMap}.
+ * @throws {@link !Error} If `obj.edges` is not an {@link EdgeMap}.
  */
-export function validateObjectHasEdgesKey(obj: object): { edges: MergeMap<Op, Tree> } {
+export function validateObjectHasEdgesKey(obj: object): { edges: EdgeMap } {
   if (!('edges' in obj)) {
     throw new Error('Expected key .edges');
   }
   const edges: object = validateNonNullObject(obj.edges);
-  if (edges.constructor !== MergeMap) {
-    throw new Error('Expected MergeMap');
+  if (edges.constructor !== EdgeMap) {
+    throw new Error('Expected EdgeMap');
   }
-  (edges as MergeMap<unknown, unknown>).keys().forEach(validateOp);
-  (edges as MergeMap<unknown, unknown>).values().forEach(validateTree);
+  (edges as EdgeMap).keys().forEach(validateOp);
+  (edges as EdgeMap).values().forEach(validateTree);
 
-  return obj as { edges: MergeMap<Op, Tree> };
+  return obj as { edges: EdgeMap };
 }
 
 /**
@@ -466,13 +548,20 @@ export function validateObjectHasEdgesKey(obj: object): { edges: MergeMap<Op, Tr
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasAlgorithmKey({ algorithm: 'sha1' }));  // { algorithm: 'sha1' }
+ * import { validateObjectHasAlgorithmKey } from './src/validation';
+ *
+ * console.log(validateObjectHasAlgorithmKey({ algorithm: 'sha1' }));
+ *   // { algorithm: 'sha1' }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasAlgorithmKey({}));                  // Error: Expected key .algorithm
- * console.log(validateObjectHasAlgorithmKey({ algorithm: 123 }));  // Error: Expected string
+ * import { validateObjectHasAlgorithmKey } from './src/validation';
+ *
+ * console.log(validateObjectHasAlgorithmKey({}));
+ *   // Error: Expected key .algorithm
+ * console.log(validateObjectHasAlgorithmKey({ algorithm: 123 }));
+ *   // Error: Expected string
  * ```
  *
  * @param obj - `object` to validate.
@@ -499,12 +588,18 @@ export function validateObjectHasAlgorithmKey(obj: object): { algorithm: string 
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasValueKey({ value: Uint8Array.of() }));  // { value: Uint8Array(0) [] }
+ * import { validateObjectHasValueKey } from './src/validation';
+ *
+ * console.log(validateObjectHasValueKey({ value: Uint8Array.of() }));
+ *   // { value: Uint8Array(0) [] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateObjectHasValueKey({}));  // Error: Expected key .value
+ * import { validateObjectHasValueKey } from './src/validation';
+ *
+ * console.log(validateObjectHasValueKey({}));
+ *   // Error: Expected key .value
  * ```
  *
  * @param obj - `object` to validate.
@@ -539,38 +634,62 @@ export function validateObjectHasValueKey(obj: object): { value: Uint8Array } {
  *
  * @example
  * ```typescript
- * console.log(validateLeaf({ type: 'bitcoin', height: 123 }));  // { type: 'bitcoin', height: 123 }
- * console.log(validateLeaf({ type: 'litecoin', height: 123 })); // { type: 'litecoin', height: 123 }
- * console.log(validateLeaf({ type: 'ethereum', height: 123 })); // { type: 'ethereum', height: 123 }
- * console.log(validateLeaf({
- *   type: 'pending',
- *   url: new URL('https://www.example.com'),
- * }));                                                          // { type: 'pending', url: URL { ... } }
- * console.log(validateLeaf({
- *   type: 'unknown',
- *   header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
- *   payload: Uint8Array.of(),
- * }));                                                          // {
- *                                                               //   type: 'unknown',
- *                                                               //   header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ],
- *                                                               //   payload: Uint8Array(0) [],
- *                                                               // }
+ * import { validateLeaf } from './src/validation';
+ *
+ * console.log(validateLeaf({ type: 'bitcoin', height: 123 }));
+ *   // { type: 'bitcoin', height: 123 }
+ * console.log(validateLeaf({ type: 'litecoin', height: 123 }));
+ *   // { type: 'litecoin', height: 123 }
+ * console.log(validateLeaf({ type: 'ethereum', height: 123 }));
+ *   // { type: 'ethereum', height: 123 }
+ * console.log(validateLeaf(
+ *   {
+ *     type: 'pending',
+ *     url: new URL('https://www.example.com'),
+ *   },
+ * ));
+ *   // { type: 'pending', url: URL { ... } }
+ * console.log(validateLeaf(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *     payload: Uint8Array.of(),
+ *   },
+ * ));
+ *   // {
+ *   //   type: 'unknown',
+ *   //   header: Uint8Array(8) [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+ *   //   payload: Uint8Array(0) [],
+ *   // }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateLeaf(123));                    // Error: Expected non-null object
- * console.log(validateLeaf({}));                     // Error: Expected key .type
- * console.log(validateLeaf({ type: 'something' }));  // Error: Expected one of [bitcoin, litecoin, ethereum, pending, unknown]
- * console.log(validateLeaf({ type: 'bitcoin' }));    // Error: Expected key .height
- * console.log(validateLeaf({ type: 'litecoin' }));   // Error: Expected key .height
- * console.log(validateLeaf({ type: 'ethereum' }));   // Error: Expected key .height
- * console.log(validateLeaf({ type: 'pending' }));    // Error: Expected key .url
- * console.log(validateLeaf({ type: 'unknown' }));    // Error: Expected key .header
- * console.log(validateLeaf({
- *   type: 'unknown',
- *   header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
- * }));                                               // Error: Expected key .payload
+ * import { validateLeaf } from './src/validation';
+ *
+ * console.log(validateLeaf(123));
+ *   // Error: Expected non-null object
+ * console.log(validateLeaf({}));
+ *   // Error: Expected key .type
+ * console.log(validateLeaf({ type: 'something' }));
+ *   // Error: Expected one of [bitcoin, litecoin, ethereum, pending, unknown]
+ * console.log(validateLeaf({ type: 'bitcoin' }));
+ *   // Error: Expected key .height
+ * console.log(validateLeaf({ type: 'litecoin' }));
+ *   // Error: Expected key .height
+ * console.log(validateLeaf({ type: 'ethereum' }));
+ *   // Error: Expected key .height
+ * console.log(validateLeaf({ type: 'pending' }));
+ *   // Error: Expected key .url
+ * console.log(validateLeaf({ type: 'unknown' }));
+ *   // Error: Expected key .header
+ * console.log(validateLeaf(
+ *   {
+ *     type: 'unknown',
+ *     header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *   },
+ * ));
+ *   // Error: Expected key .payload
  * ```
  *
  * @param leaf - Data to validate.
@@ -615,23 +734,40 @@ export function validateLeaf(leaf: unknown): Leaf {
  *
  * @example
  * ```typescript
- * console.log(validateOp({ type: 'sha1' }));                               // { type: 'sha1' }
- * console.log(validateOp({ type: 'ripemd160' }));                          // { type: 'ripemd160' }
- * console.log(validateOp({ type: 'sha256' }));                             // { type: 'sha256' }
- * console.log(validateOp({ type: 'keccak256' }));                          // { type: 'keccak256' }
- * console.log(validateOp({ type: 'reverse' }));                            // { type: 'reverse' }
- * console.log(validateOp({ type: 'hexlify' }));                            // { type: 'hexlify' }
- * console.log(validateOp({ type: 'append', operand: Uint8Array.of() }));   // { type: 'append', operand: Uint8Array(0) [] }
- * console.log(validateOp({ type: 'prepend', operand: Uint8Array.of() }));  // { type: 'prepend', operand: Uint8Array(0) [] }
+ * import { validateOp } from './src/validation';
+ *
+ * console.log(validateOp({ type: 'sha1' }));
+ *   // { type: 'sha1' }
+ * console.log(validateOp({ type: 'ripemd160' }));
+ *   // { type: 'ripemd160' }
+ * console.log(validateOp({ type: 'sha256' }));
+ *   // { type: 'sha256' }
+ * console.log(validateOp({ type: 'keccak256' }));
+ *   // { type: 'keccak256' }
+ * console.log(validateOp({ type: 'reverse' }));
+ *   // { type: 'reverse' }
+ * console.log(validateOp({ type: 'hexlify' }));
+ *   // { type: 'hexlify' }
+ * console.log(validateOp({ type: 'append', operand: Uint8Array.of() }));
+ *   // { type: 'append', operand: Uint8Array(0) [] }
+ * console.log(validateOp({ type: 'prepend', operand: Uint8Array.of() }));
+ *   // { type: 'prepend', operand: Uint8Array(0) [] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateOp(123));                    // Error: Expected non-null object
- * console.log(validateOp({}));                     // Error: Expected key .type
- * console.log(validateOp({ type: 'something' }));  // Error: Expected one of [sha1, ripemd160, sha256, keccak256, reverse, hexlify, append, prepend]
- * console.log(validateOp({ type: 'append' }));     // Error: Expected key .operand
- * console.log(validateOp({ type: 'prepend' }));    // Error: Expected key .operand
+ * import { validateOp } from './src/validation';
+ *
+ * console.log(validateOp(123));
+ *   // Error: Expected non-null object
+ * console.log(validateOp({}));
+ *   // Error: Expected key .type
+ * console.log(validateOp({ type: 'something' }));
+ *   // Error: Expected one of [sha1, ripemd160, sha256, keccak256, reverse, hexlify, append, prepend]
+ * console.log(validateOp({ type: 'append' }));
+ *   // Error: Expected key .operand
+ * console.log(validateOp({ type: 'prepend' }));
+ *   // Error: Expected key .operand
  * ```
  *
  * @param op - Data to validate.
@@ -687,32 +823,27 @@ export function validateOp(op: unknown): Op {
  *
  * @example
  * ```typescript
- * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree } from './src/internals';
+ * import { validateTree } from './src/validation';
  *
- * console.log(validateTree({
- *   leaves: new MergeSet<Leaf>(
- *     (_key: Leaf): string => '',
- *     (left: Leaf, _right: Leaf): Leaf => left
- *   ),
- *   edges: new MergeMap<Op, Tree>(
- *     (_key: Op): string => '',
- *     (left: Tree, _right: Tree): Tree => left
- *   ),
- * }));  // { leaves: MergeSet { ... }, edges: MergeMap { ... } }
+ * console.log(validateTree(newTree()));
+ *   // {
+ *   //   edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //   leaves: LeafSet { mapping: {} }
+ *   // }
  * ```
  *
  * @example
  * ```typescript
- * import { Leaf, MergeSet } from '@lacrypta/typescript-opentimestamps';
+ * import { LeafSet } from './src/internals';
+ * import { validateTree } from './src/validation';
  *
- * console.log(validateTree({}));              // Error: Expected key .leaves
- * console.log(validateTree({ leaves: {} }));  // Error: Expected MergeSet
- * console.log(validateTree({
- *   leaves: new MergeSet<Leaf>(
- *     (_key: Leaf): string => '',
- *     (left: Leaf, _right: Leaf): Leaf => left
- *   ),
- * }));                                        // Error: Expected key .edges
+ * console.log(validateTree({}));
+ *   // Error: Expected key .leaves
+ * console.log(validateTree({ leaves: {} }));
+ *   // Error: Expected LeafSet
+ * console.log(validateTree({ leaves: new LeafSet() }));
+ *   // Error: Expected key .edges
  * ```
  *
  * @param tree - Data to validate.
@@ -734,19 +865,53 @@ export function validateTree(tree: unknown): Tree {
  *
  * @example
  * ```typescript
- * console.log(validateFileHashValue('sha1', Uint8Array.of(1, 2, /* ..., *\/ 20)));      // { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }
- * console.log(validateFileHashValue('ripemd160', Uint8Array.of(1, 2, /* ... *\/ 20)));  // { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }
- * console.log(validateFileHashValue('sha256', Uint8Array.of(1, 2, /* ... *\/ 32)));     // { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }
- * console.log(validateFileHashValue('keccak256', Uint8Array.of(1, 2, /* ... *\/ 32)));  // { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }
+ * import { validateFileHashValue } from './src/validation';
+ *
+ * console.log(validateFileHashValue(
+ *   'sha1',
+ *   Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * ));
+ *   // { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }
+ *
+ * console.log(validateFileHashValue(
+ *   'ripemd160',
+ *   Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ * ));
+ *   // { algorithm: 'ripemd160', value: Uint8Array(20) [ ... ] }
+ * console.log(validateFileHashValue(
+ *   'sha256',
+ *   Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,
+ *                  9, 10, 11, 12, 13, 14, 15, 16,
+ *                 17, 18, 19, 20, 21, 22, 23, 24,
+ *                 25, 26, 27, 28, 29, 30, 31, 32),
+ * ));
+ *   // { algorithm: 'sha256', value: Uint8Array(32) [ ... ] }
+ * console.log(validateFileHashValue(
+ *   'keccak256',
+ *   Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,
+ *                  9, 10, 11, 12, 13, 14, 15, 16,
+ *                 17, 18, 19, 20, 21, 22, 23, 24,
+ *                 25, 26, 27, 28, 29, 30, 31, 32),
+ * ));
+ *   // { algorithm: 'keccak256', value: Uint8Array(32) [ ... ] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateFileHashValue('something', Uint8Array.of()));  // Error: Expected one of [sha1, ripemd160, sha256, keccak256]
- * console.log(validateFileHashValue('sha1', Uint8Array.of()));       // Error: Expected 20 byte hash
- * console.log(validateFileHashValue('ripemd160', Uint8Array.of()));  // Error: Expected 20 byte hash
- * console.log(validateFileHashValue('sha256', Uint8Array.of()));     // Error: Expected 32 byte hash
- * console.log(validateFileHashValue('keccak256', Uint8Array.of()));  // Error: Expected 32 byte hash
+ * import { validateFileHashValue } from './src/validation';
+ *
+ * console.log(validateFileHashValue('something', Uint8Array.of()));
+ *   // Error: Expected one of [sha1, ripemd160, sha256, keccak256]
+ * console.log(validateFileHashValue('sha1', Uint8Array.of()));
+ *   // Error: Expected 20 byte hash
+ * console.log(validateFileHashValue('ripemd160', Uint8Array.of()));
+ *   // Error: Expected 20 byte hash
+ * console.log(validateFileHashValue('sha256', Uint8Array.of()));
+ *   // Error: Expected 32 byte hash
+ * console.log(validateFileHashValue('keccak256', Uint8Array.of()));
+ *   // Error: Expected 32 byte hash
  * ```
  *
  * @param algorithm - Algorithm to validate.
@@ -786,17 +951,28 @@ export function validateFileHashValue(algorithm: string, value: Uint8Array): Fil
  *
  * @example
  * ```typescript
- * console.log(validateFileHash({
- *   algorithm: 'sha1',
- *   value: Uint8Array.of(1, 2, /* ... *\/ 20),
- * }));  // { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }
+ * import { validateFileHash } from './src/validation';
+ *
+ * console.log(validateFileHash(
+ *   {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ * ));
+ *   // { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validateFileHash(123));                    // Error: Expected non-null object
- * console.log(validateFileHash({}));                     // Error: Expected key .algorithm
- * console.log(validateFileHash({ algorithm: 'sha1' }));  // Error: Expected key .value
+ * import { validateFileHash } from './src/validation';
+ *
+ * console.log(validateFileHash(123));
+ *   // Error: Expected non-null object
+ * console.log(validateFileHash({}));
+ *   // Error: Expected key .algorithm
+ * console.log(validateFileHash({ algorithm: 'sha1' }));
+ *   // Error: Expected key .value
  * ```
  *
  * @param fileHash - Data to validate.
@@ -815,11 +991,15 @@ export function validateFileHash(fileHash: unknown): FileHash {
  *
  * @example
  * ```typescript
+ * import { validateVersion } from './src/validation';
+ *
  * console.log(validateVersion(1));  // 1
  * ```
  *
  * @example
  * ```typescript
+ * import { validateVersion } from './src/validation';
+ *
  * console.log(validateVersion(123));  // Error: Expected .version to be 1
  * ```
  *
@@ -836,10 +1016,6 @@ export function validateVersion(version: unknown): number {
   return version;
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
-
 /**
  * Validate that the given datum is a well-formed {@link Timestamp}.
  *
@@ -853,39 +1029,51 @@ export function validateVersion(version: unknown): number {
  *
  * @example
  * ```typescript
- * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree } from './src/internals';
+ * import { validate } from './src/validation';
  *
- * console.log(validate({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
+ * console.log(validate(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
  *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
- * }));  // { version: 1, fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] }, tree: { leaves: MergeSet { ... }, edges: MergeMap { ... } } }
+ * ));
+ *   // {
+ *   //   version: 1,
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
+ *   //   tree: {
+ *   //     edges: EdgeMap { keySet: {}, mapping: {} },
+ *   //     leaves: LeafSet { mapping: {} }
+ *   //   }
+ *   // }
  * ```
  *
  * @example
  * ```typescript
- * console.log(validate(123));             // Error: Expected non-null object
- * console.log(validate({}));              // Error: Expected key .version
- * console.log(validate({ version: 1 }));  // Error: Expected key .fileHash
- * console.log(validate({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
+ * import { validate } from './src/validation';
+ *
+ * console.log(validate(123));
+ *   // Error: Expected non-null object
+ * console.log(validate({}));
+ *   // Error: Expected key .version
+ * console.log(validate({ version: 1 }));
+ *   // Error: Expected key .fileHash
+ * console.log(validate(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
  *   },
- * }));                                             // Error: Expected key .tree
+ * ));
+ *   // Error: Expected key .tree
  * ```
  *
  * @param timestamp - Data to validate.
@@ -921,39 +1109,40 @@ export function validate(timestamp: unknown): Timestamp {
  *
  * @example
  * ```typescript
- * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree } from './src/internals';
+ * import { assert } from './src/validation';
  *
  * assert({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
- * });  // OK
+ *   tree: newTree(),
+ * });
+ *   // OK
  * ```
  *
  * @example
  * ```typescript
- * assert(123);             // Error: Expected non-null object
- * assert({});              // Error: Expected key .version
- * assert({ version: 1 });  // Error: Expected key .fileHash
+ * import { assert } from './src/validation';
+ *
+ * assert(123);
+ *   // Error: Expected non-null object
+ * assert({});
+ *   // Error: Expected key .version
+ * assert({ version: 1 });
+ *   // Error: Expected key .fileHash
  * assert({
  *   version: 1,
  *   fileHash: {
  *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  *   },
- * });                               // Error: Expected key .tree
+ * });
+ *   // Error: Expected key .tree
  * ```
  *
  * @param timestamp - Datum to assert.
@@ -968,35 +1157,38 @@ export function assert(timestamp: unknown): asserts timestamp is Timestamp {
  *
  * @example
  * ```typescript
- * import { Leaf, MergeMap, MergeSet, Op, Tree } from '@lacrypta/typescript-opentimestamps';
+ * import { newTree } from './src/internals';
+ * import { is } from './src/validation';
  *
- * console.log(is(123));             // false
- * console.log(is({}));              // false
- * console.log(is({ version: 1 }));  // false
- * console.log(is({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\/ 20),
+ * console.log(is(123));
+ *   // false
+ * console.log(is({}));
+ *   // false
+ * console.log(is({ version: 1 }));
+ *   // false
+ * console.log(is(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *   }
+ * ));
+ *   // false
+ * console.log(is(
+ *   {
+ *     version: 1,
+ *     fileHash: {
+ *       algorithm: 'sha1',
+ *       value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *     },
+ *     tree: newTree(),
  *   },
- * }));                                       // false
- * console.log(is({
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, /* ... *\ / 20),
- *   },
- *   tree: {
- *     leaves: new MergeSet<Leaf>(
- *       (_key: Leaf): string => '',
- *       (left: Leaf, _right: Leaf): Leaf => left
- *     ),
- *     edges: new MergeMap<Op, Tree>(
- *       (_key: Op): string => '',
- *       (left: Tree, _right: Tree): Tree => left
- *     ),
- *   },
- * }));                                       // true
+ * ));
+ *   // true
  * ```
  *
  * @param timestamp - Datum to check.

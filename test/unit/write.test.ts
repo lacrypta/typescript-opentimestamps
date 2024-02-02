@@ -14,14 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
+import type { Edge } from '../../src/internals';
+import type { FileHash, Leaf, Timestamp, Tree } from '../../src/types';
 
-import type { FileHash, Leaf, Timestamp, Tree } from '../src/types';
-import type { Edge } from '../src/internals';
-
-import { newEdges, newLeaves, newTree } from '../src/internals';
-import { uint8ArrayFromHex } from '../src/utils';
-import { writeBytes, writeEdge, writeFileHash, writeLeaf, write, writeTree, writeUint } from '../src/write';
+import { newTree, EdgeMap, LeafSet } from '../../src/internals';
+import { uint8ArrayFromHex } from '../../src/utils';
+import { write, writeBytes, writeEdge, writeFileHash, writeLeaf, writeTree, writeUint } from '../../src/write';
 
 const textEncoder: TextEncoder = new TextEncoder();
 
@@ -225,35 +223,35 @@ describe('Write', (): void => {
         name: 'should write empty tree',
       },
       {
-        tree: { leaves: newLeaves().add({ type: 'bitcoin', height: 123 }), edges: newEdges() },
+        tree: { leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }), edges: new EdgeMap() },
         expected: uint8ArrayFromHex('000588960d73d71901017b'),
         name: 'should write tree with single leaf',
       },
       {
         tree: {
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
-          edges: newEdges(),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+          edges: new EdgeMap(),
         },
         expected: uint8ArrayFromHex('ff000588960d73d71901017b0006869a0d73d71b45017b'),
         name: 'should write tree with two leaves',
       },
       {
-        tree: { leaves: newLeaves(), edges: newEdges().add({ type: 'sha1' }, newTree()) },
+        tree: { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha1' }, newTree()) },
         expected: uint8ArrayFromHex('02'),
         name: 'should write tree with single edge',
       },
       {
         tree: {
-          leaves: newLeaves(),
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet(),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
         },
         expected: uint8ArrayFromHex('ff0208'),
         name: 'should write tree with two edges',
       },
       {
         tree: {
-          leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
-          edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+          leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+          edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
         },
         expected: uint8ArrayFromHex('ff000588960d73d71901017bff0006869a0d73d71b45017bff0208'),
         name: 'should write tree with edges and leaves',
@@ -290,8 +288,8 @@ describe('Write', (): void => {
             value: uint8ArrayFromHex('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
           },
           tree: {
-            leaves: newLeaves().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
-            edges: newEdges().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
+            leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }).add({ type: 'litecoin', height: 123 }),
+            edges: new EdgeMap().add({ type: 'sha1' }, newTree()).add({ type: 'sha256' }, newTree()),
           },
         } as Timestamp,
         expected: uint8ArrayFromHex(

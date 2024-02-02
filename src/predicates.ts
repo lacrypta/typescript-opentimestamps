@@ -14,16 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-'use strict';
-
 import type { Path, Paths } from './internals';
+import type { Timestamp } from './types';
 
 import { treeToPaths } from './internals';
-import { Timestamp } from './types';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// -- API ---------------------------------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------
 
 export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {
   const paths: Paths = treeToPaths(timestamp.tree);
