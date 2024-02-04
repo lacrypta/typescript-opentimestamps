@@ -83,7 +83,7 @@
     "typedoc": "^0.25.7",
     "typedoc-plugin-katex": "^0.1.2",
     "typedoc-plugin-keywords": "^1.6.0",
-    "typedoc-plugin-mdn-links": "^3.1.14",
+    "typedoc-plugin-mdn-links": "^3.1.15",
     "typedoc-plugin-mermaid": "^1.10.0",
     "typedoc-plugin-remove-references": "^0.0.6",
     "typescript": "^5.3.3"
