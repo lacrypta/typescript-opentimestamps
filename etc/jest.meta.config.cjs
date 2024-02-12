@@ -2,9 +2,9 @@
 module.exports = {
   clearMocks: true,
   collectCoverage: true,
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts', '<rootDir>/test/unit/**/*.ts'],
+  collectCoverageFrom: ['<rootDir>/test/helpers.ts'],
   coveragePathIgnorePatterns: ['\\.test\\.ts'],
-  coverageDirectory: '<rootDir>/dist/.coverage/unit',
+  coverageDirectory: '<rootDir>/dist/.coverage/meta',
   coverageProvider: 'babel',
   logHeapUsage: true,
   passWithNoTests: true,
@@ -14,7 +14,7 @@ module.exports = {
   restoreMocks: false,
   rootDir: '..',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/test/unit/**/*.test.ts'],
+  testMatch: ['<rootDir>/test/helpers.test.ts'],
   transform: {
     '\\.ts$': 'ts-jest',
   },

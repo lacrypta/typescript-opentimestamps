@@ -61,6 +61,7 @@
     "doc:internal": "typedoc --options ./etc/typedoc.internal.json",
     "clean": "rm -rf dist",
     "test": "jest --runInBand --config=./etc/jest.unit.config.cjs",
+    "test:meta": "jest --runInBand --config=./etc/jest.meta.config.cjs",
     "test:regression": "jest --runInBand --config=./etc/jest.regression.config.cjs",
     "reset": "pnpm clean && rm -rf node_modules && rm -f pnpm-lock.yaml"
   },
