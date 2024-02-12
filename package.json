@@ -32,7 +32,6 @@
   "esm": "./dist/esm/index.js",
   "module-browser": "./dist/esm/index.js",
   "source": "./dist/esm/index.js",
-  "modules.root": "esm",
   "unpkg": "./dist/umd/index.min.js",
   "jsdelivr": "./dist/umd/index.min.js",
   "exports": {
