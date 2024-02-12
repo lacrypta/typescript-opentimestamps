@@ -17,6 +17,8 @@
 /**
  * This module exposes binary writing functions.
  *
+ * See {@link read! | read} for information regarding the binary serialization format.
+ *
  * @packageDocumentation
  * @module
  */

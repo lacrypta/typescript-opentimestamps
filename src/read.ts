@@ -17,6 +17,123 @@
 /**
  * This module exposes binary reading functions.
  *
+ * A {@link types!Timestamp | Timestamp} is stored as a sequence of bytes.
+ * In order to understand how this is done, let us build an [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form) grammar for it.
+ *
+ * First, let's deal with the _primitive derivation rules_, these derivation rules constitute the basis for byte-based (de)serialization.
+ *
+ * ```ini
+ * uint  = *%x80-ff %x00-7f
+ * bytes = uint *OCTET
+ * url   = uint
+ *         %s"https://"
+ *         1*(ALPHA / DIGIT / "-" / "." / "_") [ ":" 1*DIGIT ]
+ *         *( "/" 1*( ALPHA / DIGIT / "-" / "." / "_" / ":" ) )
+ *         [ "/" ]
+ * ```
+ *
+ * `<uint>`s are the serialization of an arbitrary length unsigned integer value.
+ * It is serialized into a multi-byte little-endian encoding using 7-bits-per-byte with the MSB indicating continuation into the next byte (high) or marking the end of the multi-byte serialization (low).
+ *
+ * `<bytes>` are the serialization of an arbitrary length byte value.
+ * It is serialized as a `<uint>` indicating the number of `<OCTET>`s that follow and constitute the actual serialized byte string.
+ *
+ * `<url>`s are the serialization of HTTPS URLs, it constitutes a specialization of the `<bytes>` derivation rule.
+ * All characters involved are singe-byte values and no percent-encoding is allowed.
+ * A JavaScript RegExp to validate this pattern is:
+ *
+ * ```javascript
+ * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
+ * ```
+ *
+ * Now, let's deal with _attestation derivation rules_ (nb. "attestations" are what we call {@link types!Leaf | Leaves}).
+ *
+ *
+ * ```ini
+ * attestation-bitcoin  = %x05.88.96.0d.73.d7.19.01
+ * attestation-litecoin = %x06.86.9a.0d.73.d7.1b.45
+ * attestation-ethereum = %x30.fe.80.87.b5.c7.ea.d7
+ * attestation-pending  = %x83.df.e3.0d.2e.f9.0c.8e
+ * attestation-unknown  = 8OCTET
+ *
+ * attestation = ( attestation-pending  uint    url )
+ *             / ( attestation-bitcoin  uint   uint )
+ *             / ( attestation-ethereum uint   uint )
+ *             / ( attestation-litecoin uint   uint )
+ *             / ( attestation-unknown  uint *OCTET )
+ * ```
+ *
+ * An `<attestation>` consists of an 8-byte "tag" (similar to the tags defined further down) that discriminates the attestation type proper, followed by a `<bytes>`; the bytes value of this `<bytes>` constitutes the attestation's "payload".
+ *
+ * All "determined" attestations (those using the Bitcoin, Ethereum, and Litecoin blockchains) have a payload consisting solely of a `<uint>` value indicating the block height where the attestation was indeed included in the blockchain; this means that the `<bytes>` will be effectively a `<uint> <uint>`.
+ *
+ * Pending attestations' payload consist of a `<url>` itself; this means that the `<bytes>` will be effectively `<uint> <uint> *<OCTET>`.
+ *
+ * Unknown attestations simply ignore their `<bytes>` value.
+ *
+ * Now, let's deal with _operations derivation rules_ (these are realized via {@link types!Op | Op}s).
+ *
+ * ```ini
+ * op-attestation = %x00  ; not explicitly referred to as such in the code
+ * op-sha1        = %x02
+ * op-ripemd160   = %x03
+ * op-sha256      = %x08
+ * op-keccak256   = %x67
+ * op-append      = %xf0
+ * op-prepend     = %xf1
+ * op-reverse     = %xf2  ; not present in all code bases
+ * op-hexlify     = %xf3  ; not present in all code bases
+ *
+ * op = ( op-append      bytes   timestamp )
+ *    / ( op-prepend     bytes   timestamp )
+ *    / ( op-reverse             timestamp )
+ *    / ( op-hexlify             timestamp )
+ *    / ( op-sha1                timestamp )
+ *    / ( op-ripemd160           timestamp )
+ *    / ( op-sha256              timestamp )
+ *    / ( op-keccak256           timestamp )
+ *    / ( op-attestation       attestation )
+ * ```
+ *
+ * Operations consist of a single-byte tag (the `<op-*>` rules) and a number of associated arguments.
+ * Operations are divided into three different types: binary, unary, and attestations.
+ *
+ * Binary operations (viz. `append` and `prepend`) are serialized as their tag, a `<bytes>` operand, and a (recursive) `<timestamp>`.
+ *
+ * Unary operations (viz. `reverse`, `hexlify`, `sha1`, `ripemd160`, `sha256`, and `keccak256`) are serialized as their tag, and a (recursive) `<timestamp>`.
+ *
+ * Finally, attestations are simply serialized as their tag, and an `<attestation>`.
+ *
+ * We can now define the {@link types!Timestamp | Timestamp} rules:
+ *
+ * ```ini
+ * non-final = %xff
+ * timestamp = *( non-final op ) op
+ * ```
+ *
+ * Timestamps consist of a number of operations (as defined above), where non-final operations are preceded by a `<non-final>` tag.
+ * Timestamps **must not** be empty (ie. at least an attestation or an operation proper **must** be present).
+ *
+ * Finally, a "detached" timestamp file's rules are:
+ *
+ * ```ini
+ * magic-header = %x00.4f.70.65.6e.54.69.6d.65.73.74.61.6d.70.73.00.00.50.72.6f.6f.66.00.bf.89.e2.e8.84.e8.92.94
+ *
+ * file-hash = ( op-sha1      20OCTET )
+ *           / ( op-ripemd160 20OCTET )
+ *           / ( op-sha256    32OCTET )
+ *           / ( op-keccak256 32OCTET )
+ *
+ * DETACHED = magic-header
+ *            uint
+ *            file-hash
+ *            timestamp
+ * ```
+ *
+ * A detached timestamp file consists of a 31 byte magic header, a `<uint>` indicating the serialization version to use (only version `1` is defined so far), a `<file-hash>`, and a `<timestamp>`.
+ *
+ * A `<file-hash>` is simply an algorithm tag, followed by the prescribed number of bytes required for its value (20 bytes for `sha1` and `ripemd160`, 32 bytes for `sha256` and `keccak256`).
+ *
  * @packageDocumentation
  * @module
  */
