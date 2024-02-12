@@ -52,12 +52,23 @@ describe('Submit', (): void => {
   });
 
   describe('submit()', (): void => {
+    const theNonFudgedTimestamp: Timestamp = {
+      version: 1,
+      fileHash: {
+        algorithm: 'sha1',
+        value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
+      },
+      tree: {
+        edges: new EdgeMap().add({ type: 'sha256' }, newTree()),
+        leaves: new LeafSet(),
+      },
+    };
     it.each([
       {
         responseBody: null,
         responseError: 'something',
         expected: {
-          timestamp: undefined,
+          timestamp: theNonFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): Unknown fetch() error')],
         },
         name: 'should accumulate unknown fetch errors (no fudge)',
@@ -66,7 +77,7 @@ describe('Submit', (): void => {
         responseBody: null,
         responseError: new Error('something'),
         expected: {
-          timestamp: undefined,
+          timestamp: theNonFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): something')],
         },
         name: 'should accumulate fetch errors (no fudge)',
@@ -75,7 +86,7 @@ describe('Submit', (): void => {
         responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123, 456),
         responseError: null,
         expected: {
-          timestamp: undefined,
+          timestamp: theNonFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): Garbage at end of calendar response')],
         },
         name: 'should accumulate body errors (no fudge)',
@@ -131,13 +142,9 @@ describe('Submit', (): void => {
           });
 
         void expect(
-          submit(
-            'sha1',
-            uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
-            Uint8Array.of(),
-            [new URL('https://www.example.com')],
-            true,
-          ).then(
+          submit('sha1', uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'), Uint8Array.of(), [
+            new URL('https://www.example.com'),
+          ]).then(
             ({
               timestamp,
               errors,
@@ -159,12 +166,24 @@ describe('Submit', (): void => {
       },
     );
 
+    const theFudgedTimestamp: Timestamp = {
+      version: 1,
+      fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
+      tree: {
+        leaves: new LeafSet(),
+        edges: new EdgeMap().add(
+          { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
+          { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha256' }, newTree()) },
+        ),
+      },
+    };
+
     it.each([
       {
         responseBody: null,
         responseError: 'something',
         expected: {
-          timestamp: undefined,
+          timestamp: theFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): Unknown fetch() error')],
         },
         name: 'should accumulate unknown fetch errors',
@@ -173,7 +192,7 @@ describe('Submit', (): void => {
         responseBody: null,
         responseError: new Error('something'),
         expected: {
-          timestamp: undefined,
+          timestamp: theFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): something')],
         },
         name: 'should accumulate fetch errors',
@@ -182,7 +201,7 @@ describe('Submit', (): void => {
         responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123, 456),
         responseError: null,
         expected: {
-          timestamp: undefined,
+          timestamp: theFudgedTimestamp,
           errors: [new Error('Error (https://www.example.com/): Garbage at end of calendar response')],
         },
         name: 'should accumulate body errors',
@@ -214,131 +233,6 @@ describe('Submit', (): void => {
           errors: [],
         },
         name: 'should return merged timestamp',
-      },
-    ])(
-      '$name',
-      ({
-        responseBody,
-        responseError,
-        expected,
-      }:
-        | {
-            responseBody: Uint8Array;
-            responseError: null;
-            expected: { timestamp: Timestamp | undefined; errors: Error[] };
-          }
-        | {
-            responseBody: null;
-            responseError: Error | string;
-            expected: { timestamp: Timestamp | undefined; errors: Error[] };
-          }): void => {
-        jest
-          .spyOn(globalThis, 'fetch')
-          .mockImplementation((_input: string | URL | globalThis.Request, _init?: RequestInit): Promise<Response> => {
-            if (null === responseError) {
-              return Promise.resolve(new Response(responseBody, { status: 200 }));
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-throw-literal
-              throw responseError;
-            }
-          });
-
-        void expect(
-          submit(
-            'sha1',
-            uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
-            Uint8Array.of(1, 2, 3, 4, 5, 6),
-            [new URL('https://www.example.com')],
-            true,
-          ).then(
-            ({
-              timestamp,
-              errors,
-            }: {
-              timestamp: Timestamp | undefined;
-              errors: Error[];
-            }): { timestamp: string | undefined; errors: Error[] } => {
-              return { timestamp: undefined === timestamp ? undefined : timestampToString(timestamp), errors };
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (_reason: any): void => {
-              throw new Error('unexpected');
-            },
-          ),
-        ).resolves.toStrictEqual({
-          timestamp: undefined === expected.timestamp ? undefined : timestampToString(expected.timestamp),
-          errors: expected.errors,
-        });
-      },
-    );
-
-    const theTimestamp: Timestamp = {
-      version: 1,
-      fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
-      tree: {
-        leaves: new LeafSet(),
-        edges: new EdgeMap().add(
-          { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
-          { leaves: new LeafSet(), edges: new EdgeMap().add({ type: 'sha256' }, newTree()) },
-        ),
-      },
-    };
-
-    it.each([
-      {
-        responseBody: null,
-        responseError: 'something',
-        expected: {
-          timestamp: theTimestamp,
-          errors: [new Error('Error (https://www.example.com/): Unknown fetch() error')],
-        },
-        name: 'should accumulate unknown fetch errors (non-normalizing)',
-      },
-      {
-        responseBody: null,
-        responseError: new Error('something'),
-        expected: {
-          timestamp: theTimestamp,
-          errors: [new Error('Error (https://www.example.com/): something')],
-        },
-        name: 'should accumulate fetch errors (non-normalizing)',
-      },
-      {
-        responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123, 456),
-        responseError: null,
-        expected: {
-          timestamp: theTimestamp,
-          errors: [new Error('Error (https://www.example.com/): Garbage at end of calendar response')],
-        },
-        name: 'should accumulate body errors (non-normalizing)',
-      },
-      {
-        responseBody: Uint8Array.of(0x00, ...uint8ArrayFromHex('0588960d73d71901'), 1, 123),
-        responseError: null,
-        expected: {
-          timestamp: {
-            version: 1,
-            fileHash: {
-              algorithm: 'sha1',
-              value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
-            },
-            tree: {
-              edges: new EdgeMap().add(
-                { type: 'append', operand: Uint8Array.of(1, 2, 3, 4, 5, 6) },
-                {
-                  leaves: new LeafSet(),
-                  edges: new EdgeMap().add(
-                    { type: 'sha256' },
-                    { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
-                  ),
-                },
-              ),
-              leaves: new LeafSet(),
-            },
-          } as Timestamp,
-          errors: [],
-        },
-        name: 'should return merged timestamp (non-normalizing)',
       },
     ])(
       '$name',

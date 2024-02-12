@@ -185,10 +185,6 @@
  *
  * ...
  *
- * # What does "normalization" mean?
- *
- * ...
- *
  * @packageDocumentation
  * @module typescript-opentimestamps
  */
@@ -198,7 +194,7 @@ import type { Timestamp } from './types';
 export type { FileHash, Leaf, MergeMap, MergeSet, Op, Timestamp, Tree, Verifier } from './types';
 
 import { info as _info } from './info';
-import { newTree as _newTree, normalize as _normalize } from './internals';
+import { newTree as _newTree } from './internals';
 import { canShrink as _canShrink, canUpgrade as _canUpgrade, canVerify as _canVerify } from './predicates';
 import { read as _read } from './read';
 import { shrink as _shrink } from './shrink';
@@ -284,68 +280,6 @@ export const newTree = _newTree;
  */
 export const info = _info;
 
-/**
- * Normalize the given {@link Timestamp}, so as to have it have standardized `tree` component.
- *
- * This function will perform the following steps in order:
- *
- * 1. Transform the given {@link Timestamp}'s `tree` component into a set of paths.
- * 2. Normalize each of these paths individually.
- * 3. Re-build a {@link Tree} from these normalized paths.
- * 4. Coalesce these {@link Op | operation}s in this resulting {@link Tree}.
- * 5. Finally, decoalesce them to deal with edge cases.
- *
- * If the normalization operation would yield an empty {@link Tree}, `undefined` is returned (since "empty" {@link Timestamp}s are not allowed).
- *
- * @example
- * ```typescript
- * import type { Timestamp, Tree } from '@lacrypta/typescript-opentimestamps';
- *
- * import { newTree, normalize, info } from '@lacrypta/typescript-opentimestamps';
- *
- * const tree1: Tree = newTree();
- * const tree2: Tree = newTree();
- * const tree3: Tree = newTree();
- * const tree4: Tree = newTree();
- * const tree5: Tree = newTree();
- *
- * tree1.leaves.add({ type: 'bitcoin', height: 456 });
- * tree2.leaves.add({ type: 'bitcoin', height: 123 });
- * tree3.edges.add({ type: 'append', operand: Uint8Array.of(7, 8, 9) }, tree2);
- * tree4.edges.add({ type: 'reverse' }, tree3).add({ type: 'prepend', operand: Uint8Array.of(4, 5, 6) }, tree1);
- * tree5.edges.add({ type: 'prepend', operand: Uint8Array.of(1, 2, 3) }, tree4);
- *
- * const timestamp: Timestamp = {
- *   version: 1,
- *   fileHash: {
- *     algorithm: 'sha1',
- *     value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
- *   },
- *   tree: tree5,
- * };
- *
- * console.log(info(timestamp));
- *   // msg = sha1(FILE)
- *   // msg = prepend(msg, 010203)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506)
- *   //     bitcoinVerify(msg, 456)
- * console.log(info(normalize(timestamp)!));
- *   // msg = sha1(FILE)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 030201070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506010203)
- *   //     bitcoinVerify(msg, 456)
- * ```
- *
- * @param timestamp - The timestamp to normalize.
- * @returns The normalized timestamp.
- */
-export const normalize = _normalize;
-
 export const canShrink = _canShrink;
 export const canUpgrade = _canUpgrade;
 export const canVerify = _canVerify;
@@ -360,7 +294,7 @@ export const canVerify = _canVerify;
  * 3. The serialized {@link FileHash}.
  * 4. The serialized {@link Tree}.
  *
- * This function will read the given data stream, and normalize the resulting {@link Timestamp} value.
+ * This function will read the given data stream, and return the resulting {@link Timestamp} value.
  *
  * @example
  * ```typescript
@@ -420,8 +354,7 @@ export const canVerify = _canVerify;
  * ```
  *
  * @param data - The data substrate to use.
- * @param normalizeResult - Whether to normalize the result prior to returning it or not (via {@link normalize}).
- * @returns The read and normalized Timestamp.
+ * @returns The read Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */
 export const read = _read;

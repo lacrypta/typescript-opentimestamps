@@ -17,13 +17,9 @@
 import type { Path } from './internals';
 import type { Leaf, Timestamp } from './types';
 
-import { normalize, pathsToTree, treeToPaths } from './internals';
+import { pathsToTree, treeToPaths } from './internals';
 
-export function shrink(
-  timestamp: Timestamp,
-  chain: 'bitcoin' | 'litecoin' | 'ethereum',
-  normalizeResult: boolean = false,
-): Timestamp {
+export function shrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
     .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
     .reduce((left: Path | undefined, right: Path): Path => {
@@ -41,11 +37,10 @@ export function shrink(
   if (undefined === shrunkenPath) {
     return timestamp;
   } else {
-    const result: Timestamp = {
+    return {
       fileHash: timestamp.fileHash,
       version: timestamp.version,
       tree: pathsToTree([shrunkenPath]),
     };
-    return normalizeResult ? normalize(result)! : result;
   }
 }

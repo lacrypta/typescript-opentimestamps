@@ -723,44 +723,5 @@ describe('Read', (): void => {
         }
       },
     );
-
-    it.each([
-      {
-        data: Uint8Array.of(
-          ...uint8ArrayFromHex('004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294'),
-          1,
-          0x02,
-          ...uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233'),
-          0x00,
-          ...uint8ArrayFromHex('0588960d73d71901'),
-          1,
-          123,
-        ),
-        expected: {
-          version: 1,
-          fileHash: { algorithm: 'sha1', value: uint8ArrayFromHex('00112233445566778899aabbccddeeff00112233') },
-          tree: { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
-        } as Timestamp,
-        error: null,
-        name: 'should read simple tree timestamp',
-      },
-    ])(
-      '$name',
-      ({
-        data,
-        expected,
-        error,
-      }:
-        | { data: Uint8Array; expected: Timestamp; error: null }
-        | { data: Uint8Array; expected: null; error: Error }): void => {
-        if (null === error) {
-          expect(timestampToString(read(data, true))).toStrictEqual(timestampToString(expected));
-        } else {
-          expect((): void => {
-            read(data);
-          }).toThrow(error);
-        }
-      },
-    );
   });
 });

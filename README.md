@@ -3,7 +3,7 @@
 An OpenTimestamps client written in TypeScript
 
 This project aims to provide a fully-tested, fully typed, OpenTimestamps Client.
-It currently supports stamping, upgrading, and verifying timestamps, as well as normalizing them so as to occupy as little space as possible.
+It currently supports stamping, upgrading, and verifying timestamps.
 
 ## Table of Contents
 
@@ -86,7 +86,6 @@ This library exports the following types:
 It exports the following functions:
 
 - **`info`:** obtain a human-readable description of the `Timestamp`'s content.
-- **`normalize`:** normalize the given `Timestamp` so as to have it occupy the least amount of space possible.
 - **`canShrink`:** determine whether the given `Timestamp` can be shrunk to a single attestation chain.
 - **`canUpgrade`:** determine whether the given `Timestamp` ca be upgraded via a Calendar.
 - **`canVerify`:** determine whether the given `Timestamp` can be verified in the blockchain(s).

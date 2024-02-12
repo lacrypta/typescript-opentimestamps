@@ -24,7 +24,7 @@
 import type { Edge } from './internals';
 import type { FileHash, Leaf, Timestamp, Tree } from './types';
 
-import { incorporateToTree, magicHeader, newTree, nonFinal, normalize, Tag } from './internals';
+import { incorporateToTree, magicHeader, newTree, nonFinal, Tag } from './internals';
 import { textDecoder, uint8ArrayEquals, uint8ArrayToHex } from './utils';
 import { validateCalendarUrl } from './validation';
 
@@ -757,7 +757,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  * 3. The serialized {@link FileHash}.
  * 4. The serialized {@link Tree}.
  *
- * This function will read the given data stream, and normalize the resulting {@link Timestamp} value.
+ * This function will read the given data stream, and return the resulting {@link Timestamp} value.
  *
  * > This function internally calls {@link readLiteral}.
  * >
@@ -820,11 +820,10 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  * ```
  *
  * @param data - The data substrate to use.
- * @param normalizeResult - Whether to normalize the result prior to returning it or not (via {@link normalize}).
- * @returns The read and normalized Timestamp.
+ * @returns The read Timestamp.
  * @throws {@link !Error} when there's additional data past the Timestamp's value.
  */
-export function read(data: Uint8Array, normalizeResult: boolean = false): Timestamp {
+export function read(data: Uint8Array): Timestamp {
   const idx: number = readLiteral(data, 0, magicHeader)[1];
   const [version, idx2]: [number, number] = readVersion(data, idx);
   const [fileHash, idx3]: [FileHash, number] = readFileHash(data, idx2);
@@ -834,6 +833,5 @@ export function read(data: Uint8Array, normalizeResult: boolean = false): Timest
     throw new Error('Garbage at EOF');
   }
 
-  const result: Timestamp = { version, fileHash, tree };
-  return normalizeResult ? normalize(result)! : result;
+  return { version, fileHash, tree };
 }
