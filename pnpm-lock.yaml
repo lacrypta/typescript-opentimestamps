@@ -53,20 +53,20 @@ devDependencies:
     specifier: ^29.1.2
     version: 29.1.2(@babel/core@7.23.9)(esbuild@0.20.0)(jest@29.7.0)(typescript@5.3.3)
   typedoc:
-    specifier: ^0.25.7
-    version: 0.25.7(typescript@5.3.3)
+    specifier: ^0.25.8
+    version: 0.25.8(typescript@5.3.3)
   typedoc-plugin-katex:
     specifier: ^0.1.2
     version: 0.1.2
   typedoc-plugin-keywords:
     specifier: ^1.6.0
-    version: 1.6.0(typedoc@0.25.7)
+    version: 1.6.0(typedoc@0.25.8)
   typedoc-plugin-mdn-links:
     specifier: ^3.1.15
-    version: 3.1.15(typedoc@0.25.7)
+    version: 3.1.15(typedoc@0.25.8)
   typedoc-plugin-mermaid:
     specifier: ^1.10.0
-    version: 1.10.0(typedoc@0.25.7)
+    version: 1.10.0(typedoc@0.25.8)
   typedoc-plugin-remove-references:
     specifier: ^0.0.6
     version: 0.0.6
@@ -4129,38 +4129,38 @@ packages:
     resolution: {integrity: sha512-2TsaDyvQVYq1yEa7v7MPz4GEM1iWlu4QWeEtcx3B1FyLdHRDoAf0aEW2zo7By8aOyrI1yWA4hnAZKYg1iW/HHA==, tarball: https://registry.npmjs.org/typedoc-plugin-katex/-/typedoc-plugin-katex-0.1.2.tgz}
     dev: true
 
-  /typedoc-plugin-keywords@1.6.0(typedoc@0.25.7):
+  /typedoc-plugin-keywords@1.6.0(typedoc@0.25.8):
     resolution: {integrity: sha512-URyCIHw6+Lwil0ywy6lVb2TckfDVGjAWnRnTAiiSZaRaglI6vaaP1EhhwEipOIlHaJSnHZfdwpWe1t4mffTIpA==, tarball: https://registry.npmjs.org/typedoc-plugin-keywords/-/typedoc-plugin-keywords-1.6.0.tgz}
     peerDependencies:
       typedoc: ^0.25.4
     dependencies:
-      typedoc: 0.25.7(typescript@5.3.3)
+      typedoc: 0.25.8(typescript@5.3.3)
       typescript: 5.3.3
     dev: true
 
-  /typedoc-plugin-mdn-links@3.1.15(typedoc@0.25.7):
+  /typedoc-plugin-mdn-links@3.1.15(typedoc@0.25.8):
     resolution: {integrity: sha512-PniQgrCAmhbJf8fPiZULxPV9aYVszNoEk1R7XbTBIMluqplaUkG3qfckthb2l++5yDR1lHEycTMu6hQyKyz+QA==, tarball: https://registry.npmjs.org/typedoc-plugin-mdn-links/-/typedoc-plugin-mdn-links-3.1.15.tgz}
     peerDependencies:
       typedoc: '>= 0.23.14 || 0.24.x || 0.25.x'
     dependencies:
-      typedoc: 0.25.7(typescript@5.3.3)
+      typedoc: 0.25.8(typescript@5.3.3)
     dev: true
 
-  /typedoc-plugin-mermaid@1.10.0(typedoc@0.25.7):
+  /typedoc-plugin-mermaid@1.10.0(typedoc@0.25.8):
     resolution: {integrity: sha512-NMo+m5FY5SuNR2dgDYwLO/Bu8O1927xPm1B5S5QcqBD9JiNaWP6jbyuPUltJtq9KEZOme3QwLVe1ZPSDr3tsmw==, tarball: https://registry.npmjs.org/typedoc-plugin-mermaid/-/typedoc-plugin-mermaid-1.10.0.tgz}
     peerDependencies:
       typedoc: '>=0.23.0'
     dependencies:
       html-escaper: 3.0.3
-      typedoc: 0.25.7(typescript@5.3.3)
+      typedoc: 0.25.8(typescript@5.3.3)
     dev: true
 
   /typedoc-plugin-remove-references@0.0.6:
     resolution: {integrity: sha512-QoyHpopznnJbWW/9JT2NHSK+eTmyShkPYebwe5ZnO8aohPLc5okk4puWUDXnNh2Tn7cJU8U3t1tEMO6ghbwE8Q==, tarball: https://registry.npmjs.org/typedoc-plugin-remove-references/-/typedoc-plugin-remove-references-0.0.6.tgz}
     dev: true
 
-  /typedoc@0.25.7(typescript@5.3.3):
-    resolution: {integrity: sha512-m6A6JjQRg39p2ZVRIN3NKXgrN8vzlHhOS+r9ymUYtcUP/TIQPvWSq7YgE5ZjASfv5Vd5BW5xrir6Gm2XNNcOow==, tarball: https://registry.npmjs.org/typedoc/-/typedoc-0.25.7.tgz}
+  /typedoc@0.25.8(typescript@5.3.3):
+    resolution: {integrity: sha512-mh8oLW66nwmeB9uTa0Bdcjfis+48bAjSH3uqdzSuSawfduROQLlXw//WSNZLYDdhmMVB7YcYZicq6e8T0d271A==, tarball: https://registry.npmjs.org/typedoc/-/typedoc-0.25.8.tgz}
     engines: {node: '>= 16'}
     hasBin: true
     peerDependencies:
