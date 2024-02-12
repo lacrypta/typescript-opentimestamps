@@ -393,6 +393,45 @@ export const canVerify = _canVerify;
  */
 export const read = _read;
 
+/**
+ * Shrink the given {@link Timestamp} on the given chain.
+ *
+ * Shrinking a {@link Timestamp} consists of eliminating all paths other than the one leading to the _oldest_ {@link Leaf} on the given chain.
+ * This allows the {@link Timestamp} to be smaller, only keeping the most stringent attestation for the chose chain.
+ *
+ * Note that shrinking multiple times does nothing.
+ *
+ * @example
+ * ```typescript
+ * import type { Timestamp } from '@lacrypta/typescript-opentimestamps';
+ *
+ * import { info, read, shrink } from '@lacrypta/typescript-opentimestamps';
+ *
+ * const timestamp: Timestamp = read(
+ *   Uint8Array.of(
+ *     0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65,
+ *     0x73, 0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50,
+ *     0x72, 0x6f, 0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8,
+ *     0x84, 0xe8, 0x92, 0x94, 0x01, 0x02, 0x01, 0x02, 0x03,
+ *     0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+ *     0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0xff,
+ *     0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7, 0x19, 0x01,
+ *     0x01, 0x7b, 0x00, 0x05, 0x88, 0x96, 0x0d, 0x73, 0xd7,
+ *     0x19, 0x01, 0x02, 0xc8, 0x03,
+ *   ),
+ * );
+ * console.log(info(shrink(timestamp, 'bitcoin')));
+ *   // msg = sha1(FILE)
+ *   // bitcoinVerify(msg, 123)
+ * console.log(info(shrink(shrink(timestamp, 'bitcoin'), 'bitcoin')));
+ *   // msg = sha1(FILE)
+ *   // bitcoinVerify(msg, 123)
+ * ```
+ *
+ * @param timestamp - The {@link Timestamp} to shrink.
+ * @param chain - The chain to look into for shrinking.
+ * @returns The shrunken {@link Timestamp}.
+ */
 export const shrink = _shrink;
 
 export const submit = _submit;

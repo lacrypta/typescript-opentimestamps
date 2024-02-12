@@ -14,11 +14,61 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * This module exposes the shrinking functions.
+ *
+ * @packageDocumentation
+ * @module
+ */
+
 import type { Path } from './internals';
 import type { Leaf, Timestamp } from './types';
 
 import { pathsToTree, treeToPaths } from './internals';
 
+/**
+ * Shrink the given {@link Timestamp} on the given chain.
+ *
+ * Shrinking a {@link Timestamp} consists of eliminating all paths other than the one leading to the _oldest_ {@link Leaf} on the given chain.
+ * This allows the {@link Timestamp} to be smaller, only keeping the most stringent attestation for the chose chain.
+ *
+ * Note that shrinking multiple times does nothing.
+ *
+ * @example
+ * ```typescript
+ * import type { Timestamp } from './src';
+ *
+ * import { info } from './src/info';
+ * import { EdgeMap, LeafSet } from './src/internals';
+ * import { shrink } from './src/shrink';
+ *
+ * const timestamp: Timestamp = {
+ *   version: 1,
+ *   fileHash: {
+ *     algorithm: 'sha1',
+ *     value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                          11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   },
+ *   tree: {
+ *     edges: new EdgeMap(),
+ *     leaves: new LeafSet()
+ *       .add({ type: 'bitcoin', height: 123 })
+ *       .add({ type: 'bitcoin', height: 456 }),
+ *   },
+ * };
+ *
+ * console.log(info(shrink(timestamp, 'bitcoin')));
+ *   // msg = sha1(FILE)
+ *   // bitcoinVerify(msg, 123)
+ * console.log(info(shrink(shrink(timestamp, 'bitcoin'), 'bitcoin')));
+ *   // msg = sha1(FILE)
+ *   // bitcoinVerify(msg, 123)
+ * ```
+ *
+ * @param timestamp - The {@link Timestamp} to shrink.
+ * @param chain - The chain to look into for shrinking.
+ * @returns The shrunken {@link Timestamp}.
+ */
 export function shrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): Timestamp {
   const shrunkenPath: Path | undefined = treeToPaths(timestamp.tree)
     .filter(({ leaf }: { leaf: Leaf }): boolean => chain === leaf.type)
