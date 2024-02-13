@@ -42,7 +42,7 @@
  * All characters involved are singe-byte values and no percent-encoding is allowed.
  * A JavaScript RegExp to validate this pattern is:
  *
- * ```javascript
+ * ```perl
  * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
  * ```
  *

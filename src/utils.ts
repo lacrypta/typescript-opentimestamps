@@ -290,7 +290,7 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *
  * @param url - The {@link !URL} to fetch.
  * @param init - The {@link !fetch} options to use.
- * @returns The response body as a {@link Uint8Array}.
+ * @returns The response body as a {@link !Uint8Array}.
  * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
  */
 export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Array> {

@@ -134,6 +134,12 @@ export function validateURL(url: unknown): URL {
  *       [ "/" ]
  * ```
  *
+ * Or equivalently, to the following RegExp:
+ *
+ * ```perl
+ * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
+ * ```
+ *
  * @example
  * ```typescript
  * import { validateCalendarUrl } from './src/validation';

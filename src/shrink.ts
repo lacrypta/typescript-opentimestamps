@@ -36,7 +36,7 @@ import { pathsToTree, treeToPaths } from './internals';
  *
  * @example
  * ```typescript
- * import type { Timestamp } from './src';
+ * import type { Timestamp } from './src/types';
  *
  * import { info } from './src/info';
  * import { EdgeMap, LeafSet } from './src/internals';
