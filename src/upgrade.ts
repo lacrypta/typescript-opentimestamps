@@ -32,7 +32,7 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
   return upgradedTree;
 }
 
-export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, Error[]]> {
+export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: Tree; errors: Error[] }> {
   const { paths, errors }: { paths: Paths; errors: Error[] } = (
     await Promise.all(
       treeToPaths(tree).map(async ({ operations, leaf }: Path): Promise<{ paths: Paths; errors: Error[] }> => {
@@ -71,11 +71,11 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<[Tree, E
     },
     { paths: [], errors: [] },
   );
-  return [pathsToTree(paths), errors];
+  return { tree: pathsToTree(paths), errors };
 }
 
 export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
-  const [tree, errors]: [Tree, Error[]] = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
+  const { tree, errors }: { tree: Tree; errors: Error[] } = await upgradeTree(timestamp.tree, timestamp.fileHash.value);
   return {
     timestamp: {
       version: timestamp.version,

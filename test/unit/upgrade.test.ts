@@ -128,7 +128,7 @@ describe('Upgrade', (): void => {
 
         void expect(
           upgradeTree(tree, Uint8Array.of()).then(
-            ([resultTree, resultErrors]: [Tree, Error[]]): [string, Error[]] => {
+            ({ tree: resultTree, errors: resultErrors }: { tree: Tree; errors: Error[] }): [string, Error[]] => {
               return [treeToString(resultTree), resultErrors];
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
