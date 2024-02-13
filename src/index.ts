@@ -482,6 +482,112 @@ export const shrink = _shrink;
  */
 export const submit = _submit;
 
+/**
+ * Try to upgrade _all_ `pending` {@link Leaf | Leaves} on the given {@link Timestamp}.
+ *
+ * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error}s encountered.
+ *
+ * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
+ *
+ * @example
+ * ```typescript
+ * import type { Timestamp } from './src';
+ *
+ * import { info, read, upgrade } from './src';
+ *
+ * const pendingTimestamp: Timestamp = read(Uint8Array.of(
+ *   0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65,
+ *   0x73, 0x74, 0x61, 0x6d, 0x70, 0x73, 0x00, 0x00, 0x50,
+ *   0x72, 0x6f, 0x6f, 0x66, 0x00, 0xbf, 0x89, 0xe2, 0xe8,
+ *   0x84, 0xe8, 0x92, 0x94, 0x01, 0x08, 0x05, 0xc4, 0xf6,
+ *   0x16, 0xa8, 0xe5, 0x31, 0x0d, 0x19, 0xd9, 0x38, 0xcf,
+ *   0xd7, 0x69, 0x86, 0x4d, 0x7f, 0x4c, 0xcd, 0xc2, 0xca,
+ *   0x8b, 0x47, 0x9b, 0x10, 0xaf, 0x83, 0x56, 0x4b, 0x09,
+ *   0x7a, 0xf9, 0xf0, 0x10, 0xe7, 0x54, 0xbf, 0x93, 0x80,
+ *   0x6a, 0x7e, 0xba, 0xa6, 0x80, 0xef, 0x7b, 0xd0, 0x11,
+ *   0x4b, 0xf4, 0x08, 0xf0, 0x10, 0xb5, 0x73, 0xe8, 0x85,
+ *   0x0c, 0xfd, 0x9e, 0x63, 0xd1, 0xf0, 0x43, 0xfb, 0xb6,
+ *   0xfc, 0x25, 0x0e, 0x08, 0xf1, 0x04, 0x57, 0xcf, 0xa5,
+ *   0xc4, 0xf0, 0x08, 0x6f, 0xb1, 0xac, 0x8d, 0x4e, 0x4e,
+ *   0xb0, 0xe7, 0x00, 0x83, 0xdf, 0xe3, 0x0d, 0x2e, 0xf9,
+ *   0x0c, 0x8e, 0x2f, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x73,
+ *   0x3a, 0x2f, 0x2f, 0x61, 0x6c, 0x69, 0x63, 0x65, 0x2e,
+ *   0x62, 0x74, 0x63, 0x2e, 0x63, 0x61, 0x6c, 0x65, 0x6e,
+ *   0x64, 0x61, 0x72, 0x2e, 0x6f, 0x70, 0x65, 0x6e, 0x74,
+ *   0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x73,
+ *   0x2e, 0x6f, 0x72, 0x67, 0x2f
+ * ));
+ *
+ * const { timestamp, errors }: { timestamp: Timestamp; errors: Error[] } = await upgrade(pendingTimestamp);
+ *
+ * console.log(info(pendingTimestamp));
+ *   // msg = sha256(FILE)
+ *   // msg = append(msg, e754bf93806a7ebaa680ef7bd0114bf4)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, b573e8850cfd9e63d1f043fbb6fc250e)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 57cfa5c4)
+ *   // msg = append(msg, 6fb1ac8d4e4eb0e7)
+ *   // pendingVerify(msg, https://alice.btc.calendar.opentimestamps.org/)
+ * console.log(info(timestamp));
+ *   // msg = sha256(FILE)
+ *   // msg = append(msg, e754bf93806a7ebaa680ef7bd0114bf4)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, b573e8850cfd9e63d1f043fbb6fc250e)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 57cfa5c4)
+ *   // msg = append(msg, 6fb1ac8d4e4eb0e7)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 6563bb432a829ac8d6c54d1a9330d2240664cad8338dd05e63eec12a18a68d50)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, ba83ddbe2bd6772b4584b46eaed23606b712dd740a89e99e927571f77f64aa21)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 193c81e70e4472b52811fe7837ce1293b1d3542b244f27f44182af8287fc9f4e)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, c6c57696fcd39b4d992477889d04e6882829f5fe556304a281dce258b78a1f07)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 0100000001b592ca038eaa9c1b698a049b09be8ee8972b5d0eca29c19946027ba9248acb03000000004847304402200f992d5dbec6edb143f76c14e4538e0a50d66bae27c683cf4291e475287ec6af022010bae9443390aadbd2e2b8b9f757beea26d3f5c345f7e6b4d81b3d390edd381801fdffffff022eb142000000000023210338b2490eaa949538423737cd83449835d1061dca88f4ffaca7181bcac67d2095ac0000000000000000226a20)
+ *   // msg = append(msg, 678a0600)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 977ac39d89bb8b879d4a2c38fca48a040c82637936707fc452c9db1390b515c8)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, 74268b23e614997d18c7c063d8d82d7e1db57b5fc4346cc47ac2c46d54168d71)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 560c45b854f8507c8bfacf2662fef269c208a7e5df5c3145cbce417ecacc595e)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 0dba8721b9cd4ac7c2fcc7e15ba2cb9f2906bfc577c212747cd352d61b5d7fdb)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 81107a010d527d18baa874bc99c19a3a7a25dfe110a4c8985bf30f6c3e77baed)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, ca3cdcd7093498b3f180b38a9773207e52fca992c2db1d660fdfa1b329500c39)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, ca6c6464dd02ced64c9c82246ccfc626caa78d9e624cc11013e3b4bbc09e9891)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = append(msg, 1c7ae0feac018fa19bd8459a4ae971b3e6c816a87254317e0a9f0ec9425ba761)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 90263a73e415a975dc07706772dbb6200ef0d0a23006218e65d4a5d811206730)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // msg = prepend(msg, 79530163b0d912249438628bd791ac9402fa707eb314c6237b0ef90271625c84)
+ *   // msg = sha256(msg)
+ *   // msg = sha256(msg)
+ *   // bitcoinVerify(msg, 428648)
+ * console.log(errors);
+ *   // []
+ * ```
+ *
+ * @param timestamp - The {@link Timestamp} to upgrade.
+ * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error}s encountered.
+ */
 export const upgrade = _upgrade;
 
 /**
