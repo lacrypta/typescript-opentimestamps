@@ -610,7 +610,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * This is the main storage mapping used to implement the {@link LeafSet}.
    *
    */
-  private readonly mapping: Record<string, Leaf> = {};
+  readonly #mapping: Record<string, Leaf> = {};
 
   /** @ignore */
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
@@ -622,7 +622,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * @param leaf - Leaf to get the `string` representation of.
    * @returns The `string` representation of the given {@link Leaf}.
    */
-  private toKey(leaf: Leaf): string {
+  #toKey(leaf: Leaf): string {
     switch (leaf.type) {
       case 'pending':
         return `${leaf.type}:${leaf.url.toString()}`;
@@ -640,19 +640,19 @@ export class LeafSet implements MergeSet<Leaf> {
    * @param _right - Second Leaf to combine.
    * @returns The resulting combined {@link Leaf}.
    */
-  private combine(left: Leaf, _right: Leaf): Leaf {
+  #combine(left: Leaf, _right: Leaf): Leaf {
     return left;
   }
 
   /**
    * Perform the addition "heavy-lifting" within a {@link LeafSet}.
    *
-   * @param key - The `string` key to use (previously passed through {@link toKey}).
+   * @param key - The `string` key to use (previously passed through {@link \#toKey}).
    * @param leaf - The actual {@link Leaf} to add.
    * @returns The {@link LeafSet} instance, for chaining.
    */
-  private doAdd(key: string, leaf: Leaf): this {
-    this.mapping[key] = key in this.mapping ? this.combine(this.mapping[key]!, leaf) : leaf;
+  #doAdd(key: string, leaf: Leaf): this {
+    this.#mapping[key] = key in this.#mapping ? this.#combine(this.#mapping[key]!, leaf) : leaf;
     return this;
   }
 
@@ -693,7 +693,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * @returns The list of leaves in the {@link LeafSet}.
    */
   public values(): Leaf[] {
-    return Object.values(this.mapping);
+    return Object.values(this.#mapping);
   }
 
   /**
@@ -718,7 +718,7 @@ export class LeafSet implements MergeSet<Leaf> {
    */
   public remove(leaf: Leaf): this {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.mapping[this.toKey(leaf)];
+    delete this.#mapping[this.#toKey(leaf)];
     return this;
   }
 
@@ -753,7 +753,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * @returns The original {@link LeafSet} with the given {@link Leaf} added, for chaining.
    */
   public add(leaf: Leaf): this {
-    return this.doAdd(this.toKey(leaf), leaf);
+    return this.#doAdd(this.#toKey(leaf), leaf);
   }
 
   /**
@@ -783,8 +783,8 @@ export class LeafSet implements MergeSet<Leaf> {
    * @returns The original {@link LeafSet} with the given other {@link LeafSet} incorporated, for chaining.
    */
   public incorporate(other: typeof this): this {
-    Object.entries(other.mapping).forEach(([key, value]: [string, Leaf]): void => {
-      this.doAdd(key, value);
+    Object.entries(other.#mapping).forEach(([key, value]: [string, Leaf]): void => {
+      this.#doAdd(key, value);
     });
     return this;
   }
@@ -863,7 +863,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * This is the main {@link Op}-mapping used to implement the {@link EdgeMap}.
    *
    */
-  private readonly keySet: Record<string, Op> = {};
+  readonly #keySet: Record<string, Op> = {};
 
   /**
    * The {@link EdgeMap} is implemented via a pair of {@link !Record}s; the second one maps "keys" (derived from an actual {@link Op}) to actual {@link Tree}s.
@@ -871,7 +871,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * This is the main {@link Tree}-mapping used to implement the {@link EdgeMap}.
    *
    */
-  private readonly mapping: Record<string, Tree> = {};
+  readonly #mapping: Record<string, Tree> = {};
 
   /** @ignore */
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
@@ -883,7 +883,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @param op - Op to get the `string` representation of.
    * @returns The `string` representation of the given {@link Op}.
    */
-  private toKey(op: Op): string {
+  #toKey(op: Op): string {
     switch (op.type) {
       case 'append':
       case 'prepend':
@@ -900,7 +900,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @param right - Second Tree to combine.
    * @returns The resulting combined {@link Tree}.
    */
-  private combine(left: Tree, right: Tree): Tree {
+  #combine(left: Tree, right: Tree): Tree {
     return incorporateTreeToTree(left, right);
   }
 
@@ -911,10 +911,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @param tree - The {@link Tree} to add.
    * @returns The {@link EdgeMap} instance, for chaining.
    */
-  private doAdd(op: Op, tree: Tree): this {
-    const sKey: string = this.toKey(op);
-    this.keySet[sKey] = op;
-    this.mapping[sKey] = sKey in this.mapping ? this.combine(this.mapping[sKey]!, tree) : tree;
+  #doAdd(op: Op, tree: Tree): this {
+    const sKey: string = this.#toKey(op);
+    this.#keySet[sKey] = op;
+    this.#mapping[sKey] = sKey in this.#mapping ? this.#combine(this.#mapping[sKey]!, tree) : tree;
     return this;
   }
 
@@ -955,7 +955,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @returns The list of {@link Op}s in the {@link EdgeMap}.
    */
   public keys(): Op[] {
-    return Object.values(this.keySet);
+    return Object.values(this.#keySet);
   }
 
   /**
@@ -976,7 +976,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @returns The list of {@link Tree}s in the {@link EdgeMap}.
    */
   public values(): Tree[] {
-    return Object.values(this.mapping);
+    return Object.values(this.#mapping);
   }
 
   /**
@@ -997,7 +997,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @returns The list of entries in the {@link EdgeMap}.
    */
   public entries(): [Op, Tree][] {
-    return this.keys().map((key: Op): [Op, Tree] => [key, this.mapping[this.toKey(key)]!]);
+    return this.keys().map((key: Op): [Op, Tree] => [key, this.#mapping[this.#toKey(key)]!]);
   }
 
   /**
@@ -1021,11 +1021,11 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @returns The original {@link EdgeMap} with the given {@link Op} removed, for chaining.
    */
   public remove(op: Op): this {
-    const sKey: string = this.toKey(op);
+    const sKey: string = this.#toKey(op);
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.mapping[sKey];
+    delete this.#mapping[sKey];
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.keySet[sKey];
+    delete this.#keySet[sKey];
     return this;
   }
 
@@ -1061,7 +1061,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * @returns The original {@link EdgeMap} with the given {@link Op} / {@link Tree} pair added, for chaining.
    */
   public add(op: Op, tree: Tree): this {
-    return this.doAdd(op, tree);
+    return this.#doAdd(op, tree);
   }
 
   /**
@@ -1092,7 +1092,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    */
   public incorporate(other: typeof this): this {
     other.entries().forEach(([op, tree]: [Op, Tree]): void => {
-      this.doAdd(op, tree);
+      this.#doAdd(op, tree);
     });
     return this;
   }
