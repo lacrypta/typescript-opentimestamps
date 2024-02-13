@@ -32,11 +32,11 @@ export const defaultCalendarUrls: URL[] = [
 ];
 
 export async function submit(
-  algorithm: string,
+  algorithm: 'sha1' | 'ripemd160' | 'sha256' | 'keccak256',
   value: Uint8Array,
   fudge?: Uint8Array,
   calendarUrls?: URL[],
-): Promise<{ timestamp: Timestamp | undefined; errors: Error[] }> {
+): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const fileHash: FileHash = validateFileHashValue(algorithm, value);
   calendarUrls ??= defaultCalendarUrls;
   fudge ??= randomBytes(16);
