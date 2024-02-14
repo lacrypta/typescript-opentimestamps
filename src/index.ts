@@ -80,7 +80,7 @@ import { assert as _assert, is as _is, validate as _validate } from './validatio
 import { write as _write } from './write';
 
 import { verify as _verify } from './verify';
-import { default as verifiers } from './verifiers';
+import { default as _verifiers } from './verifiers';
 
 /**
  * Construct an empty {@link Tree}.
@@ -900,4 +900,4 @@ export const write = _write;
  */
 export const verify = _verify;
 
-export { verifiers };
+export const verifiers = _verifiers;
