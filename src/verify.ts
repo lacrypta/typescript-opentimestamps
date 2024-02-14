@@ -146,7 +146,7 @@ import { callOps, treeToPaths } from './internals';
  *
  * @param timestamp - The {@link Timestamp} to verify.
  * @param verifiers - An object, mapping a name to a {@link Verifier} proper to utilize.
- * @returns An object, mapping `attestations` to an object in turn mapping a chain "height" to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `attestations` to an object in turn mapping a UNIX timestamp to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error}s encountered.
  */
 export async function verify(
   timestamp: Timestamp,
