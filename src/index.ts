@@ -96,7 +96,7 @@ import { default as _verifiers } from './verifiers';
  *   // }
  * ```
  *
- * @returns The empty tree constructed.
+ * @returns The empty {@link Tree} constructed.
  */
 export const newTree = _newTree;
 
@@ -150,7 +150,7 @@ export const newTree = _newTree;
  *   //     bitcoinVerify(msg, 456)
  * ```
  *
- * @param timestamp - File hash to generate human-readable string for.
+ * @param timestamp - {@link Timestamp} to generate human-readable string for.
  * @param verbose - Whether to include the `value` field in the output or not.
  * @returns Human-readable string generated.
  */
@@ -159,8 +159,8 @@ export const info = _info;
 /**
  * Determine whether the given {@link Timestamp} can be shrunk on the given chain.
  *
- * In order for a {@link Timestamp} to be shrunk, it needs to have at least one attestation on the given chain, and at least one other attestation.
- * Shrinking it would remove all but the oldest attestation on the given chain.
+ * In order for a {@link Timestamp} to be shrunk, it needs to have at least one {@link Leaf} on the given chain, and at least one other {@link Leaf}.
+ * Shrinking it would remove all but the oldest {@link Leaf} on the given chain.
  *
  * @example
  * ```typescript
@@ -196,7 +196,7 @@ export const info = _info;
  * ```
  *
  * @param timestamp - The {@link Timestamp} being queried.
- * @param chain - The blockchain in question.
+ * @param chain - The chain in question.
  * @returns `true` if the given {@link Timestamp} can be shrunk on the given chain, `false` otherwise.
  */
 export const canShrink = _canShrink;
@@ -204,7 +204,7 @@ export const canShrink = _canShrink;
 /**
  * Determine whether the given {@link Timestamp} can be upgraded.
  *
- * In order for a {@link Timestamp} to be upgraded, it needs to have at least one `pending` attestation.
+ * In order for a {@link Timestamp} to be upgraded, it needs to have at least one `pending` {@link Leaf}.
  *
  * @example
  * ```typescript
@@ -252,7 +252,7 @@ export const canUpgrade = _canUpgrade;
 /**
  * Determine whether the given {@link Timestamp} can be verified.
  *
- * In order for a {@link Timestamp} to be verified, it needs to have at least one non-`pending` attestation.
+ * In order for a {@link Timestamp} to be verified, it needs to have at least one non-`pending` {@link Leaf}.
  *
  * @example
  * ```typescript
@@ -372,8 +372,8 @@ export const canVerify = _canVerify;
  * ```
  *
  * @param data - The data substrate to use.
- * @returns The read Timestamp.
- * @throws {@link !Error} when there's additional data past the Timestamp's value.
+ * @returns The read {@link Timestamp}.
+ * @throws {@link !Error} when there's additional data past the {@link Timestamp}'s value.
  */
 export const read = _read;
 
@@ -381,9 +381,9 @@ export const read = _read;
  * Shrink the given {@link Timestamp} on the given chain.
  *
  * Shrinking a {@link Timestamp} consists of eliminating all paths other than the one leading to the _oldest_ {@link Leaf} on the given chain.
- * This allows the {@link Timestamp} to be smaller, only keeping the most stringent attestation for the chose chain.
+ * This allows the {@link Timestamp} to be smaller, only keeping the most stringent {@link Leaf | attestation} for the chose chain.
  *
- * Note that shrinking multiple times does nothing.
+ * Note that shrinking an already shrunken {@link Timestamp} does nothing.
  *
  * @example
  * ```typescript
@@ -426,7 +426,7 @@ export const shrink = _shrink;
  * Prior to submission, a "fudge" value is hashed alongside the given one, to prevent information leakage.
  * This fudge value may be given explicitly, or it may be randomly generated if none given.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting timestamp.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
  * @example
  * ```typescript
@@ -485,9 +485,9 @@ export const submit = _submit;
 /**
  * Try to upgrade _all_ `pending` {@link Leaf | Leaves} on the given {@link Timestamp}.
  *
- * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
+ * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting (potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
  * @example
  * ```typescript
@@ -742,7 +742,7 @@ export const validate = _validate;
  *
  * A {@link Timestamp} is written by concatenating the following parts in order:
  *
- * 1. A "magic header" to indicate that this is an ots.
+ * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream.
  * 2. The `version` used to write the value.
  * 3. The {@link Timestamp}'s {@link FileHash}.
  * 4. The {@link Timestamp}'s {@link Tree}.
@@ -771,8 +771,8 @@ export const validate = _validate;
  *   // ]
  * ```
  *
- * @param timestamp - The value to write.
- * @returns The written value.
+ * @param timestamp - The {@link Timestamp} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export const write = _write;
 
@@ -781,7 +781,7 @@ export const write = _write;
  *
  * This function will extract all {@link Leaf | Leaves} from the given {@link Timestamp}, run all operations leading to them, and, with the resulting message, call each {@link Verifier} given.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the result.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the result.
  *
  * @example
  * ```typescript
@@ -896,7 +896,7 @@ export const write = _write;
  *
  * @param timestamp - The {@link Timestamp} to verify.
  * @param verifiers - An object, mapping a name to a {@link Verifier} proper to utilize.
- * @returns An object, mapping `attestations` to an object in turn mapping a chain "height" to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error | Errors} encountered.
+ * @returns An object, mapping `attestations` to an object in turn mapping a UNIX timestamp to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in turn mapping a verifier name to a list of {@link !Error | Errors} encountered.
  */
 export const verify = _verify;
 

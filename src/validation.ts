@@ -123,9 +123,9 @@ export function validateURL(url: unknown): URL {
 }
 
 /**
- * Validate that the given datum is a valid "Calendar" URL `string`.
+ * Validate that the given datum is a valid calendar {@link !URL} `string`.
  *
- * Calendar URLs need to abide by the following [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form):
+ * Calendar {@link !URL | URLs} need to abide by the following [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form):
  *
  * ```ini
  * url = %s"https://"
@@ -134,7 +134,7 @@ export function validateURL(url: unknown): URL {
  *       [ "/" ]
  * ```
  *
- * Or equivalently, to the following RegExp:
+ * Or equivalently, to the following {@link !RegExp}:
  *
  * ```perl
  * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/

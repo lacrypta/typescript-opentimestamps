@@ -32,7 +32,7 @@ import { retrievePostBody } from './utils';
 import { validateCalendarUrl, validateFileHashValue } from './validation';
 
 /**
- * A list of calendars to use by default, in case none are provided.
+ * A list of calendar {@link !URL | URLs} to use by default, in case none are provided.
  *
  * This list consists of:
  *
@@ -57,7 +57,7 @@ export const defaultCalendarUrls: URL[] = [
  * Prior to submission, a "fudge" value is hashed alongside the given one, to prevent information leakage.
  * This fudge value may be given explicitly, or it may be randomly generated if none given.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting timestamp.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
  * > This function internally calls {@link retrievePostBody}.
  * >

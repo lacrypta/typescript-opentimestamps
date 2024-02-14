@@ -80,7 +80,7 @@ import { treeToPaths } from './internals';
  * ```
  *
  * @param timestamp - The {@link Timestamp} being queried.
- * @param chain - The blockchain in question.
+ * @param chain - The chain in question.
  * @returns `true` if the given {@link Timestamp} can be shrunk on the given chain, `false` otherwise.
  */
 export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 'ethereum'): boolean {

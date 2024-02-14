@@ -29,7 +29,7 @@ import { readTree } from './read';
 import { retrieveGetBody, uint8ArrayToHex } from './utils';
 
 /**
- * Query the given calendar {@link !URL} with the given message in order to get an "absolute" version of the pending assertion.
+ * Query the given calendar {@link !URL} with the given message in order to get an "absolute" version of the pending {@link types!Leaf | assertion}.
  *
  * Calendars are queried by appending `/timestamp/{message}` to their {@link !URL}.
  * The calendar's response is then parsed as a {@link Tree} and returned.
@@ -121,7 +121,7 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
  *
  * This function will iterate all `pending` {@link types!Leaf | Leaves} and try to query the calendar therein looking for an upgraded {@link Tree}.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Tree}.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Tree}.
  *
  * > This function internally calls {@link upgradeFromCalendar}.
  *
@@ -316,9 +316,9 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: 
 /**
  * Try to upgrade _all_ `pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}.
  *
- * This function will try to upgrade all`pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
+ * This function will try to upgrade all`pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}, and return the resulting (potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
  * > This function internally calls {@link upgradeTree}.
  *

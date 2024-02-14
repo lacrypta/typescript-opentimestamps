@@ -128,9 +128,9 @@ export interface MergeMap<K, V> {
 }
 
 /**
- * A "Leaf" represents an attestation on a blockchain or a pending attestation on a Calendar.
+ * A {@link Leaf} represents an attestation on a blockchain or a pending attestation on a calendar.
  *
- * Leaves are realized as tagged unions utilizing the `type` field as discriminator.
+ * {@link Leaf | Leaves} are realized as tagged unions utilizing the `type` field as discriminator.
  *
  * Unknown attestations are "future-proofing" devices: there's no way of verifying them on the current version of the standard,
  * but are nonetheless supported in case a new blockchain is supported in the future.
@@ -139,7 +139,7 @@ export interface MergeMap<K, V> {
 export type Leaf =
   | {
       /**
-       * The discriminator declaring this to be a Bitcoin attestation leaf.
+       * The discriminator declaring this to be a Bitcoin attestation.
        *
        */
       type: 'bitcoin';
@@ -152,7 +152,7 @@ export type Leaf =
     }
   | {
       /**
-       * The discriminator declaring this to be a Litecoin attestation leaf.
+       * The discriminator declaring this to be a Litecoin attestation.
        *
        */
       type: 'litecoin';
@@ -165,7 +165,7 @@ export type Leaf =
     }
   | {
       /**
-       * The discriminator declaring this to be an Ethereum attestation leaf.
+       * The discriminator declaring this to be an Ethereum attestation.
        *
        */
       type: 'ethereum';
@@ -178,7 +178,7 @@ export type Leaf =
     }
   | {
       /**
-       * The discriminator declaring this to be a _pending_ attestation leaf.
+       * The discriminator declaring this to be a _pending_ attestation.
        *
        */
       type: 'pending';
@@ -191,26 +191,26 @@ export type Leaf =
     }
   | {
       /**
-       * The discriminator declaring this to be an _unknown_ attestation leaf.
+       * The discriminator declaring this to be an _unknown_ attestation.
        *
        */
       type: 'unknown';
 
       /**
-       * The 8-byte header identifying this (unknown) leaf type.
+       * The 8-byte header identifying this (unknown) attestation type.
        *
        */
       header: Uint8Array;
 
       /**
-       * The unknown leaf's payload.
+       * The unknown attestation's payload.
        *
        */
       payload: Uint8Array;
     };
 
 /**
- * An "Operation" is simply a unary operation to apply to the message being attested (an {@link !Uint8Array}).
+ * An {@link Op | Operation} is simply a transformation to apply to the message being attested (an {@link !Uint8Array}).
  *
  * Operations are realized as tagged unions utilizing the `type` field as discriminator.
  *
@@ -218,9 +218,9 @@ export type Leaf =
 export type Op =
   | {
       /**
-       * The discriminator declaring this to be a SHA1-hashing operation.
+       * The discriminator declaring this to be a SHA1-hashing transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = sha1(oldMsg);
@@ -231,9 +231,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be a RIPEMD160-hashing operation.
+       * The discriminator declaring this to be a RIPEMD160-hashing transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = ripemd160(oldMsg);
@@ -244,9 +244,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be a SHA256-hashing operation.
+       * The discriminator declaring this to be a SHA256-hashing transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = sha256(oldMsg);
@@ -257,9 +257,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be a KECCAK256-hashing operation.
+       * The discriminator declaring this to be a KECCAK256-hashing transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = keccak256(oldMsg);
@@ -270,9 +270,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be a reversal operation.
+       * The discriminator declaring this to be a reversal transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = oldMsg.toReversed();
@@ -283,9 +283,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be a "hexlify" operation.
+       * The discriminator declaring this to be a "hexlify" transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = oldMsg
@@ -302,9 +302,9 @@ export type Op =
     }
   | {
       /**
-       * The discriminator declaring this to be an appending operation.
+       * The discriminator declaring this to be an appending transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = Uint8Array.of(...oldMsg, ...operand);
@@ -314,18 +314,18 @@ export type Op =
       type: 'append';
 
       /**
-       * The operand for the appending operation.
+       * The operand for the appending transformation.
        *
-       * Note how the presence of this operand as part of the operation itself makes it effectively a _unary_ operation.
+       * Note how the presence of this operand as part of the {@link Op | operation} itself makes it effectively a _unary_ transformation.
        *
        */
       operand: Uint8Array;
     }
   | {
       /**
-       * The discriminator declaring this to be aa prepending operation.
+       * The discriminator declaring this to be aa prepending transformation.
        *
-       * Upon executing this operation the message will be transformed thus:
+       * Upon executing, the message will be transformed thus:
        *
        * ```typescript
        * let newMsg: Uint8Array = Uint8Array.of(...operand, ...oldMsg);
@@ -335,42 +335,42 @@ export type Op =
       type: 'prepend';
 
       /**
-       * The operand for the prepending operation.
+       * The operand for the prepending transformation.
        *
-       * Note how the presence of this operand as part of the operation itself makes it effectively a _unary_ operation.
+       * Note how the presence of this operand as part of the {@link Op | operation} itself makes it effectively a _unary_ transformation.
        *
        */
       operand: Uint8Array;
     };
 
 /**
- * A "Tree" is the result of combining several paths and merging their common prefixes to save space.
+ * A {@link Tree} is the result of combining several paths and merging their common prefixes to save space.
  *
  * This is implemented as a [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), with edges being decorated by {@link Op | operations} that
- * lead to other Trees, and terminals being simply {@link Leaf} elements.
+ * lead to other {@link Tree | Trees}, and terminals being simply {@link Leaf} elements.
  *
- * Furthermore, there's no point in having repeated {@link Leaf | leaves}, so a {@link MergeSet} is used to merge them;
- * likewise, there's no point in having repeated {@link Op} edges, so a {@link MergeMap} is used to merge the target Trees.
+ * Furthermore, there's no point in having repeated {@link Leaf | leaves}, so a {@link MergeSet} is used to merge them; likewise, there's no point in having repeated {@link Op} edges, so a {@link MergeMap} is used to merge the target {@link Tree | Trees}.
  *
  */
 export type Tree = {
   /**
-   * The leaves associated to this Tree node, as a {@link MergeSet} of {@link Leaf | leaves}.
+   * The {@link Leaf | leaves} associated to this {@link Tree} node, as a {@link MergeSet} of {@link Leaf | leaves}.
    *
    */
   leaves: MergeSet<Leaf>;
 
   /**
-   * The edges associated to this Tree node, as a {@link MergeMap} mapping {@link Op | operations} to Trees.
+   * The edges associated to this {@link Tree} node, as a {@link MergeMap} mapping {@link Op | operations} to {@link Tree | Trees}.
    *
    */
   edges: MergeMap<Op, Tree>;
 };
 
 /**
- * A "File Hash" is a way of representing both a hashing algorithm used and its resulting value.
+ * A {@link FileHash} is a way of representing both a hashing algorithm used and its resulting value.
  *
- * File Hashes are realized as tagged unions utilizing the `algorithm` field as discriminator.
+ * {@link FileHash | FileHashes} are realized as tagged unions utilizing the `algorithm` field as discriminator.
+ *
  */
 export type FileHash =
   | {
@@ -455,7 +455,7 @@ export type Timestamp = {
 };
 
 /**
- * Verifiers are callbacks used to verify that a {@link Leaf} is indeed valid.
+ * {@link Verifier | Verifiers} are callbacks used to verify that a {@link Leaf} is indeed valid.
  *
  * This type alias captures the required callback prototype.
  *

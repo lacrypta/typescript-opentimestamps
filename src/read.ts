@@ -40,7 +40,7 @@
  *
  * `<url>`s are the serialization of HTTPS URLs, it constitutes a specialization of the `<bytes>` derivation rule.
  * All characters involved are singe-byte values and no percent-encoding is allowed.
- * A JavaScript RegExp to validate this pattern is:
+ * A JavaScript {@link !RegExp} to validate this pattern is:
  *
  * ```perl
  * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
@@ -63,15 +63,15 @@
  *             / ( attestation-unknown  uint *OCTET )
  * ```
  *
- * An `<attestation>` consists of an 8-byte "tag" (similar to the tags defined further down) that discriminates the attestation type proper, followed by a `<bytes>`; the bytes value of this `<bytes>` constitutes the attestation's "payload".
+ * An `<attestation>` consists of an 8-byte "tag" (similar to the tags defined further down) that discriminates the {@link types!Leaf | attestation} type proper, followed by a `<bytes>`; the bytes value of this `<bytes>` constitutes the {@link types!Leaf | attestation}'s "payload".
  *
- * All "determined" attestations (those using the Bitcoin, Ethereum, and Litecoin blockchains) have a payload consisting solely of a `<uint>` value indicating the block height where the attestation was indeed included in the blockchain; this means that the `<bytes>` will be effectively a `<uint> <uint>`.
+ * All "determined" {@link types!Leaf | attestation} (those using the Bitcoin, Ethereum, and Litecoin blockchains) have a payload consisting solely of a `<uint>` value indicating the block height where the {@link types!Leaf | attestation} was indeed included in the blockchain; this means that the `<bytes>` will be effectively a `<uint> <uint>`.
  *
- * Pending attestations' payload consist of a `<url>` itself; this means that the `<bytes>` will be effectively `<uint> <uint> *<OCTET>`.
+ * Pending {@link types!Leaf | attestation}' payload consist of a `<url>` itself; this means that the `<bytes>` will be effectively `<uint> <uint> *<OCTET>`.
  *
- * Unknown attestations simply ignore their `<bytes>` value.
+ * Unknown {@link types!Leaf | attestations} simply ignore their `<bytes>` value.
  *
- * Now, let's deal with _operations derivation rules_ (these are realized via {@link types!Op | operations}).
+ * Now, let's deal with _{@link types!Op | operations} derivation rules_.
  *
  * ```ini
  * op-attestation = %x00  ; not explicitly referred to as such in the code
@@ -95,14 +95,14 @@
  *    / ( op-attestation       attestation )
  * ```
  *
- * Operations consist of a single-byte tag (the `<op-*>` rules) and a number of associated arguments.
- * Operations are divided into three different types: binary, unary, and attestations.
+ * {@link types!Op | Operations} consist of a single-byte tag (the `<op-*>` rules) and a number of associated arguments.
+ * {@link types!Op | Operations} are divided into three different types: binary, unary, and {@link types!Leaf | attestations}.
  *
- * Binary operations (viz. `append` and `prepend`) are serialized as their tag, a `<bytes>` operand, and a (recursive) `<timestamp>`.
+ * Binary {@link types!Op | operations} (viz. `append` and `prepend`) are serialized as their tag, a `<bytes>` operand, and a (recursive) `<timestamp>`.
  *
- * Unary operations (viz. `reverse`, `hexlify`, `sha1`, `ripemd160`, `sha256`, and `keccak256`) are serialized as their tag, and a (recursive) `<timestamp>`.
+ * Unary {@link types!Op | operations} (viz. `reverse`, `hexlify`, `sha1`, `ripemd160`, `sha256`, and `keccak256`) are serialized as their tag, and a (recursive) `<timestamp>`.
  *
- * Finally, attestations are simply serialized as their tag, and an `<attestation>`.
+ * Finally, {@link types!Leaf | attestations} are simply serialized as their tag, and an `<attestation>`.
  *
  * We can now define the {@link types!Timestamp | Timestamp} rules:
  *
@@ -130,7 +130,7 @@
  *            timestamp
  * ```
  *
- * A detached timestamp file consists of a 31 byte magic header, a `<uint>` indicating the serialization version to use (only version `1` is defined so far), a `<file-hash>`, and a `<timestamp>`.
+ * A {@link types!Timestamp | detached timestamp} file consists of a 31 byte {@link internals!magicHeader | magic header}, a `<uint>` indicating the serialization version to use (only version `1` is defined so far), a `<file-hash>`, and a `<timestamp>`.
  *
  * A `<file-hash>` is simply an algorithm tag, followed by the prescribed number of bytes required for its value (20 bytes for `sha1` and `ripemd160`, 32 bytes for `sha256` and `keccak256`).
  *
@@ -298,9 +298,9 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
 }
 
 /**
- * Read a variable-length _calendar_ URL, from the given position onwards, from the given data substrate.
+ * Read a variable-length _calendar_ {@link !URL}, from the given position onwards, from the given data substrate.
  *
- * Variable-length calendar URLs are stored as a `VARBYTE`, when read, they're also validated via {@link validateCalendarUrl}.
+ * Variable-length calendar {@link !URL | URLs} are stored as a `VARBYTE`, when read, they're also validated via {@link validateCalendarUrl}.
  *
  * > This function internally calls {@link readBytes}.
  * >
@@ -340,7 +340,7 @@ export function readBytes(data: Uint8Array, index: number): [Uint8Array, number]
  *
  * @param data - The data substrate to use.
  * @param index - The position from which to read.
- * @returns A pair, consisting of the read URL, and the new data `index`.
+ * @returns A pair, consisting of the read {@link !URL}, and the new data `index`.
  */
 export function readUrl(data: Uint8Array, index: number): [URL, number] {
   const [url, idx]: [Uint8Array, number] = readBytes(data, index);
@@ -440,7 +440,7 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
 /**
  * Read the `payload` portion of a pending {@link Leaf} (ie. a {@link Leaf} with `type` equal to `'pending'`).
  *
- * A pending {@link Leaf}'s payload consists solely of an URL, that constitutes the {@link Leaf}'s `url` value.
+ * A pending {@link Leaf}'s payload consists solely of an {@link !URL}, that constitutes the {@link Leaf}'s `url` value.
  *
  * > This function internally calls {@link readUrl}.
  *
@@ -478,8 +478,8 @@ export function readDoneLeafPayload(payload: Uint8Array): number {
  * ```
  *
  * @param payload - Payload data to read.
- * @returns The read `url` value.
- * @throws {@link !Error} when the payload contains additional data past the URL's value.
+ * @returns The read {@link !URL} value.
+ * @throws {@link !Error} when the payload contains additional data past the {@link !URL}'s value.
  */
 export function readPendingLeafPayload(payload: Uint8Array): URL {
   const [url, length]: [URL, number] = readUrl(payload, 0);
@@ -565,7 +565,7 @@ export function readPendingLeafPayload(payload: Uint8Array): URL {
  *
  * @param data - The data substrate to use.
  * @param index - The position from which to read.
- * @returns A pair, consisting of the read Leaf, and the new data `index`.
+ * @returns A pair, consisting of the read {@link Leaf}, and the new data `index`.
  */
 export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
   const [header, idx]: [Uint8Array, number] = getBytes(8, data, index);
@@ -588,7 +588,7 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
 /**
  * Read either an {@link Edge} or a {@link Leaf}, from the given position onwards, from the given data substrate.
  *
- * {@link Leaf | Leaves} are signalled by a `0x00` byte, followed by the {@link Leaf}'s content (cf. {@link readLeaf}).
+ * {@link Leaf | Leaves} are signalled by a `0x00` byte, followed by the {@link Leaf}'s content.
  *
  * {@link Edge | Edges} are signalled by a non-`0x00` byte that identifies their `type` (cf. {@link Tag}), followed by the {@link Edge}'s content.
  * Unary {@link Edge} `type`s (ie. `'sha1'`, `'ripemd160'`, `'sha256'`, `'keccak256'`, `'reverse'`, and `'hexlify'`) are followed by a {@link Tree}'s content, whilst binary {@link Edge} `type`s (ie. `'append'` and `'prepend'`) are followed by a `VARBYTE` (their `operand`) and then a {@link Tree}'s content.
@@ -654,7 +654,7 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * @param data - The data substrate to use.
  * @param index - The position from which to read.
- * @returns A pair, consisting of the read Edge or Leaf, and the new data `index`.
+ * @returns A pair, consisting of the read {@link Edge} or {@link Leaf}, and the new data `index`.
  * @throws {@link !Error} when the {@link Edge} `type` is not known.
  */
 export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, number] {
@@ -688,7 +688,7 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
 /**
  * Read a {@link Tree}, from the given position onwards, from the given data substrate.
  *
- * {@link Tree | Trees} are stored as sequences of values, with a special "tag" (ie. `0xff`) signifying that the one that follows is **not** the last value in the {@link Tree}.
+ * {@link Tree | Trees} are stored as sequences of values, with a special "tag" (ie. {@link internals!nonFinal | `0xff`}) signifying that the one that follows is **not** the last value in the {@link Tree}.
  * Values themselves can be either {@link Leaf | Leaves} or {@link Edge | Edges}.
  *
  * > This function internally calls {@link readEdgeOrLeaf}.
@@ -722,7 +722,7 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
  *
  * @param data - The data substrate to use.
  * @param index - The position from which to read.
- * @returns A pair, consisting of the read Tree, and the new data `index`.
+ * @returns A pair, consisting of the read {@link Tree}, and the new data `index`.
  */
 export function readTree(data: Uint8Array, index: number): [Tree, number] {
   const result: Tree = newTree();
@@ -803,7 +803,7 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
  *
  * @param data - The data substrate to use.
  * @param index - The position from which to read.
- * @returns A pair, consisting of the read FileHash, and the new data `index`.
+ * @returns A pair, consisting of the read {@link FileHash}, and the new data `index`.
  * @throws {@link !Error} when the hash algorithm is unknown.
  */
 export function readFileHash(data: Uint8Array, index: number): [FileHash, number] {
@@ -869,7 +869,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *
  * {@link Timestamp | Timestamps} are stored as a sequence of "parts":
  *
- * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream (cf. {@link magicHeader}).
+ * 1. A {@link magicHeader | "magic header"} to indicate that this is a {@link Timestamp} data stream.
  * 2. The serialization format `version`, as a `UINT`.
  * 3. The serialized {@link FileHash}.
  * 4. The serialized {@link Tree}.
@@ -937,8 +937,8 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  * ```
  *
  * @param data - The data substrate to use.
- * @returns The read Timestamp.
- * @throws {@link !Error} when there's additional data past the Timestamp's value.
+ * @returns The read {@link Timestamp}.
+ * @throws {@link !Error} when there's additional data past the {@link Timestamp}'s value.
  */
 export function read(data: Uint8Array): Timestamp {
   const idx: number = readLiteral(data, 0, magicHeader)[1];

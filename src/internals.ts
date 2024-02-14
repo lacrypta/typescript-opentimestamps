@@ -73,7 +73,7 @@ export type Edge = [Op, Tree];
  */
 export enum Tag {
   /**
-   * Tag indicating that the next element in the `ots` file is an attestation.
+   * Tag indicating that the next element in the `ots` file is an attestation (we call those {@link Leaf | Leaves}).
    *
    */
   attestation = 0x00,
@@ -220,7 +220,7 @@ export const nonFinal: number = 0xff;
  *   // Uint8Array(6) [ 48, 49, 48, 50, 48, 51 ]
  * ```
  *
- * @param op - The operation to execute.
+ * @param op - The {@link Op | operation} to execute.
  * @param msg - The message to execute it on.
  * @returns The resulting message.
  */
@@ -262,7 +262,7 @@ export function callOp(op: Op, msg: Uint8Array): Uint8Array {
  *   // Uint8Array(26) [ 1, 2, 3, 218, 57, ..., 9, 4, 5, 6 ]
  * ```
  *
- * @param ops - The sequence of operations to execute.
+ * @param ops - The sequence of {@link Ops | operations} to execute.
  * @param msg - The message to execute them on.
  * @returns The resulting message.
  */
@@ -317,8 +317,8 @@ export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
  * ));                                                                                              //  3
  * ```
  *
- * @param left - The first leaf to compare.
- * @param right - The second leaf to compare.
+ * @param left - The first {@link Leaf} to compare.
+ * @param right - The second {@link Leaf} to compare.
  * @returns `0` if both {@link Leaf | Leaves} are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
  */
 export function compareLeaves(left: Leaf, right: Leaf): number {
@@ -381,8 +381,8 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  * ));  //  3
  * ```
  *
- * @param left - The first operation to compare.
- * @param right - The second operation to compare.
+ * @param left - The first {@link Op | operation} to compare.
+ * @param right - The second {@link Op | operation} to compare.
  * @returns `0` if both {@link Op | operations} are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
  */
 export function compareOps(left: Op, right: Op): number {
@@ -476,9 +476,9 @@ export function compareEdges(left: Edge, right: Edge): number {
  *   // ]
  * ```
  *
- * @param left - The tree to incorporate data _into_.
- * @param right - The tree to incorporate data _from_.
- * @returns The `left` tree, for chaining.
+ * @param left - The {@link Tree} to incorporate data _into_.
+ * @param right - The {@link Tree} to incorporate data _from_.
+ * @returns The resulting {@link Tree}, for chaining.
  */
 export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
   left.leaves.incorporate(right.leaves);
@@ -530,9 +530,9 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *   // ]
  * ```
  *
- * @param tree - The tree to incorporate the given parameter _into_.
+ * @param tree - The {@link Tree} to incorporate the given parameter _into_.
  * @param edgeOrLeaf - The element to incorporate.
- * @returns The `tree`, for chaining.
+ * @returns The resulting {@link Tree}, for chaining.
  */
 export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
   if (Array.isArray(edgeOrLeaf)) {
@@ -546,7 +546,7 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
 /**
  * A set of {@link Leaf | leaves} which are implicitly deduplicated.
  *
- * A `LeafSet` needs to take two operations into account:
+ * A {@link LeafSet} needs to take two parameters into account:
  *
  * - **how to determine if two {@link Leaf | leaves} are equivalent:** takes a {@link Leaf} and return a `string` that represents it unequivocally (ie. two {@link Leaf | leaves} returning the same `string` will be taken to be equal themselves).
  * - **how to combine two equivalent {@link Leaf | leaves}:** {@link Leaf | leaves} are not really combined, if two of them are equivalent, then they're _equal_, and only a single one is kept.
@@ -619,7 +619,7 @@ export class LeafSet implements MergeSet<Leaf> {
   /**
    * The callback that will transform a {@link Leaf} into a `string` (implicitly defining what "equality" between them means).
    *
-   * @param leaf - Leaf to get the `string` representation of.
+   * @param leaf - {@link Leaf} to get the `string` representation of.
    * @returns The `string` representation of the given {@link Leaf}.
    */
   #toKey(leaf: Leaf): string {
@@ -636,8 +636,8 @@ export class LeafSet implements MergeSet<Leaf> {
   /**
    * The callback that will be used to combine two equivalent {@link Leaf | leaves} within the {@link LeafSet}.
    *
-   * @param left - First Leaf to combine.
-   * @param _right - Second Leaf to combine.
+   * @param left - First {@link Leaf} to combine.
+   * @param _right - Second {@link Leaf} to combine.
    * @returns The resulting combined {@link Leaf}.
    */
   #combine(left: Leaf, _right: Leaf): Leaf {
@@ -647,7 +647,7 @@ export class LeafSet implements MergeSet<Leaf> {
   /**
    * Perform the addition "heavy-lifting" within a {@link LeafSet}.
    *
-   * @param key - The `string` key to use (previously passed through {@link \#toKey}).
+   * @param key - The `string` key to use (derived from a {@link Leaf}).
    * @param leaf - The actual {@link Leaf} to add.
    * @returns The {@link LeafSet} instance, for chaining.
    */
@@ -669,7 +669,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).size());  // 1
    * ```
    *
-   * @returns The number of leaves in the {@link LeafSet}.
+   * @returns The number of {@link Leaf | leaves} in the {@link LeafSet}.
    */
   public size(): number {
     return this.values().length;
@@ -690,7 +690,7 @@ export class LeafSet implements MergeSet<Leaf> {
    *   // [ { type: 'bitcoin', height: 123 } ]
    * ```
    *
-   * @returns The list of leaves in the {@link LeafSet}.
+   * @returns The list of {@link Leaf | leaves} in the {@link LeafSet}.
    */
   public values(): Leaf[] {
     return Object.values(this.#mapping);
@@ -713,7 +713,7 @@ export class LeafSet implements MergeSet<Leaf> {
    * console.log(leafSet.remove({ type: 'litecoin', height: 123 }).size());  // 0
    * ```
    *
-   * @param leaf - The Leaf to remove.
+   * @param leaf - The {@link Leaf} to remove.
    * @returns The original {@link LeafSet} with the given {@link Leaf} removed, for chaining.
    */
   public remove(leaf: Leaf): this {
@@ -793,9 +793,9 @@ export class LeafSet implements MergeSet<Leaf> {
 /**
  * A mapping from {@link Op | operations} to {@link Tree | Trees} which is implicitly deduplicated.
  *
- * An `EdgeMap` needs to take two operations into account:
+ * An {@link EdgeMap} needs to take two parameters into account:
  *
- * - **how to determine if two {@link Op | operations} are equivalent:** takes an {@link Op} and return a `string` that represents it unequivocally (ie. two {@link Op | operations} returning the same `string` will be taken to be equal themselves).
+ * - **how to determine if two {@link Op | operations} are equivalent:** takes an {@link Op} and returns a `string` that represents it unequivocally (ie. two {@link Op | operations} returning the same `string` will be taken to be equal themselves).
  * - **how to combine two equivalent {@link Tree | Trees}:** {@link Tree | Trees} are combined by merging them recursively.
  *
  * @example
@@ -880,7 +880,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
   /**
    * The callback that will transform an {@link Op} into a `string` (implicitly defining what "equality" between keys means).
    *
-   * @param op - Op to get the `string` representation of.
+   * @param op - {@link Op} to get the `string` representation of.
    * @returns The `string` representation of the given {@link Op}.
    */
   #toKey(op: Op): string {
@@ -896,8 +896,8 @@ export class EdgeMap implements MergeMap<Op, Tree> {
   /**
    * The callback that will be used to combine two equivalent {@link Tree | Trees} within the {@link EdgeMap}.
    *
-   * @param left - First Tree to combine.
-   * @param right - Second Tree to combine.
+   * @param left - First {@link Tree} to combine.
+   * @param right - Second {@link Tree} to combine.
    * @returns The resulting combined {@link Tree}.
    */
   #combine(left: Tree, right: Tree): Tree {
@@ -1112,14 +1112,14 @@ export class EdgeMap implements MergeMap<Op, Tree> {
  *   // }
  * ```
  *
- * @returns The empty tree constructed.
+ * @returns The empty {@link Tree} constructed.
  */
 export function newTree(): Tree {
   return { edges: new EdgeMap(), leaves: new LeafSet() };
 }
 
 /**
- * Given a set of {@link Path | Paths}, transform them into a {@link Tree}, by repeatedly incorporating each of them to an empty one.
+ * Given a set of {@link Path | Paths}, transform them into a {@link Tree}, by repeatedly incorporating each of them to {@link newTree | an empty one}.
  *
  * @example
  * ```typescript
@@ -1148,8 +1148,8 @@ export function newTree(): Tree {
  *   // [ { type: 'bitcoin', height: 456 } ]
  * ```
  *
- * @param paths - The paths to transform.
- * @returns The resulting tree.
+ * @param paths - The {@link Paths} to transform.
+ * @returns The resulting {@link Tree}.
  */
 export function pathsToTree(paths: Paths): Tree {
   return paths
@@ -1167,7 +1167,7 @@ export function pathsToTree(paths: Paths): Tree {
 }
 
 /**
- * Transform a {@link Tree} into a set of {@link Path | Paths}, by extracting each path from the tree's root to a {@link Leaf}.
+ * Transform a {@link Tree} into a set of {@link Path | Paths}, by extracting each path from the {@link Tree}'s root to a {@link Leaf}.
  *
  * @example
  * ```typescript
@@ -1204,9 +1204,9 @@ export function pathsToTree(paths: Paths): Tree {
  *   // { type: 'bitcoin', height: 456 }
  * ```
  *
- * @param tree - The tree to transform.
- * @param path - A list of {@link Op | operations} representing the current path from the root to the given tree.
- * @returns The extracted paths.
+ * @param tree - The {@link Tree} to transform.
+ * @param path - A list of {@link Op | operations} representing the current {@link Path} from the root to the given {@link Tree}.
+ * @returns The extracted {@link Paths}.
  */
 export function treeToPaths(tree: Tree, path: Ops = []): Paths {
   const result: Paths = [];

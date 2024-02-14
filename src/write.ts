@@ -17,7 +17,7 @@
 /**
  * This module exposes binary writing functions.
  *
- * See {@link read! | read} for information regarding the binary serialization format.
+ * @see {@link read! | Read} for information regarding the binary serialization format.
  *
  * @packageDocumentation
  * @module
@@ -71,7 +71,7 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```
  *
  * @param value - The value to write.
- * @returns The written value.
+ * @returns The written {@link !Uint8Array}.
  * @throws {@link !Error} when the given value is not a {@link !Number.isSafeInteger | safe integer}.
  */
 export function writeUint(value: number): Uint8Array {
@@ -104,8 +104,8 @@ export function writeUint(value: number): Uint8Array {
  *   // Uint8Array(5) [ 4, 1, 2, 3, 4 ]
  * ```
  *
- * @param bytes - The value to write.
- * @returns The written value.
+ * @param bytes - The bytes to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function writeBytes(bytes: Uint8Array): Uint8Array {
   return uint8ArrayConcat(writeUint(bytes.length), bytes);
@@ -171,8 +171,8 @@ export function writeBytes(bytes: Uint8Array): Uint8Array {
  *   // ]
  * ```
  *
- * @param fileHash - The value to write.
- * @returns The written value.
+ * @param fileHash - The {@link FileHash} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function writeFileHash(fileHash: FileHash): Uint8Array {
   return uint8ArrayConcat(Uint8Array.of(Tag[fileHash.algorithm]), fileHash.value);
@@ -214,8 +214,8 @@ export function writeFileHash(fileHash: FileHash): Uint8Array {
  *   // Uint8Array(13) [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 3, 1, 2, 3 ]
  * ```
  *
- * @param leaf - The value to write.
- * @returns The written value.
+ * @param leaf - The {@link Leaf} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function writeLeaf(leaf: Leaf): Uint8Array {
   const resultParts: Uint8Array[] = [];
@@ -272,8 +272,8 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
  *   // Uint8Array(5) [ 241, 3, 1, 2, 3 ]
  * ```
  *
- * @param edge - The value to write.
- * @returns The written value.
+ * @param edge - The {@link Edge} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function writeEdge(edge: Edge): Uint8Array {
   const [op, tree]: Edge = edge;
@@ -350,8 +350,8 @@ export function writeEdge(edge: Edge): Uint8Array {
  *   // Uint8Array(3) [ 255, 2, 8 ]
  * ```
  *
- * @param tree - The value to write.
- * @returns The written value.
+ * @param tree - The {@link Tree} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function writeTree(tree: Tree): Uint8Array {
   const leaves: Leaf[] = tree.leaves.values();
@@ -383,7 +383,7 @@ export function writeTree(tree: Tree): Uint8Array {
  *
  * A {@link Timestamp} is written by concatenating the following parts in order:
  *
- * 1. A "magic header" to indicate that this is an ots (cf. {@link magicHeader}).
+ * 1. A {@link magicHeader | "magic header"} to indicate that this is a {@link Timestamp} data stream.
  * 2. The `version` used to write the value.
  * 3. The {@link Timestamp}'s {@link FileHash}.
  * 4. The {@link Timestamp}'s {@link Tree}.
@@ -419,8 +419,8 @@ export function writeTree(tree: Tree): Uint8Array {
  * // ]
  * ```
  *
- * @param timestamp - The value to write.
- * @returns The written value.
+ * @param timestamp - The {@link Timestamp} to write.
+ * @returns The written {@link !Uint8Array}.
  */
 export function write(timestamp: Timestamp): Uint8Array {
   return uint8ArrayConcat(

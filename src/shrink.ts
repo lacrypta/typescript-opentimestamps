@@ -29,10 +29,10 @@ import { pathsToTree, treeToPaths } from './internals';
 /**
  * Shrink the given {@link Timestamp} on the given chain.
  *
- * Shrinking a {@link Timestamp} consists of eliminating all paths other than the one leading to the _oldest_ {@link Leaf} on the given chain.
- * This allows the {@link Timestamp} to be smaller, only keeping the most stringent attestation for the chose chain.
+ * Shrinking a {@link Timestamp} consists of eliminating all {@link internals!Paths | Paths} other than the one leading to the _oldest_ {@link Leaf} on the given chain.
+ * This allows the {@link Timestamp} to be smaller, only keeping the most stringent {@link Leaf | attestation} for the chosen chain.
  *
- * Note that shrinking multiple times does nothing.
+ * Note that shrinking an already shrunken {@link Timestamp} does nothing.
  *
  * @example
  * ```typescript

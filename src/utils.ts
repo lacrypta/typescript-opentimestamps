@@ -63,7 +63,7 @@ export function uint8ArrayToHex(data: Uint8Array): string {
  * ```
  *
  * @param hex - Hex string to deserialize.
- * @returns The deserialized data.
+ * @returns The deserialized {@link !Uint8Array}.
  * @throws {@link !Error} if the given hex string length is odd.
  * @throws {@link !Error} if the given hex string contains non-hexadecimal characters.
  */
@@ -126,7 +126,7 @@ export function uint8ArrayToBase64(data: Uint8Array): string {
  * ```
  *
  * @param base64 - Base64 string to deserialize.
- * @returns The deserialized data.
+ * @returns The deserialized {@link !Uint8Array}.
  * @throws {@link !DOMException} if the given base64 string contains invalid characters.
  * @throws {@link !DOMException} if the given base64 string is not correctly encoded.
  */
@@ -155,9 +155,9 @@ export function uint8ArrayFromBase64(base64: string): Uint8Array {
  * )); // false
  * ```
  *
- * @param left - The first array to compare.
- * @param right - The second array to compare.
- * @returns `true` if both arrays are equal, `false` otherwise.
+ * @param left - The first {@link !Uint8Array | array} to compare.
+ * @param right - The second {@link !Uint8Array | array} to compare.
+ * @returns `true` if both {@link !Uint8Array | arrays} are equal, `false` otherwise.
  */
 export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
   return (
@@ -194,9 +194,9 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
  * ));  // -2
  *  * ```
  *
- * @param left - The first array to compare.
- * @param right - The second array to compare.
- * @returns `0` if both arrays are equal, a positive `number` if the {@link left} array is bigger, a negative `number` otherwise.
+ * @param left - The first {@link !Uint8Array | array} to compare.
+ * @param right - The second {@link !Uint8Array | array} to compare.
+ * @returns `0` if both {@link !Uint8Array | arrays} are equal, a positive number if the `left` {@link !Uint8Array | array} is bigger, a negative number otherwise.
  */
 export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
   for (let i: number = 0; i < left.length && i < right.length; i++) {
@@ -223,7 +223,7 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
  *   // Uint8Array(2) [ 1, 2 ]
  * ```
  *
- * @param arrays - The arrays to concatenate.
+ * @param arrays - The {@link !Uint8Array | arrays} to concatenate.
  * @returns The resulting concatenated {@link !Uint8Array}.
  */
 export function uint8ArrayConcat(...arrays: Uint8Array[]): Uint8Array {
@@ -253,8 +253,8 @@ export function uint8ArrayConcat(...arrays: Uint8Array[]): Uint8Array {
  *   // Uint8Array(3) [ 3, 2, 1 ]
  * ```
  *
- * @param array - The array to reverse.
- * @returns The reversed array.
+ * @param array - The {@link !Uint8Array | array} to reverse.
+ * @returns The reversed {@link !Uint8Array}.
  */
 export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
   const result: Uint8Array = new Uint8Array(array.length);
@@ -335,7 +335,7 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
  * ```
  *
  * @param url - The {@link !URL} to fetch.
- * @returns The response body as a {@link Uint8Array}.
+ * @returns The response body as a {@link !Uint8Array}.
  * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
  */
 export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
@@ -380,7 +380,7 @@ export async function retrieveGetBody(url: URL): Promise<Uint8Array> {
  *
  * @param url - The {@link !URL} to fetch.
  * @param body - The `POST` body to send, as a {@link !Uint8Array}.
- * @returns The response body as a {@link Uint8Array}.
+ * @returns The response body as a {@link !Uint8Array}.
  * @throws {@link !Error} If there are errors performing the {@link !fetch} call.
  */
 export async function retrievePostBody(url: URL, body: Uint8Array): Promise<Uint8Array> {

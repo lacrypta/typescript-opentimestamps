@@ -31,7 +31,7 @@ import { callOps, treeToPaths } from './internals';
  *
  * This function will extract all {@link types!Leaf | Leaves} from the given {@link Timestamp}, run all operations leading to them, and, with the resulting message, call each {@link Verifier} given.
  *
- * Errors encountered upon submission are not thrown, but rather collected and returned alongside the result.
+ * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the result.
  *
  * @example
  * ```typescript
@@ -146,7 +146,7 @@ import { callOps, treeToPaths } from './internals';
  *
  * @param timestamp - The {@link Timestamp} to verify.
  * @param verifiers - An object, mapping a name to a {@link Verifier} proper to utilize.
- * @returns An object, mapping `attestations` to an object in turn mapping a UNIX timestamp to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error | Errors} encountered.
+ * @returns An object, mapping `attestations` to an object in turn mapping a UNIX timestamp to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in turn mapping a verifier name to a list of {@link !Error | Errors} encountered.
  */
 export async function verify(
   timestamp: Timestamp,

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * This module exposes functions related to the human-readable output of Timestamps.
+ * This module exposes functions related to the human-readable output of {@link types!Timestamp | Timestamps}.
  *
  * @packageDocumentation
  * @module
@@ -79,7 +79,7 @@ export function indent(text: string): string {
  * );                                                         // unknownVerify<0102030405060708>(msg, 010203)
  *```
  *
- * @param leaf - Leaf to generate human-readable string for.
+ * @param leaf - {@link Leaf} to generate human-readable string for.
  * @returns Human-readable string generated.
  */
 export function infoLeaf(leaf: Leaf): string {
@@ -124,7 +124,7 @@ export function infoLeaf(leaf: Leaf): string {
  *   // bitcoinVerify(msg, 123)
  *```
  *
- * @param edge - Edge to generate human-readable string for.
+ * @param edge - {@link Edge} to generate human-readable string for.
  * @param msg - Optional message to use as {@link Op | operation} input for verbose output.
  * @returns Human-readable string generated.
  */
@@ -209,7 +209,7 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *   //     bitcoinVerify(msg, 456)
  *```
  *
- * @param tree - Tree to generate human-readable string for.
+ * @param tree - {@link Tree} to generate human-readable string for.
  * @param msg - Optional message to use for verbose output.
  * @returns Human-readable string generated.
  */
@@ -253,7 +253,7 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  *                                              //     = 0102030405060708090a0b0c0d0e0f1011121314
  *```
  *
- * @param fileHash - File hash to generate human-readable string for.
+ * @param fileHash - {@link FileHash} to generate human-readable string for.
  * @param verbose - Whether to include the `value` field in the output or not.
  * @returns Human-readable string generated.
  */
@@ -340,7 +340,7 @@ export function infoFileHash(fileHash: FileHash, verbose: boolean): string {
  *   //     bitcoinVerify(msg, 456)
  * ```
  *
- * @param timestamp - File hash to generate human-readable string for.
+ * @param timestamp - {@link Timestamp} to generate human-readable string for.
  * @param verbose - Whether to include the `value` field in the output or not.
  * @returns Human-readable string generated.
  */
