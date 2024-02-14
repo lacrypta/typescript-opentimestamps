@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Implementation of a {@link types!Verifier | Verifier} using [Blockstream](https://blockstream.info)'s API.
+ *
+ * @packageDocumentation
+ * @module
+ */
+
 import type { Leaf, Verifier } from '../types';
 
 import {
@@ -25,6 +32,18 @@ import {
   uint8ArrayToHex,
 } from '../utils';
 
+/**
+ * Call [Blockstream](https://blockstream.info)'s API to verify the given {@link Leaf}.
+ *
+ * If the given {@link Leaf} is a `bitcoin` one, call [Blockstream](https://blockstream.info)'s API with the given {@link Leaf}'s `height` and verify that the Merkle root corresponds with the given expected one.
+ * Otherwise, return `undefined`.
+ *
+ * @param msg - Message to expect at the block's Merkle root.
+ * @param leaf - {@link Leaf} to verify.
+ * @return Either the UNIX timestamp corresponding to the block in question, or `undefined` if the given {@link Leaf} is not a `bitcoin` one.
+ * @throws {@link !Error} if the API's response is malformed.
+ * @throws {@link !Error} if the Merkle root in the block in question does not match the expected Merkle root.
+ */
 export default (async (msg: Uint8Array, leaf: Leaf): Promise<number | undefined> => {
   if ('bitcoin' !== leaf.type) {
     return undefined;

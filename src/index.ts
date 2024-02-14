@@ -900,4 +900,8 @@ export const write = _write;
  */
 export const verify = _verify;
 
+/**
+ * A mapping from {@link Verifier} name to their actual implementation, suitable for usage with {@link verify}.
+ *
+ */
 export const verifiers = _verifiers;

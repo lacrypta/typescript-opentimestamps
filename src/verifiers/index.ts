@@ -14,9 +14,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * This module gathers {@link types!Verifier | Verifier}s under a single entry point, and provides a default export ready for usage with {@link verify!verify | verify}.
+ *
+ * @packageDocumentation
+ * @module
+ */
+
 import type { Verifier } from '../types';
 
 import { default as verifyViaBlockchainInfo } from './blockchain.info';
 import { default as verifyViaBlockstream } from './blockstream';
 
+/**
+ * A `default` export that simply re-exports all defined {@link Verifier}s in the module in a manner suitable for usage with {@link verify!verify | verify}.
+ *
+ */
 export default { verifyViaBlockchainInfo, verifyViaBlockstream } satisfies Record<string, Verifier>;
