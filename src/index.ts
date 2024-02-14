@@ -305,7 +305,7 @@ export const canVerify = _canVerify;
 /**
  * Read a {@link Timestamp} from the given data substrate.
  *
- * {@link Timestamp}s are stored as a sequence of "parts":
+ * {@link Timestamp | Timestamps} are stored as a sequence of "parts":
  *
  * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream.
  * 2. The serialization format `version`, as a `UINT`.
@@ -478,14 +478,14 @@ export const shrink = _shrink;
  * @param value - The value to hash.
  * @param fudge - The fudging string to add (if not given, use a 16 random bytes).
  * @param calendarUrls - The calendars to submit the hashed value to, if not give, use default values.
- * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `timestamp` to the resulting {@link Timestamp | Timestamps} and `errors` to a list of {@link !Error | Errors} encountered.
  */
 export const submit = _submit;
 
 /**
  * Try to upgrade _all_ `pending` {@link Leaf | Leaves} on the given {@link Timestamp}.
  *
- * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error}s encountered.
+ * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
  *
  * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
@@ -586,7 +586,7 @@ export const submit = _submit;
  * ```
  *
  * @param timestamp - The {@link Timestamp} to upgrade.
- * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error | Errors} encountered.
  */
 export const upgrade = _upgrade;
 
@@ -777,7 +777,7 @@ export const validate = _validate;
 export const write = _write;
 
 /**
- * Verify the given {@link Timestamp} with the given {@link Verifier}s.
+ * Verify the given {@link Timestamp} with the given {@link Verifier | Verifiers}.
  *
  * This function will extract all {@link Leaf | Leaves} from the given {@link Timestamp}, run all operations leading to them, and, with the resulting message, call each {@link Verifier} given.
  *
@@ -896,7 +896,7 @@ export const write = _write;
  *
  * @param timestamp - The {@link Timestamp} to verify.
  * @param verifiers - An object, mapping a name to a {@link Verifier} proper to utilize.
- * @returns An object, mapping `attestations` to an object in turn mapping a chain "height" to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `attestations` to an object in turn mapping a chain "height" to a list of verifier names verifying the existence of the {@link Timestamp} at said height; and mapping `errors` to an object in tun mapping a verifier name to a list of {@link !Error | Errors} encountered.
  */
 export const verify = _verify;
 

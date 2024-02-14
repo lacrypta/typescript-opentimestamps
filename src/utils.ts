@@ -135,7 +135,7 @@ export function uint8ArrayFromBase64(base64: string): Uint8Array {
 }
 
 /**
- * Determine whether two {@link !Uint8Array}s are indeed equal to each other.
+ * Determine whether two {@link !Uint8Array | Uint8Arrays} are indeed equal to each other.
  *
  * @example
  * ```typescript
@@ -166,7 +166,7 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
 }
 
 /**
- * Compare the given {@link !Uint8Array}s lexicographically.
+ * Compare the given {@link !Uint8Array | Uint8Arrays} lexicographically.
  *
  * @example
  * ```typescript
@@ -209,7 +209,7 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
 
 // ref: https://stackoverflow.com/a/49129872
 /**
- * Concatenate the given {@link !Uint8Array}s.
+ * Concatenate the given {@link !Uint8Array | Uint8Arrays}.
  *
  * @example
  * ```typescript

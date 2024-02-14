@@ -56,7 +56,7 @@ export type Path = {
 };
 
 /**
- * A simple type alias to refer to a list of {@link Path}s.
+ * A simple type alias to refer to a list of {@link Path | Paths}.
  *
  */
 export type Paths = Path[];
@@ -343,7 +343,7 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
 }
 
 /**
- * Compare two {@link Op}s, and return the comparison result.
+ * Compare two {@link Op | operations}, and return the comparison result.
  *
  * {@link Op} comparison works as follows:
  * 1. First the {@link Op}'s _tags_ are compared (cf. {@link Tag}), if they're different, their difference is returned as the result.
@@ -383,7 +383,7 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  *
  * @param left - The first operation to compare.
  * @param right - The second operation to compare.
- * @returns `0` if both {@link Op}s are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
+ * @returns `0` if both {@link Op | operations} are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
  */
 export function compareOps(left: Op, right: Op): number {
   const tagCompare: number = Tag[left.type] - Tag[right.type];
@@ -394,9 +394,9 @@ export function compareOps(left: Op, right: Op): number {
 }
 
 /**
- * Compare two {@link Edge}s, and return the comparison result.
+ * Compare two {@link Edge | Edges}, and return the comparison result.
  *
- * {@link Edge} comparison merely entails comparing their corresponding {@link Op}s.
+ * {@link Edge} comparison merely entails comparing their corresponding {@link Op | operations}.
  *
  * @example
  * ```typescript
@@ -427,7 +427,7 @@ export function compareOps(left: Op, right: Op): number {
  *
  * @param left - The first edge to compare.
  * @param right - The second edge to compare.
- * @returns `0` if both {@link Edge}s are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
+ * @returns `0` if both {@link Edge | Edges} are equal, a positive number if the `left` one is bigger than the `right` one, or a negative number otherwise.
  */
 export function compareEdges(left: Edge, right: Edge): number {
   const [[leftOp], [rightOp]]: [Edge, Edge] = [left, right];
@@ -435,10 +435,10 @@ export function compareEdges(left: Edge, right: Edge): number {
 }
 
 /**
- * Incorporate _all_ {@link Leaf | Leaves} and {@link Edge}s from the `right` {@link Tree} into the `left` {@link Tree}.
+ * Incorporate _all_ {@link Leaf | Leaves} and {@link Edge | Edges} from the `right` {@link Tree} into the `left` {@link Tree}.
  *
  * This function will effectively take all {@link Leaf | Leaves} from the `right` {@link Tree} and add them to the `left` {@link Tree}.
- * Likewise, it will take all {@link Edge}s from the `right` {@link Tree} and add them to the `left` {@link Tree}.
+ * Likewise, it will take all {@link Edge | Edges} from the `right` {@link Tree} and add them to the `left` {@link Tree}.
  * This effectively makes the `left` {@link Tree} contain all of the data in the `right` {@link Tree} in addition to its own.
  *
  * @example
@@ -791,12 +791,12 @@ export class LeafSet implements MergeSet<Leaf> {
 }
 
 /**
- * A mapping from {@link Op}s to {@link Tree}s which is implicitly deduplicated.
+ * A mapping from {@link Op | operations} to {@link Tree | Trees} which is implicitly deduplicated.
  *
  * An `EdgeMap` needs to take two operations into account:
  *
- * - **how to determine if two {@link Op}s are equivalent:** takes an {@link Op} and return a `string` that represents it unequivocally (ie. two {@link Op}s returning the same `string` will be taken to be equal themselves).
- * - **how to combine two equivalent {@link Tree}s:** {@link Tree}s are combined by merging them recursively.
+ * - **how to determine if two {@link Op | operations} are equivalent:** takes an {@link Op} and return a `string` that represents it unequivocally (ie. two {@link Op | operations} returning the same `string` will be taken to be equal themselves).
+ * - **how to combine two equivalent {@link Tree | Trees}:** {@link Tree | Trees} are combined by merging them recursively.
  *
  * @example
  * ```typescript
@@ -858,7 +858,7 @@ export class LeafSet implements MergeSet<Leaf> {
  */
 export class EdgeMap implements MergeMap<Op, Tree> {
   /**
-   * The {@link EdgeMap} is implemented via a pair of {@link !Record}s; the first one maps "keys" (derived form an actual {@link Op}) to actual {@link Op}s.
+   * The {@link EdgeMap} is implemented via a pair of {@link !Record | Records}; the first one maps "keys" (derived form an actual {@link Op}) to actual {@link Op | operations}.
    *
    * This is the main {@link Op}-mapping used to implement the {@link EdgeMap}.
    *
@@ -866,7 +866,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
   readonly #keySet: Record<string, Op> = {};
 
   /**
-   * The {@link EdgeMap} is implemented via a pair of {@link !Record}s; the second one maps "keys" (derived from an actual {@link Op}) to actual {@link Tree}s.
+   * The {@link EdgeMap} is implemented via a pair of {@link !Record | Records}; the second one maps "keys" (derived from an actual {@link Op}) to actual {@link Tree | Trees}.
    *
    * This is the main {@link Tree}-mapping used to implement the {@link EdgeMap}.
    *
@@ -894,7 +894,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
   }
 
   /**
-   * The callback that will be used to combine two equivalent {@link Tree}s within the {@link EdgeMap}.
+   * The callback that will be used to combine two equivalent {@link Tree | Trees} within the {@link EdgeMap}.
    *
    * @param left - First Tree to combine.
    * @param right - Second Tree to combine.
@@ -938,7 +938,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
   }
 
   /**
-   * Return a list of {@link Op}s stored in a {@link EdgeMap}.
+   * Return a list of {@link Op | operations} stored in a {@link EdgeMap}.
    *
    * @example
    * ```typescript
@@ -952,14 +952,14 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *   // [ { type: 'sha1' } ]
    * ```
    *
-   * @returns The list of {@link Op}s in the {@link EdgeMap}.
+   * @returns The list of {@link Op | operations} in the {@link EdgeMap}.
    */
   public keys(): Op[] {
     return Object.values(this.#keySet);
   }
 
   /**
-   * Return a list of {@link Tree}s stored in a {@link EdgeMap}.
+   * Return a list of {@link Tree | Trees} stored in a {@link EdgeMap}.
    *
    * @example
    * ```typescript
@@ -973,7 +973,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *   // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
    * ```
    *
-   * @returns The list of {@link Tree}s in the {@link EdgeMap}.
+   * @returns The list of {@link Tree | Trees} in the {@link EdgeMap}.
    */
   public values(): Tree[] {
     return Object.values(this.#mapping);
@@ -1119,7 +1119,7 @@ export function newTree(): Tree {
 }
 
 /**
- * Given a set of {@link Path}s, transform them into a {@link Tree}, by repeatedly incorporating each of them to an empty one.
+ * Given a set of {@link Path | Paths}, transform them into a {@link Tree}, by repeatedly incorporating each of them to an empty one.
  *
  * @example
  * ```typescript
@@ -1167,7 +1167,7 @@ export function pathsToTree(paths: Paths): Tree {
 }
 
 /**
- * Transform a {@link Tree} into a set of {@link Path}s, by extracting each path from the tree's root to a {@link Leaf}.
+ * Transform a {@link Tree} into a set of {@link Path | Paths}, by extracting each path from the tree's root to a {@link Leaf}.
  *
  * @example
  * ```typescript

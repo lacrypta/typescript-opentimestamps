@@ -239,7 +239,7 @@ export function writeLeaf(leaf: Leaf): Uint8Array {
 /**
  * Write an {@link Edge} value.
  *
- * {@link Edge}s are written by concatenating the following elements:
+ * {@link Edge | Edges} are written by concatenating the following elements:
  *
  * 1. The {@link Edge}'s operation `type` {@link Tag}.
  * 2. If the {@link Edge}'s operation `type` is binary (ie. `append` or `prepend`), concatenate their `operand` as a `VARBYTE`.
@@ -291,7 +291,7 @@ export function writeEdge(edge: Edge): Uint8Array {
  *
  * A {@link Tree}'s value simply consists of all their "elements".
  * An "element" is either a {@link Leaf} or an {@link Edge}.
- * A {@link Tree}'s elements are listed in order, first its {@link Leaf | Leaves} (sorted via {@link compareLeaves}), then their {@link Edge}s (sorted via {@link compareEdges}).
+ * A {@link Tree}'s elements are listed in order, first its {@link Leaf | Leaves} (sorted via {@link compareLeaves}), then their {@link Edge | Edges} (sorted via {@link compareEdges}).
  * Now, _all but the last_ of these elements are written out like so:
  *
  * 1. Write a single-byte {@link nonFinal} tag.

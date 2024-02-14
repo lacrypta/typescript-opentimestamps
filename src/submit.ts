@@ -116,7 +116,7 @@ export const defaultCalendarUrls: URL[] = [
  * @param value - The value to hash.
  * @param fudge - The fudging string to add (if not given, use a 16 random bytes).
  * @param calendarUrls - The calendars to submit the hashed value to, if not give, use {@link defaultCalendarUrls}.
- * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error | Errors} encountered.
  */
 export async function submit(
   algorithm: 'sha1' | 'ripemd160' | 'sha256' | 'keccak256',

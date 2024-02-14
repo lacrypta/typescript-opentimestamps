@@ -71,7 +71,7 @@
  *
  * Unknown attestations simply ignore their `<bytes>` value.
  *
- * Now, let's deal with _operations derivation rules_ (these are realized via {@link types!Op | Op}s).
+ * Now, let's deal with _operations derivation rules_ (these are realized via {@link types!Op | operations}).
  *
  * ```ini
  * op-attestation = %x00  ; not explicitly referred to as such in the code
@@ -590,7 +590,7 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *
  * {@link Leaf | Leaves} are signalled by a `0x00` byte, followed by the {@link Leaf}'s content (cf. {@link readLeaf}).
  *
- * {@link Edge}s are signalled by a non-`0x00` byte that identifies their `type` (cf. {@link Tag}), followed by the {@link Edge}'s content.
+ * {@link Edge | Edges} are signalled by a non-`0x00` byte that identifies their `type` (cf. {@link Tag}), followed by the {@link Edge}'s content.
  * Unary {@link Edge} `type`s (ie. `'sha1'`, `'ripemd160'`, `'sha256'`, `'keccak256'`, `'reverse'`, and `'hexlify'`) are followed by a {@link Tree}'s content, whilst binary {@link Edge} `type`s (ie. `'append'` and `'prepend'`) are followed by a `VARBYTE` (their `operand`) and then a {@link Tree}'s content.
  *
  * > This function internally calls {@link getByte}.
@@ -688,8 +688,8 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
 /**
  * Read a {@link Tree}, from the given position onwards, from the given data substrate.
  *
- * {@link Tree}s are stored as sequences of values, with a special "tag" (ie. `0xff`) signifying that the one that follows is **not** the last value in the {@link Tree}.
- * Values themselves can be either {@link Leaf | Leaves} or {@link Edge}s.
+ * {@link Tree | Trees} are stored as sequences of values, with a special "tag" (ie. `0xff`) signifying that the one that follows is **not** the last value in the {@link Tree}.
+ * Values themselves can be either {@link Leaf | Leaves} or {@link Edge | Edges}.
  *
  * > This function internally calls {@link readEdgeOrLeaf}.
  *
@@ -740,7 +740,7 @@ export function readTree(data: Uint8Array, index: number): [Tree, number] {
 /**
  * Read a {@link FileHash}, from the given position onwards, from the given data substrate.
  *
- * {@link FileHash}es are stored as a single-byte hash algorithm indicator, followed by a fixed-length byte sequence that stores the hash value proper.
+ * {@link FileHash | File hashes} are stored as a single-byte hash algorithm indicator, followed by a fixed-length byte sequence that stores the hash value proper.
  * For "short" hash algorithms (ie. `'sha1'` and `'ripemd160'`), the fixed-length sequence has 20 bytes; for "long" hash algorithms (ie. `'sha256'` and `'keccak256'`), the fixed-length sequence has 32 bytes.
  *
  * > This function internally calls {@link getByte}.
@@ -867,7 +867,7 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
 /**
  * Read a {@link Timestamp} from the given data substrate.
  *
- * {@link Timestamp}s are stored as a sequence of "parts":
+ * {@link Timestamp | Timestamps} are stored as a sequence of "parts":
  *
  * 1. A "magic header" to indicate that this is a {@link Timestamp} data stream (cf. {@link magicHeader}).
  * 2. The serialization format `version`, as a `UINT`.

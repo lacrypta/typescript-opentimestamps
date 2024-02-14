@@ -269,7 +269,7 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
  *
  * @param tree - The {@link Tree} to upgrade.
  * @param msg - The _initial_ message to use for upgrading.
- * @returns An object, mapping `tree` to the resulting {@link Tree}, and `errors` to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `tree` to the resulting {@link Tree}, and `errors` to a list of {@link !Error | Errors} encountered.
  */
 export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: Tree; errors: Error[] }> {
   const { paths, errors }: { paths: Paths; errors: Error[] } = (
@@ -316,7 +316,7 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: 
 /**
  * Try to upgrade _all_ `pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}.
  *
- * This function will try to upgrade all`pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error}s encountered.
+ * This function will try to upgrade all`pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}, and return the resulting, potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
  *
  * Errors encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
@@ -471,7 +471,7 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: 
  * ```
  *
  * @param timestamp - The {@link Timestamp} to upgrade.
- * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error}s encountered.
+ * @returns An object, mapping `timestamp` to the resulting {@link Timestamp}, and `errors` to a list of {@link !Error | Errors} encountered.
  */
 export async function upgrade(timestamp: Timestamp): Promise<{ timestamp: Timestamp; errors: Error[] }> {
   const { tree, errors }: { tree: Tree; errors: Error[] } = await upgradeTree(timestamp.tree, timestamp.fileHash.value);

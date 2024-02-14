@@ -346,7 +346,7 @@ export type Op =
 /**
  * A "Tree" is the result of combining several paths and merging their common prefixes to save space.
  *
- * This is implemented as a [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), with edges being decorated by {@link Op}s that
+ * This is implemented as a [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), with edges being decorated by {@link Op | operations} that
  * lead to other Trees, and terminals being simply {@link Leaf} elements.
  *
  * Furthermore, there's no point in having repeated {@link Leaf | leaves}, so a {@link MergeSet} is used to merge them;
@@ -361,7 +361,7 @@ export type Tree = {
   leaves: MergeSet<Leaf>;
 
   /**
-   * The edges associated to this Tree node, as a {@link MergeMap} mapping {@link Op}s to Trees.
+   * The edges associated to this Tree node, as a {@link MergeMap} mapping {@link Op | operations} to Trees.
    *
    */
   edges: MergeMap<Op, Tree>;

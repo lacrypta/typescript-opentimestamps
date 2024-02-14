@@ -153,7 +153,7 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
 /**
  * Generate a human-readable string form the given {@link Tree}.
  *
- * Human-readable strings are generated as lists of {@link Op | operation}s whenever possible, only reverting to {@link indent | indentation} when a given {@link Tree} node has more than one successor (ie. either a {@link Leaf} or an {@link Edge}).
+ * Human-readable strings are generated as lists of {@link Op | operations} whenever possible, only reverting to {@link indent | indentation} when a given {@link Tree} node has more than one successor (ie. either a {@link Leaf} or an {@link Edge}).
  *
  * If the optional `msg` parameter is given, it is passed to {@link infoEdge} to show verbose output.
  *
