@@ -17,13 +17,21 @@
 /**
  * This library will allow you to interact with Timestamps.
  *
- * # What are Timestamps?
+ * # What are "timestamps"?
  *
- * ...
+ * Timestamps are a way of attesting you had knowledge of a particular byte sequence at least at a specific point in time.
+ * The idea behind this is that you must somehow "commit" yourself to a value that you could not have guessed at the moment.
+ *
+ * One such "value that you could not have guessed at the moment" is the Merkle root of a blockchain block... so long as "the moment" is no further away than the block's generation time.
+ *
+ * On the other hand... what does "committing" mean?
+ * The general idea is to provide a hash of the data to attest, since hashes are (hopefully) non-reversible, you have effectively committed to the data itself.
+ *
+ * And, oversimplifying, that's pretty much what OpenTimestamps does.
  *
  * # How does OpenTimestamps work?
  *
- * ...
+ * The best way to understand the OpenTimestamps workflow is by following along a full example, one such prototypical flow is show below:
  *
  * ```mermaid
  * sequenceDiagram
@@ -59,7 +67,30 @@
  *     deactivate B
  * ```
  *
- * ...
+ * There are three noteworthy _agents_:
+ *
+ * 1. The **Client** (ie. you): is the one wanting to attest the existence of some data.
+ * 2. The **Calendar** (likely one of OpenTimestamp's default calendars): is a server that will collect several such requests from different clients, merge them all together likely in a Merkle-tree-like manner (note that this is _not_ the same as the Blockchain's Merkle tree, this is simply a Calendar's implementation detail you need not be concerned with), and eventually send them over to the Blockchain proper.
+ * 3. The **Blockchain** in question: is what acts as the actual "notary" and generates a block's Merkle root from _all_ the transactions therein, including the one published by the Calendars.
+ *
+ * Let us now consider each interaction in turn:
+ *
+ * 1. Firstly, the Client _submits_ a value to a Calendar: this is done by performing an HTTP `POST` request to the Calendar's `/digest` endpoint, with the data to submit as the request's body.
+ * 2. The Calendar will record this and return a "tree" with a "pending" validation leaf: this is simply a list of operations that you'll need to apply to the value submitted in (1) to arrive at a "pending" validation leaf; these in turn consist of an URL that we'll use in step (5).
+ * 3. Eventually, the Calendar will submit a transaction on the Blockchain: this happens asynchronously, and is outside of the Client's control, the Calendar will keep accumulating attestation requests until it sees fit to submit a transaction (criteria vary, but donations and transaction costs are expected to play a role in this).
+ * 4. Eventually, the published transaction will be mined in a block on the target Blockchain: when this happens, the Calendar will update all of its stored pending attestations so as to know how to answer in step (6).
+ * 5. The Client may now _upgrade_ the "pending" timestamp obtained in step (2): after the transaction has been included in the Blockchain, the Client may query the calendar by performing an HTTP `GET` request to `{pendingLeafUrl}/timestamp/{message}`, where `pendingLefUrl` is the URL mentioned in step (2), and `message` is the result of executing the list of operations retrieved in step (2) on the original data.
+ * 6. The Calendar will query its internal state and respond with an upgraded timestamp: this is simply another "tree" which will take the place of the "pending" leaf, and eventually end in a "definitive" attestation containing the block-height where the resulting Merkle-root may be queried.
+ * 7. The Client (any Client, actually) may now query the Blockchain: this merely entails retrieving the block at a timestamp's "definitive"-leaf's block-height and obtaining the block's Merkle-root.
+ * 8. Finally, the Client (any Client) may verify the timestamp: this is achieved by executing the list of operations specified in the "tree", and comparing the result with the Blockchain's retrieved block Merkle-root, if they match, the timestamp is valid for that block's mining time, otherwise, the timestamp is invalid.
+ *
+ * There are a couple more things one may do with a timestamp:
+ *
+ * - A timestamp may be stored as a byte sequence by serializing the tree and some additional metadata.
+ * - A timestamp may be read from a byte stream and deserialized into a tree.
+ * - A timestamp may be _shrunk_ by keeping only the earliest "definitive" leaf.
+ *
+ * An the library will allow you to query for when all of these operations are applicable.
  *
  * @packageDocumentation
  * @module typescript-opentimestamps
