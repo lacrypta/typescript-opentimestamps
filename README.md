@@ -49,8 +49,7 @@ import {
   read as read,
   verify as verify,
   //
-  verifyViaBlockchainInfo,
-  verifyViaBlockstream,
+  verifiers,
 } from '@lacrypta/typescript-opentimestamps';
 
 const rawTimestamp: Uint8Array = Uint8Array.from(someTimestampBytes);
@@ -58,13 +57,10 @@ const timestamp: Timestamp = read(rawTimestamp);
 
 verify(
   timestamp,
-  {
-    'blockchain.info': verifyViaBlockchainInfo,
-    'blockstream': verifyViaBlockstream,
-  },
+  verifiers,
 ).then(
-  ({ attestations: Record<number, string[]>; errors: Record<string, Error[]> }): void => {
-    Object.entries(attestations).forEach(([time, verifiers]: [number, string[]]): void => {
+  ({ attestations,  errors }: { attestations: Record<number, string[]>; errors: Record<string, Error[]> }): void => {
+    Object.entries(attestations).forEach(([time, verifiers]: [string, string[]]): void => {
       console.log(`Verifiers ${verifiers.join(', ')} attest to this timestamp as of ${time}`);
     });
     Object.entries(errors).forEach(([verifier, errorList]: [string, Error[]]): void => {
