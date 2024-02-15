@@ -291,6 +291,68 @@ describe('javascript-opentimestamps', (): void => {
       ]),
       name: 'Unknown notary',
     },
+    {
+      input: uint8ArrayFromBase64(`
+        AE9wZW5UaW1lc3RhbXBzAABQcm9vZgC/ieLohOiSlAEDBCPO1JFLxeR67aMUtZk7e9eW/gDwEGPNWQA4UzL5tNGib8gwjRAI//AQrgwIsfd2dfvFCx6L5HBF
+        9wjwIBaSNqA2cpaenyG8eByLFhV2hxT1Rj1mbF8zqZqUdtxmCPAgfIjvdhZsGEc314nu6wktobksd+8xG13RFRlPdRspDmAI8QRaqlI98AhGZOdbaV8yKwCD
+        3+MNLvkMji4taHR0cHM6Ly9hbGljZS5idGMuY2FsZW5kYXIub3BlbnRpbWVzdGFtcHMub3Jn//AQhNq8jJjJJaO0u/bc6DKSIAjxBFqqUj3wCG4zXZAi+45N
+        AIPf4w0u+QyOLCtodHRwczovL2JvYi5idGMuY2FsZW5kYXIub3BlbnRpbWVzdGFtcHMub3Jn8BDEBzhUXRZz/8f2mr+gJ+UvCPEgya8q+bXOGIQwM3D3O9FR
+        seJeBGRmDOVqAti5j8Do3KQI8QRaqlI98AjWw1fN+R5LFgCD3+MNLvkMjikoaHR0cHM6Ly9maW5uZXkuY2FsZW5kYXIuZXRlcm5pdHl3YWxsLmNvbQ==
+      `),
+      expected: new Set([
+        uint8ArrayConcat(
+          uint8ArrayFromHex('5aaa523d23d28b7c856f513256db6f54780a5a3916e47e1a905344ce99dc7d643edf837d4664e75b695f322b'),
+          writeLeaf({ type: 'pending', url: new URL('https://alice.btc.calendar.opentimestamps.org') }),
+        ),
+        uint8ArrayConcat(
+          uint8ArrayFromHex('5aaa523d98e7749616be9cc9dd920bed3b8704df9b3200a3ad0f6bda5866cdcbb920d64e6e335d9022fb8e4d'),
+          writeLeaf({ type: 'pending', url: new URL('https://bob.btc.calendar.opentimestamps.org') }),
+        ),
+        uint8ArrayConcat(
+          uint8ArrayFromHex('5aaa523d66581cf4aa250590a66df884013284c19be941ea2381d0a381a6537020ab8100d6c357cdf91e4b16'),
+          writeLeaf({ type: 'pending', url: new URL('https://finney.calendar.eternitywall.com') }),
+        ),
+      ]),
+      name: 'ripemd160 - Readme',
+    },
+    {
+      input: uint8ArrayFromBase64(`
+        AE9wZW5UaW1lc3RhbXBzAABQcm9vZgC/ieLohOiSlAEC+S1044dFh6r0Q9Hblh1OJt3hPpzwED4Imsf4D7MbnNRMk6apF9wI//AQSlHXJ1hyYKPjrdTHUUqv
+        OwjxBFkcXHnwCP/m10PYq3ya/wCD3+MNLvkMjikoaHR0cHM6Ly9maW5uZXkuY2FsZW5kYXIuZXRlcm5pdHl3YWxsLmNvbQjxIOjLqJkDtLSDf17GCnOyrl5Z
+        EBwFc6AV5ys9YKBXFnGaCPAg7AMu2hT6dMHt08bF/yDDlZ6H5QBMvfudFxg8LKp4+zoI8CAVTngQ6vHKEEk9J3Pwb1GRdidy3u5Lita02j8l3XicDQjwIEYl
+        jSRLV84K4jQI1sm0a5eOZ4rQaKzd3qcFBFguU+qDCPAg/sTzTRcTDJo5uxwzCwiGRFUDCuZ7dJZwSZNLEfzxGMsI8SA6KmnQ3EgY0MidLpCH7tsvEnKe1w3R
+        M9Kk0+qdLclYQQjwIFau325aLj4fZ1uuIs/1J7rqgqspY5S8bFNbMOBmAxjaCPEgeabaXkS9y4zw4epu5mjIyx6lL4x/j+2fKcRJrx/mqfoI8CDi3fPiM5/7
+        BiuPSC72Nk6lX9Lld1zWBv+LcbX3bObxzQjxrgEBAAAAAfc2/olit0U94KlYshfHooQKMPYkMqeM/1ePh5gdAgISAAAAAEhHMEQCIA8OliC7yhLsXyd9W0vn
+        lsCr6FQaOFEU67Ge5mfIToIzAiBDBmcvTGMmcNlXhlPcxEnCkGcggnD+pIi/YHa+heZLdQH9////AnxOCQAAAAAAIyEDKk6TladD2IyOt1/pTwxFrmCCXh7e
+        vk7f4dcKBu73lqWsAAAAAAAAAAAiaiDwBNkfBwAICPAgEVoOXyBzMEM/lrsk+MXRAP9RWJzumXfbyWDPBJwq4JIICPAgIpIWJhM1I119vjXYStwSS8kVfsoB
+        iITn1Eo0YTMIipoICPAgUJtCVlG1+yhFEuIPh+An85uUGPVu07j99iPthHs9CwAICPEgaStg7XBTPUN5F6ms6x1BtM6l3WIh9EJHw+tTVAMa6vUICPEgZNCC
+        Ex0LBlqrdWqqmYDqVxXucdin71IuqPIXU5QZIY4ICPAgpqW641GCK806Rr0oAtYSVwkR7tDP87yqsbRshD2O65YICPEgnEt0pbF2bpS2FOgC0tOCRqaH7RbK
+        epIC59PHEP2GI70ICPAgsx0ihrDwS2Uo16MvUh9v18Eann2LXVrv6GZ2swpr5HwICPEg6Yx5aHz1ke4gFga00+D9WRcfW5ST/S1lVM9jSMec4L4ICPAgpeGX
+        +oWPPUy7RXKingzYk1WctuoKv3EArqtRFibQt2IICPAgROgp/Lluvd30JO8rKxqJQQdqL5eINaD/XMWj31Nrm8UICPEgqhDbO74H4zlkTPkU34ipQRHMtMqF
+        M08VdAi7bDNYt1kICAAFiJYNc9cZAQPavxz/8BDL1gSnWoRFOMzFJ0FbQwy4CPEEWRxcevAIFnOscUC/c7oAg9/jDS75DI4sK2h0dHBzOi8vYm9iLmJ0Yy5j
+        YWxlbmRhci5vcGVudGltZXN0YW1wcy5vcmfwEOT/jCVT9+3mUhiw9w4jGPcI8QRZHFx58AjlekpyYB/rkACD3+MNLvkMji4taHR0cHM6Ly9hbGljZS5idGMu
+        Y2FsZW5kYXIub3BlbnRpbWVzdGFtcHMub3Jn
+      `),
+      expected: new Set([
+        uint8ArrayConcat(
+          uint8ArrayFromHex('591c5c79d5103f9ad3914c8b9b8a4261736c05cb0d576f498e5290e3862f8280c9618ea0ffe6d743d8ab7c9a'),
+          writeLeaf({ type: 'pending', url: new URL('https://finney.calendar.eternitywall.com') }),
+        ),
+        uint8ArrayConcat(
+          uint8ArrayFromHex('267c8a43b9bf4968356f85f313943ef8371d106b4c6f67b2c4a8b05c3a30c940'),
+          writeLeaf({ type: 'bitcoin', height: 466906 }),
+        ),
+        uint8ArrayConcat(
+          uint8ArrayFromHex('591c5c7a85830d62b246bdce8c756ac7c76a39e475a1f90b89037eae1f3d51b25824caa91673ac7140bf73ba'),
+          writeLeaf({ type: 'pending', url: new URL('https://bob.btc.calendar.opentimestamps.org') }),
+        ),
+        uint8ArrayConcat(
+          uint8ArrayFromHex('591c5c7935c1c5d0980c54010cab2751ac8181b2a1aa51b8a7f956835f9081adb4ac2230e57a4a72601feb90'),
+          writeLeaf({ type: 'pending', url: new URL('https://alice.btc.calendar.opentimestamps.org') }),
+        ),
+      ]),
+      name: 'sha1 - a/b',
+    },
   ])('$name', ({ input, expected }: { input: Uint8Array; expected: Set<Uint8Array> }): void => {
     const timestamp: Timestamp = read(input);
     expect(
