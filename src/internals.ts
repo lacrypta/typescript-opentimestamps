@@ -285,36 +285,46 @@ export function callOps(ops: Ops, msg: Uint8Array): Uint8Array {
  * ```typescript
  * import { compareLeaves } from './src/internals';
  *
- * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 })); // -1
- * console.log(compareLeaves({ type: 'litecoin', height: 123 }, { type: 'bitcoin', height: 123 })); //  1
- * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 }));  // -333
- * console.log(compareLeaves({ type: 'bitcoin', height: 456 }, { type: 'bitcoin', height: 123 }));  //  333
+ * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'litecoin', height: 123 }));
+ *   // -1
+ * console.log(compareLeaves({ type: 'litecoin', height: 123 }, { type: 'bitcoin', height: 123 }));
+ *   // 1
+ * console.log(compareLeaves({ type: 'bitcoin', height: 123 }, { type: 'bitcoin', height: 456 }));
+ *   // -333
+ * console.log(compareLeaves({ type: 'bitcoin', height: 456 }, { type: 'bitcoin', height: 123 }));
+ *   // 333
  *
  * console.log(compareLeaves(
  *   { type: 'pending', url: new URL('https://example.com/a') },
  *   { type: 'pending', url: new URL('https://example.com/b') },
- * ));                                                                                              // -1
+ * ));
+ *   // -1
  * console.log(compareLeaves(
  *   { type: 'pending', url: new URL('https://example.com') },
  *   { type: 'pending', url: new URL('https://example.com') },
- * ));                                                                                              //  0
+ * ));
+ *   // 0
  * console.log(compareLeaves(
  *   { type: 'pending', url: new URL('https://example.com/b') },
  *   { type: 'pending', url: new URL('https://example.com/a') },
- * ));                                                                                              //  1
+ * ));
+ *   // 1
  *
  * console.log(compareLeaves(
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) },
- * ));                                                                                              // -3
+ * ));
+ *   // -3
  * console.log(compareLeaves(
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of() },
- * ));                                                                                              //  0
+ * ));
+ *   // 0
  * console.log(compareLeaves(
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(4, 5, 6) },
  *   { type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) },
- * ));                                                                                              //  3
+ * ));
+ *   // 3
  * ```
  *
  * @param left - The first {@link Leaf} to compare.
@@ -355,30 +365,27 @@ export function compareLeaves(left: Leaf, right: Leaf): number {
  * ```typescript
  * import { compareOps } from './src/internals';
  *
- * console.log(compareOps(
- *   { type: 'sha1' },
- *   { type: 'ripemd160' },
- * ));  // -1
- * console.log(compareOps(
- *   { type: 'sha1' },
- *   { type: 'sha1' },
- * ));  //  0
- * console.log(compareOps(
- *   { type: 'ripemd160' },
- *   { type: 'sha1' },
- * ));  //  1
+ * console.log(compareOps({ type: 'sha1' }, { type: 'ripemd160' }));
+ *   // -1
+ * console.log(compareOps({ type: 'sha1' }, { type: 'sha1' }));
+ *   // 0
+ * console.log(compareOps({ type: 'ripemd160' }, { type: 'sha1' }));
+ *   // 1
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
  *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
- * ));  // -3
+ * ));
+ *   // -3
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
- * ));  //  0
+ * ));
+ *   // 0
  * console.log(compareOps(
  *   { type: 'append', operand: Uint8Array.of(4, 5, 6) },
  *   { type: 'append', operand: Uint8Array.of(1, 2, 3) },
- * ));  //  3
+ * ));
+ *   // 3
  * ```
  *
  * @param left - The first {@link Op | operation} to compare.
@@ -404,25 +411,31 @@ export function compareOps(left: Op, right: Op): number {
  *
  * console.log(compareEdges(
  *   [{ type: 'sha1' }, newTree()], [{ type: 'ripemd160' }, newTree()],
- * ));  // -1
+ * ));
+ *   // -1
  * console.log(compareEdges(
  *   [{ type: 'sha1' }, newTree()], [{ type: 'sha1' }, newTree()],
- * ));  //  0
+ * ));
+ *   // 0
  * console.log(compareEdges(
  *   [{ type: 'ripemd160' }, newTree()], [{ type: 'sha1' }, newTree()],
- * ));  //  1
+ * ));
+ *   // 1
  * console.log(compareEdges(
  *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
  *   [{ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()],
- * ));  // -3
+ * ));
+ *   // -3
  * console.log(compareEdges(
  *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
  *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
- * ));  //  0
+ * ));
+ *   // 0
  * console.log(compareEdges(
  *   [{ type: 'append', operand: Uint8Array.of(4, 5, 6) }, newTree()],
  *   [{ type: 'append', operand: Uint8Array.of(1, 2, 3) }, newTree()],
- * ));  //  3
+ * ));
+ *   // 3
  * ```
  *
  * @param left - The first edge to compare.
@@ -472,7 +485,7 @@ export function compareEdges(left: Edge, right: Edge): number {
  *   // ]
  * console.log(left.edges.entries());
  *   // [
- *   //   [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ]
+ *   //   [ { type: 'sha1' }, { leaves: LeafSet {}, edges: EdgeMap {} } ]
  *   // ]
  * ```
  *
@@ -526,7 +539,7 @@ export function incorporateTreeToTree(left: Tree, right: Tree): Tree {
  *   // ]
  * console.log(tree.edges.entries());
  *   // [
- *   //   [ { type: 'sha1' }, { leaves: [LeafSet], edges: [EdgeMap] } ]
+ *   //   [ { type: 'sha1' }, { leaves: LeafSet {}, edges: EdgeMap {} } ]
  *   // ]
  * ```
  *
@@ -588,11 +601,11 @@ export function incorporateToTree(tree: Tree, edgeOrLeaf: Edge | Leaf): Tree {
  *   // []
  *
  * console.log(leafSetA.remove({ type: 'ethereum', height: 123 }));
- *   // LeafSet { mapping: { ... } }
+ *   // LeafSet {}
  * console.log(leafSetB.remove({ type: 'ethereum', height: 456 }));
- *   // LeafSet { mapping: { ... } }
+ *   // LeafSet {}
  * console.log(leafSetC.remove({ type: 'ethereum', height: 789 }));
- *   // LeafSet { mapping: {} }
+ *   // LeafSet {}
  *
  * console.log(leafSetA.incorporate(leafSetB).size());
  *   // 3
@@ -665,8 +678,10 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * const leafSet: LeafSet = new LeafSet();
    *
-   * console.log(leafSet.size());                                        // 0
-   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).size());  // 1
+   * console.log(leafSet.size());
+   *   // 0
+   * console.log(leafSet.add({ type: 'bitcoin', height: 123 }).size());
+   *   // 1
    * ```
    *
    * @returns The number of {@link Leaf | leaves} in the {@link LeafSet}.
@@ -707,10 +722,14 @@ export class LeafSet implements MergeSet<Leaf> {
    *   .add({ type: 'bitcoin', height: 123 })
    *   .add({ type: 'litecoin', height: 123 });
    *
-   * console.log(leafSet.size());                                            // 2
-   * console.log(leafSet.remove({ type: 'ethereum', height: 123 }).size());  // 2
-   * console.log(leafSet.remove({ type: 'bitcoin', height: 123 }).size());   // 1
-   * console.log(leafSet.remove({ type: 'litecoin', height: 123 }).size());  // 0
+   * console.log(leafSet.size());
+   *   // 2
+   * console.log(leafSet.remove({ type: 'ethereum', height: 123 }).size());
+   *   // 2
+   * console.log(leafSet.remove({ type: 'bitcoin', height: 123 }).size());
+   *   // 1
+   * console.log(leafSet.remove({ type: 'litecoin', height: 123 }).size());
+   *   // 0
    * ```
    *
    * @param leaf - The {@link Leaf} to remove.
@@ -731,22 +750,26 @@ export class LeafSet implements MergeSet<Leaf> {
    *
    * const leafSet: LeafSet = new LeafSet();
    *
-   * console.log(leafSet.size()); // 0
+   * console.log(leafSet.size());
+   *   // 0
    * console.log(leafSet
    *   .add({ type: 'bitcoin', height: 123 })
    *   .size(),
-   * );                           // 1
-   * console.log(leafSet
-   *   .add({ type: 'bitcoin', height: 123 })
-   *   .add({ type: 'litecoin', height: 123 })
-   *   .size(),
-   * );                           // 2
+   * );
+   *   // 1
    * console.log(leafSet
    *   .add({ type: 'bitcoin', height: 123 })
    *   .add({ type: 'litecoin', height: 123 })
+   *   .size(),
+   * );
+   *   // 2
+   * console.log(leafSet
+   *   .add({ type: 'bitcoin', height: 123 })
+   *   .add({ type: 'litecoin', height: 123 })
    *   .add({ type: 'bitcoin', height: 123 })
    *   .size(),
-   * );                           // 2
+   * );
+   *   // 2
    * ```
    *
    * @param leaf - The leaf to add to the {@link LeafSet}.
@@ -821,31 +844,25 @@ export class LeafSet implements MergeSet<Leaf> {
  *
  * console.log(edgeMapA.values());
  *   // [
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} },
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} },
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // ]
  * console.log(edgeMapB.values());
  *   // [
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } },
- *   //   { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } }
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} },
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} },
+ *   //   { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // ]
  * console.log(edgeMapC.values());
  *   // []
  *
  * console.log(edgeMapA.remove({ type: 'sha256' }));
- *   // EdgeMap {
- *   //   keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } },
- *   //   mapping: { ... }
- *   // }
+ *   // EdgeMap {}
  * console.log(edgeMapB.remove({ type: 'sha256' }));
- *   // EdgeMap {
- *   //   keySet: { sha1: { type: 'sha1' }, ripemd160: { type: 'ripemd160' } },
- *   //   mapping: { ... }
- *   // }
+ *   // EdgeMap {}
  * console.log(edgeMapC.remove({ type: 'sha256' }));
- *   // EdgeMap { keySet: {}, mapping: {} }
+ *   // EdgeMap {}
  *
  * console.log(edgeMapA.incorporate(edgeMapB).size());
  *   // 2
@@ -927,8 +944,10 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.size());                                   // 0
-   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).size());  // 1
+   * console.log(edgeMap.size());
+   *   // 0
+   * console.log(edgeMap.add({ type: 'sha1' }, newTree()).size());
+   *   // 1
    * ```
    *
    * @returns The number of pairs in the {@link EdgeMap}.
@@ -970,7 +989,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * console.log(edgeMap.values());
    *   // []
    * console.log(edgeMap.add({ type: 'sha1' }, newTree()).values());
-   *   // [ { edges: EdgeMap { keySet: {}, mapping: {} }, leaves: LeafSet { mapping: {} } } ]
+   *   // [ { edges: EdgeMap {}, leaves: LeafSet {} } ]
    * ```
    *
    * @returns The list of {@link Tree | Trees} in the {@link EdgeMap}.
@@ -991,7 +1010,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    * console.log(edgeMap.values());
    *   // []
    * console.log(edgeMap.add({ type: 'sha1' }, newTree()).entries());
-   *   // [ [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ] ]
+   *   // [ [ { type: 'sha1' }, { edges: EdgeMap {}, leaves: LeafSet {} } ] ]
    * ```
    *
    * @returns The list of entries in the {@link EdgeMap}.
@@ -1011,10 +1030,14 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *   .add({ type: 'sha1' }, newTree())
    *   .add({ type: 'ripemd160' }, newTree());
    *
-   * console.log(edgeMap.size());                                // 2
-   * console.log(edgeMap.remove({ type: 'sha256' }).size());     // 2
-   * console.log(edgeMap.remove({ type: 'sha1' }).size());       // 1
-   * console.log(edgeMap.remove({ type: 'ripemd160' }).size());  // 0
+   * console.log(edgeMap.size());
+   *   // 2
+   * console.log(edgeMap.remove({ type: 'sha256' }).size());
+   *   // 2
+   * console.log(edgeMap.remove({ type: 'sha1' }).size());
+   *   // 1
+   * console.log(edgeMap.remove({ type: 'ripemd160' }).size());
+   *   // 0
    * ```
    *
    * @param op - The {@link Op} to remove.
@@ -1038,22 +1061,26 @@ export class EdgeMap implements MergeMap<Op, Tree> {
    *
    * const edgeMap: EdgeMap = new EdgeMap();
    *
-   * console.log(edgeMap.size());  // 0
+   * console.log(edgeMap.size());
+   *   // 0
    * console.log(edgeMap
    *   .add({ type: 'sha1' }, newTree())
    *   .size(),
-   * );                            // 1
-   * console.log(edgeMap
-   *   .add({ type: 'sha1' }, newTree())
-   *   .add({ type: 'ripemd160' }, newTree())
-   *   .size(),
-   * );                            // 2
+   * );
+   *   // 1
    * console.log(edgeMap
    *   .add({ type: 'sha1' }, newTree())
    *   .add({ type: 'ripemd160' }, newTree())
+   *   .size(),
+   * );
+   *   // 2
+   * console.log(edgeMap
+   *   .add({ type: 'sha1' }, newTree())
+   *   .add({ type: 'ripemd160' }, newTree())
    *   .add({ type: 'sha1' }, newTree())
    *   .size(),
-   * );                            // 2
+   * );
+   *   // 2
    * ```
    *
    * @param op - The {@link Op} to add to the {@link EdgeMap}.
@@ -1106,10 +1133,7 @@ export class EdgeMap implements MergeMap<Op, Tree> {
  * import { newTree } from './src/internals';
  *
  * console.log(newTree());
- *   // {
- *   //   edges: EdgeMap { keySet: {}, mapping: {} },
- *   //   leaves: LeafSet { mapping: {} }
- *   // }
+ *   // { edges: EdgeMap {}, leaves: LeafSet {} }
  * ```
  *
  * @returns The empty {@link Tree} constructed.

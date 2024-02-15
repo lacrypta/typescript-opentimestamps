@@ -121,10 +121,7 @@ import { default as _verifiers } from './verifiers';
  * import { newTree } from '@lacrypta/typescript-opentimestamps';
  *
  * console.log(newTree());
- *   // {
- *   //   edges: EdgeMap { keySet: {}, mapping: {} },
- *   //   leaves: LeafSet { mapping: {} }
- *   // }
+ *   // { edges: EdgeMap {}, leaves: LeafSet {} }
  * ```
  *
  * @returns The empty {@link Tree} constructed.
@@ -162,23 +159,26 @@ export const newTree = _newTree;
  *
  * console.log(info(timestamp));
  *   // msg = sha1(FILE)
- *   //  -> msg = reverse(msg)
- *   //     msg = append(msg, 030201070809)
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506010203)
+ *   // msg = prepend(msg, 010203)
+ *   //  -> msg = prepend(msg, 040506)
  *   //     bitcoinVerify(msg, 456)
+ *   //  -> msg = reverse(msg)
+ *   //     msg = append(msg, 070809)
+ *   //     bitcoinVerify(msg, 123)
  * console.log(info(timestamp, true));
  *   // # version: 1
  *   // msg = sha1(FILE)
  *   //     = 0102030405060708090a0b0c0d0e0f1011121314
- *   //  -> msg = reverse(msg)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201
- *   //     msg = append(msg, 030201070809)
- *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
- *   //     bitcoinVerify(msg, 123)
- *   //  -> msg = prepend(msg, 040506010203)
+ *   // msg = prepend(msg, 010203)
+ *   //     = 0102030102030405060708090a0b0c0d0e0f1011121314
+ *   //  -> msg = prepend(msg, 040506)
  *   //         = 0405060102030102030405060708090a0b0c0d0e0f1011121314
  *   //     bitcoinVerify(msg, 456)
+ *   //  -> msg = reverse(msg)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201
+ *   //     msg = append(msg, 070809)
+ *   //         = 14131211100f0e0d0c0b0a090807060504030201030201070809
+ *   //     bitcoinVerify(msg, 123)
  * ```
  *
  * @param timestamp - {@link Timestamp} to generate human-readable string for.
@@ -258,7 +258,6 @@ export const canShrink = _canShrink;
  *   ),
  * )));
  *   // true
- *
  * console.log(canUpgrade(read(
  *   Uint8Array.of(
  *     0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65,
@@ -306,7 +305,6 @@ export const canUpgrade = _canUpgrade;
  *   ),
  * )));
  *   // true
- *
  * console.log(canVerify(read(
  *   Uint8Array.of(
  *     0x00, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x69, 0x6d, 0x65,
@@ -365,12 +363,9 @@ export const canVerify = _canVerify;
  *   ),
  * ));
  *   // {
- *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
- *   //   tree: {
- *   //     edges: EdgeMap { keySet: {}, mapping: {} },
- *   //     leaves: LeafSet { mapping: [Object] }
- *   //   }
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
+ *   //   tree: { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // }
  * ```
  *
@@ -435,6 +430,7 @@ export const read = _read;
  *     0x19, 0x01, 0x02, 0xc8, 0x03,
  *   ),
  * );
+ *
  * console.log(info(shrink(timestamp, 'bitcoin')));
  *   // msg = sha1(FILE)
  *   // bitcoinVerify(msg, 123)
@@ -655,7 +651,8 @@ export const upgrade = _upgrade;
  *     },
  *     tree: newTree(),
  *   },
- * )); // true
+ * ));
+ *   // true
  * ```
  *
  * @param timestamp - Datum to check.
@@ -731,11 +728,8 @@ export const assert: (timestamp: unknown) => asserts timestamp is Timestamp = _a
  * ));
  *   // {
  *   //   version: 1,
- *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
- *   //   tree: {
- *   //     edges: EdgeMap { keySet: {}, mapping: {} },
- *   //     leaves: LeafSet { mapping: {} }
- *   //   }
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [  ... ] },
+ *   //   tree: { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // }
  * ```
  *

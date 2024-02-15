@@ -43,7 +43,7 @@
  * A JavaScript {@link !RegExp} to validate this pattern is:
  *
  * ```perl
- * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
+ * /^https:\\/\\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\\/[a-zA-Z0-9_.:-]+)*\\/?$/
  * ```
  *
  * Now, let's deal with _attestation derivation rules_ (nb. "attestations" are what we call {@link types!Leaf | Leaves}).
@@ -625,10 +625,7 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *   ),
  *   0,
  * ));
- *   // [
- *   //   [ { type: 'sha1' }, { edges: [EdgeMap], leaves: [LeafSet] } ],
- *   //   12
- *   // ]
+ *   // [ [ { type: 'sha1' }, { edges: EdgeMap {}, leaves: LeafSet {} } ], 12 ]
  * console.log(readEdgeOrLeaf(
  *   Uint8Array.of(
  *     0xf0,
@@ -641,7 +638,13 @@ export function readLeaf(data: Uint8Array, index: number): [Leaf, number] {
  *   ),
  *   0,
  * ));
- *   // [ [ { type: 'append', operand: [Uint8Array] }, { edges: [EdgeMap], leaves: [LeafSet] } ], 16 ]
+ *   // [
+ *   //   [
+ *   //     { type: 'append', operand: [Uint8Array] },
+ *   //     { edges: [EdgeMap], leaves: [LeafSet] }
+ *   //   ],
+ *   //   16
+ *   // ]
  * ```
  *
  * @example
@@ -711,13 +714,7 @@ export function readEdgeOrLeaf(data: Uint8Array, index: number): [Edge | Leaf, n
  *   ),
  *   0,
  * ));
- *   // [
- *   //   {
- *   //     edges: EdgeMap { keySet: {}, mapping: {} },
- *   //     leaves: LeafSet { mapping: [Object] }
- *   //   },
- *   //   23
- *   // ]
+ *   // [ { edges: EdgeMap {}, leaves: LeafSet {} }, 23 ]
  * ```
  *
  * @param data - The data substrate to use.
@@ -902,11 +899,9 @@ export function readVersion(data: Uint8Array, index: number): [number, number] {
  *   123,
  * )));
  *   // {
- *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
  *   //   version: 1,
- *   //   tree: {
- *   //     edges: EdgeMap { keySet: {}, mapping: {} },
- *   //     leaves: LeafSet { mapping: [Object] } }
+ *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
+ *   //   tree: { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // }
  * ```
  *

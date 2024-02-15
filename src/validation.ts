@@ -32,7 +32,8 @@ import { EdgeMap, LeafSet } from './internals';
  * ```typescript
  * import { validateNonNullObject } from './src/validation';
  *
- * console.log(validateNonNullObject({}));  // {}
+ * console.log(validateNonNullObject({}));
+ *   // {}
  * ```
  *
  * @example
@@ -137,7 +138,7 @@ export function validateURL(url: unknown): URL {
  * Or equivalently, to the following {@link !RegExp}:
  *
  * ```perl
- * /^https:\/\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\/[a-zA-Z0-9_.:-]+)*\/?$/
+ * /^https:\\/\\/[a-zA-Z0-9_.-]+(:[0-9]+)?(\\/[a-zA-Z0-9_.:-]+)*\\/?$/
  * ```
  *
  * @example
@@ -182,7 +183,8 @@ export function validateCalendarUrl(url: unknown): string {
  * ```typescript
  * import { validateNonNegativeInteger } from './src/validation';
  *
- * console.log(validateNonNegativeInteger(1234));  // 1234
+ * console.log(validateNonNegativeInteger(1234));
+ *   // 1234
  * ```
  *
  * @example
@@ -469,7 +471,7 @@ export function validateObjectHasOperandKey(obj: object): { operand: Uint8Array 
  * import { validateObjectHasLeavesKey } from './src/validation';
  *
  * console.log(validateObjectHasLeavesKey({ leaves: new LeafSet() }));
- *   // { leaves: LeafSet { ... } }
+ *   // { leaves: LeafSet {} }
  * ```
  *
  * @example
@@ -515,7 +517,7 @@ export function validateObjectHasLeavesKey(obj: object): { leaves: LeafSet } {
  * import { validateObjectHasEdgesKey } from './src/validation';
  *
  * console.log(validateObjectHasEdgesKey({ edges: new EdgeMap() }));
- *   // { edges: EdgeMap { ... } }
+ *   // { edges: EdgeMap {} }
  * ```
  *
  * @example
@@ -833,10 +835,7 @@ export function validateOp(op: unknown): Op {
  * import { validateTree } from './src/validation';
  *
  * console.log(validateTree(newTree()));
- *   // {
- *   //   edges: EdgeMap { keySet: {}, mapping: {} },
- *   //   leaves: LeafSet { mapping: {} }
- *   // }
+ *   // { edges: EdgeMap {}, leaves: LeafSet {} }
  * ```
  *
  * @example
@@ -999,14 +998,16 @@ export function validateFileHash(fileHash: unknown): FileHash {
  * ```typescript
  * import { validateVersion } from './src/validation';
  *
- * console.log(validateVersion(1));  // 1
+ * console.log(validateVersion(1));
+ *   // 1
  * ```
  *
  * @example
  * ```typescript
  * import { validateVersion } from './src/validation';
  *
- * console.log(validateVersion(123));  // Error: Expected .version to be 1
+ * console.log(validateVersion(123));
+ *   // Error: Expected .version to be 1
  * ```
  *
  * @param version - Data to validate.
@@ -1052,10 +1053,7 @@ export function validateVersion(version: unknown): number {
  *   // {
  *   //   version: 1,
  *   //   fileHash: { algorithm: 'sha1', value: Uint8Array(20) [ ... ] },
- *   //   tree: {
- *   //     edges: EdgeMap { keySet: {}, mapping: {} },
- *   //     leaves: LeafSet { mapping: {} }
- *   //   }
+ *   //   tree: { edges: EdgeMap {}, leaves: LeafSet {} }
  *   // }
  * ```
  *

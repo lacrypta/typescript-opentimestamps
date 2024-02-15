@@ -45,7 +45,7 @@ import { uint8ArrayToHex } from './utils';
  *   // -> something
  *   //    else
  *   //    entirely
- *```
+ * ```
  *
  * @param text - Text to indent.
  * @returns The indented text.
@@ -68,16 +68,24 @@ export function indent(text: string): string {
  * ```typescript
  * import { infoLeaf } from './src/info';
  *
- * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));   // bitcoinVerify(msg, 123)
- * console.log(infoLeaf({ type: 'litecoin', height: 456 }));  // litecoinVerify(msg, 456)
- * console.log(infoLeaf({ type: 'ethereum', height: 789 }));  // ethereumVerify(msg, 789)
- * console.log(
- *   infoLeaf({ type: 'pending', url: new URL('https://www.example.com') })
- * );                                                         // pendingVerify(msg, https://www.example.com/)
- * console.log(
- *   infoLeaf({ type: 'unknown', header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8), payload: Uint8Array.of(1, 2, 3) }),
- * );                                                         // unknownVerify<0102030405060708>(msg, 010203)
- *```
+ * console.log(infoLeaf({ type: 'bitcoin', height: 123 }));
+ *   // bitcoinVerify(msg, 123)
+ * console.log(infoLeaf({ type: 'litecoin', height: 456 }));
+ *   // litecoinVerify(msg, 456)
+ * console.log(infoLeaf({ type: 'ethereum', height: 789 }));
+ *   // ethereumVerify(msg, 789)
+ * console.log(infoLeaf({
+ *   type: 'pending',
+ *   url: new URL('https://www.example.com'),
+ * }));
+ *   // pendingVerify(msg, https://www.example.com/)
+ * console.log(infoLeaf({
+ *   type: 'unknown',
+ *   header: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8),
+ *   payload: Uint8Array.of(1, 2, 3),
+ * }));
+ *   // unknownVerify<0102030405060708>(msg, 010203)
+ * ```
  *
  * @param leaf - {@link Leaf} to generate human-readable string for.
  * @returns Human-readable string generated.
@@ -122,7 +130,7 @@ export function infoLeaf(leaf: Leaf): string {
  *   // msg = append(msg, 070809)
  *   //     = 0102030405060708090a070809
  *   // bitcoinVerify(msg, 123)
- *```
+ * ```
  *
  * @param edge - {@link Edge} to generate human-readable string for.
  * @param msg - Optional message to use as {@link Op | operation} input for verbose output.
@@ -176,8 +184,14 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *           {
  *             leaves: new LeafSet(),
  *             edges: new EdgeMap().add(
- *               { type: 'append', operand: Uint8Array.of(7, 8, 9) },
- *               { edges: new EdgeMap(), leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }) },
+ *               {
+ *                 type: 'append',
+ *                 operand: Uint8Array.of(7, 8, 9),
+ *               },
+ *               {
+ *                 edges: new EdgeMap(),
+ *                 leaves: new LeafSet().add({ type: 'bitcoin', height: 123 }),
+ *               },
  *             ),
  *           },
  *         )
@@ -207,7 +221,7 @@ export function infoEdge(edge: Edge, msg: Uint8Array | undefined): string {
  *   //  -> msg = prepend(msg, 040506)
  *   //         = 0405060102030102030405060708090a
  *   //     bitcoinVerify(msg, 456)
- *```
+ * ```
  *
  * @param tree - {@link Tree} to generate human-readable string for.
  * @param msg - Optional message to use for verbose output.
@@ -245,13 +259,16 @@ export function infoTree(tree: Tree, msg: Uint8Array | undefined): string {
  *
  * const fileHash: FileHash = {
  *   algorithm: 'sha1',
- *   value: Uint8Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+ *   value: Uint8Array.of( 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+ *                        11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
  * };
  *
- * console.log(infoFileHash(fileHash, false));  // msg = sha1(FILE)
- * console.log(infoFileHash(fileHash, true));   // msg = sha1(FILE)
- *                                              //     = 0102030405060708090a0b0c0d0e0f1011121314
- *```
+ * console.log(infoFileHash(fileHash, false));
+ *   // msg = sha1(FILE)
+ * console.log(infoFileHash(fileHash, true));
+ *   // msg = sha1(FILE)
+ *   //     = 0102030405060708090a0b0c0d0e0f1011121314
+ * ```
  *
  * @param fileHash - {@link FileHash} to generate human-readable string for.
  * @param verbose - Whether to include the `value` field in the output or not.

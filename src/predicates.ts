@@ -57,7 +57,6 @@ import { treeToPaths } from './internals';
  *   ),
  * );
  *   // true
- *
  * console.log(
  *   canShrink(
  *     {
@@ -115,7 +114,6 @@ export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 
  *   }),
  * );
  *   // true
- *
  * console.log(
  *   canUpgrade({
  *     version: 1,
@@ -169,7 +167,6 @@ export function canUpgrade(timestamp: Timestamp): boolean {
  *   }),
  * );
  *   // true
- *
  * console.log(
  *   canVerify({
  *     version: 1,

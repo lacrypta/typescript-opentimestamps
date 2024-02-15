@@ -141,18 +141,12 @@ export function uint8ArrayFromBase64(base64: string): Uint8Array {
  * ```typescript
  * import { uint8ArrayEquals } from './src/utils';
  *
- * console.log(uint8ArrayEquals(
- *   Uint8Array.of(),
- *   Uint8Array.of(),
- * )); // true
- * console.log(uint8ArrayEquals(
- *   Uint8Array.of(1, 2, 3),
- *   Uint8Array.of(1, 2, 3),
- * )); // true
- * console.log(uint8ArrayEquals(
- *   Uint8Array.of(1, 2, 3),
- *   Uint8Array.of(1, 2, 4),
- * )); // false
+ * console.log(uint8ArrayEquals(Uint8Array.of(), Uint8Array.of()));
+ *   // true
+ * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 3)));
+ *   // true
+ * console.log(uint8ArrayEquals(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 4)));
+ *   // false
  * ```
  *
  * @param left - The first {@link !Uint8Array | array} to compare.
@@ -172,27 +166,17 @@ export function uint8ArrayEquals(left: Uint8Array, right: Uint8Array): boolean {
  * ```typescript
  * import { uint8ArrayCompare } from './src/utils';
  *
- * console.log(uint8ArrayCompare(
- *   Uint8Array.of(),
- *   Uint8Array.of(),
- * ));  //  0
- * console.log(uint8ArrayCompare(
- *   Uint8Array.of(1, 2, 3),
- *   Uint8Array.of(),
- * ));  //  3
- * console.log(uint8ArrayCompare(
- *   Uint8Array.of(1, 2, 3),
- *   Uint8Array.of(1, 2),
- * ));  //  1
- * console.log(uint8ArrayCompare(
- *   Uint8Array.of(1),
- *   Uint8Array.of(1, 2),
- * ));  // -1
- * console.log(uint8ArrayCompare(
- *   Uint8Array.of(1),
- *   Uint8Array.of(1, 2, 3),
- * ));  // -2
- *  * ```
+ * console.log(uint8ArrayCompare(Uint8Array.of(), Uint8Array.of()));
+ *   // 0
+ * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of()));
+ *   // 3
+ * console.log(uint8ArrayCompare(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2)));
+ *   // 1
+ * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2)));
+ *   // -1
+ * console.log(uint8ArrayCompare(Uint8Array.of(1), Uint8Array.of(1, 2, 3)));
+ *   // -2
+ * ```
  *
  * @param left - The first {@link !Uint8Array | array} to compare.
  * @param right - The second {@link !Uint8Array | array} to compare.
@@ -207,7 +191,6 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
   return left.length - right.length;
 }
 
-// ref: https://stackoverflow.com/a/49129872
 /**
  * Concatenate the given {@link !Uint8Array | Uint8Arrays}.
  *
@@ -223,6 +206,7 @@ export function uint8ArrayCompare(left: Uint8Array, right: Uint8Array): number {
  *   // Uint8Array(2) [ 1, 2 ]
  * ```
  *
+ * @see https://stackoverflow.com/a/49129872
  * @param arrays - The {@link !Uint8Array | arrays} to concatenate.
  * @returns The resulting concatenated {@link !Uint8Array}.
  */
@@ -288,6 +272,7 @@ export function uint8ArrayReversed(array: Uint8Array): Uint8Array {
  *   // TypeError: fetch failed ...
  * ```
  *
+ * @see https://stackoverflow.com/a/72718732
  * @param url - The {@link !URL} to fetch.
  * @param init - The {@link !fetch} options to use.
  * @returns The response body as a {@link !Uint8Array}.
@@ -299,7 +284,6 @@ export async function fetchBody(url: URL, init?: RequestInit): Promise<Uint8Arra
     if (!response.ok || null === response.body) {
       throw new Error('Error retrieving response body');
     }
-    // ref: https://stackoverflow.com/a/72718732
     return new Uint8Array(await new Response(response.body).arrayBuffer());
   } catch (e: unknown) {
     if (e instanceof Error) {
