@@ -81,7 +81,7 @@
     "markdownlint-cli": "^0.41.0",
     "prettier": "^3.3.2",
     "ts-jest": "^29.1.4",
-    "tsx": "^4.15.2",
+    "tsx": "^4.15.6",
     "typedoc": "^0.25.13",
     "typedoc-plugin-katex": "^0.1.2",
     "typedoc-plugin-keywords": "^1.6.0",
