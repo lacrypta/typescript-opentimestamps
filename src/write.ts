@@ -44,6 +44,7 @@ import { textEncoder, uint8ArrayConcat, uint8ArrayFromHex } from './utils';
  * ```
  * 1ddddddd 1ccccccc 1bbbbbbb 0aaaaaaa
  * ```
+ *
  * @example
  * ```typescript
  * import { writeUint } from './src/write';

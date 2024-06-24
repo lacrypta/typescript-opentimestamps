@@ -22,14 +22,14 @@
  */
 
 import type { Path } from './internals';
-import type { Timestamp, Verifier } from './types';
+import type { Leaf, Timestamp, Verifier } from './types';
 
 import { callOps, treeToPaths } from './internals';
 
 /**
  * Verify the given {@link Timestamp} with the given {@link Verifier | Verifiers}.
  *
- * This function will extract all {@link types!Leaf | Leaves} from the given {@link Timestamp}, run all operations leading to them, and, with the resulting message, call each {@link Verifier} given.
+ * This function will extract all {@link Leaf | Leaves} from the given {@link Timestamp}, run all operations leading to them, and, with the resulting message, call each {@link Verifier} given.
  *
  * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the result.
  *

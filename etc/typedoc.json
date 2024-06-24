@@ -25,9 +25,12 @@
     }
   },
   "keywords": ["OpenTimestamps", "library"],
-  "markedOptions": {
-    "gfm": true
+  "markdownItOptions": {
+    "html": true,
+    "linkify": true,
+    "typographer": true
   },
+  "highlightLanguages": ["ini", "perl", "sh", "typescript"],
   "pretty": true,
   "sourceLinkExternal": true,
   "hideParameterTypesInTitle": false,

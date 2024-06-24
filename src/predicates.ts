@@ -22,15 +22,15 @@
  */
 
 import type { Path, Paths } from './internals';
-import type { Timestamp } from './types';
+import type { Timestamp, Leaf } from './types';
 
 import { treeToPaths } from './internals';
 
 /**
  * Determine whether the given {@link Timestamp} can be shrunk on the given chain.
  *
- * In order for a {@link Timestamp} to be shrunk, it needs to have at least one {@link types!Leaf | Leaf} on the given chain, and at least one other {@link types!Leaf | Leaf}.
- * Shrinking it would remove all but the oldest {@link types!Leaf | Leaf} on the given chain.
+ * In order for a {@link Timestamp} to be shrunk, it needs to have at least one {@link Leaf} on the given chain, and at least one other {@link Leaf}.
+ * Shrinking it would remove all but the oldest {@link Leaf} on the given chain.
  *
  * @example
  * ```typescript
@@ -90,7 +90,7 @@ export function canShrink(timestamp: Timestamp, chain: 'bitcoin' | 'litecoin' | 
 /**
  * Determine whether the given {@link Timestamp} can be upgraded.
  *
- * In order for a {@link Timestamp} to be upgraded, it needs to have at least one `pending` {@link types!Leaf | Leaf}.
+ * In order for a {@link Timestamp} to be upgraded, it needs to have at least one `pending` {@link Leaf}.
  *
  * @example
  * ```typescript
@@ -143,7 +143,7 @@ export function canUpgrade(timestamp: Timestamp): boolean {
 /**
  * Determine whether the given {@link Timestamp} can be verified.
  *
- * In order for a {@link Timestamp} to be verified, it needs to have at least one non-`pending` {@link types!Leaf | Leaf}.
+ * In order for a {@link Timestamp} to be verified, it needs to have at least one non-`pending` {@link Leaf}.
  *
  * @example
  * ```typescript

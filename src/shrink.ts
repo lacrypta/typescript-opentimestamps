@@ -21,7 +21,7 @@
  * @module
  */
 
-import type { Path } from './internals';
+import type { Path, Paths } from './internals';
 import type { Leaf, Timestamp } from './types';
 
 import { pathsToTree, treeToPaths } from './internals';
@@ -29,7 +29,7 @@ import { pathsToTree, treeToPaths } from './internals';
 /**
  * Shrink the given {@link Timestamp} on the given chain.
  *
- * Shrinking a {@link Timestamp} consists of eliminating all {@link internals!Paths | Paths} other than the one leading to the _oldest_ {@link Leaf} on the given chain.
+ * Shrinking a {@link Timestamp} consists of eliminating all {@link Paths} other than the one leading to the _oldest_ {@link Leaf} on the given chain.
  * This allows the {@link Timestamp} to be smaller, only keeping the most stringent {@link Leaf | attestation} for the chosen chain.
  *
  * Note that shrinking an already shrunken {@link Timestamp} does nothing.

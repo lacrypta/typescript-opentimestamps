@@ -22,7 +22,7 @@
  */
 
 import type { Path, Paths } from './internals';
-import type { Timestamp, Tree } from './types';
+import type { Leaf, Timestamp, Tree } from './types';
 
 import { callOps, treeToPaths, pathsToTree } from './internals';
 import { readTree } from './read';
@@ -117,9 +117,9 @@ export async function upgradeFromCalendar(calendarUrl: URL, msg: Uint8Array): Pr
 }
 
 /**
- * Try to upgrade _all_ `pending` {@link types!Leaf | Leaves} on the given {@link Tree}.
+ * Try to upgrade _all_ `pending` {@link Leaf | Leaves} on the given {@link Tree}.
  *
- * This function will iterate all `pending` {@link types!Leaf | Leaves} and try to query the calendar therein looking for an upgraded {@link Tree}.
+ * This function will iterate all `pending` {@link Leaf | Leaves} and try to query the calendar therein looking for an upgraded {@link Tree}.
  *
  * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Tree}.
  *
@@ -314,9 +314,9 @@ export async function upgradeTree(tree: Tree, msg: Uint8Array): Promise<{ tree: 
 }
 
 /**
- * Try to upgrade _all_ `pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}.
+ * Try to upgrade _all_ `pending` {@link Leaf | Leaves} on the given {@link Timestamp}.
  *
- * This function will try to upgrade all`pending` {@link types!Leaf | Leaves} on the given {@link Timestamp}, and return the resulting (potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
+ * This function will try to upgrade all`pending` {@link Leaf | Leaves} on the given {@link Timestamp}, and return the resulting (potentially upgraded) {@link Timestamp}, and any {@link !Error | Errors} encountered.
  *
  * {@link !Error | Errors} encountered upon submission are not thrown, but rather collected and returned alongside the resulting {@link Timestamp}.
  *
