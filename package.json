@@ -68,7 +68,7 @@
   "devDependencies": {
     "@lacrypta/typescript-opentimestamps": "link:",
     "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.13.1",
     "esbuild": "^0.21.5",
     "esbuild-plugin-umd-wrapper": "^2.0.0",
