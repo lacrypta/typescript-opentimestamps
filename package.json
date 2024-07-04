@@ -68,9 +68,9 @@
   "devDependencies": {
     "@lacrypta/typescript-opentimestamps": "link:",
     "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^7.14.1",
-    "@typescript-eslint/parser": "^7.14.1",
-    "esbuild": "^0.22.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "esbuild": "^0.23.0",
     "esbuild-plugin-umd-wrapper": "^2.0.0",
     "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
@@ -81,14 +81,14 @@
     "markdownlint-cli": "^0.41.0",
     "prettier": "^3.3.2",
     "ts-jest": "^29.1.5",
-    "tsx": "^4.16.0",
+    "tsx": "^4.16.2",
     "typedoc": "^0.26.3",
     "typedoc-plugin-katex": "^0.1.2",
     "typedoc-plugin-keywords": "^1.6.0",
     "typedoc-plugin-mdn-links": "^3.2.2",
     "typedoc-plugin-mermaid": "^1.11.1",
     "typedoc-plugin-remove-references": "^0.0.6",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
