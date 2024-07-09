@@ -69,7 +69,7 @@
     "@lacrypta/typescript-opentimestamps": "link:",
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
-    "@typescript-eslint/parser": "^7.15.0",
+    "@typescript-eslint/parser": "^7.16.0",
     "esbuild": "^0.23.0",
     "esbuild-plugin-umd-wrapper": "^2.0.0",
     "eslint": "^9.6.0",
