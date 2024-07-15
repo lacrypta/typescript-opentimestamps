@@ -28,8 +28,8 @@ importers:
         specifier: ^0.23.0
         version: 0.23.0
       esbuild-plugin-umd-wrapper:
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.0.3
+        version: 2.0.3
       eslint:
         specifier: ^9.6.0
         version: 9.6.0
@@ -1156,8 +1156,8 @@ packages:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==, tarball: https://registry.npmjs.org/es-to-primitive/-/es-to-primitive-1.2.1.tgz}
     engines: {node: '>= 0.4'}
 
-  esbuild-plugin-umd-wrapper@2.0.0:
-    resolution: {integrity: sha512-pcu2/lcm29S85VCnSJuValrQ8FqeFJs5VWEwfp7vBRsOHjxZypcxgwXjxDIxDRo17uOcENZIbgz2szjln029eQ==, tarball: https://registry.npmjs.org/esbuild-plugin-umd-wrapper/-/esbuild-plugin-umd-wrapper-2.0.0.tgz}
+  esbuild-plugin-umd-wrapper@2.0.3:
+    resolution: {integrity: sha512-w81fZGyIahBBOvlJdirDJX73qoAfuD9hAQxuHZFKM+LZjsQo5To+1CFId+RYKk6PKEJZcE8yZ8LK/vyFoLqzHg==, tarball: https://registry.npmjs.org/esbuild-plugin-umd-wrapper/-/esbuild-plugin-umd-wrapper-2.0.3.tgz}
 
   esbuild@0.21.5:
     resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==, tarball: https://registry.npmjs.org/esbuild/-/esbuild-0.21.5.tgz}
@@ -3642,7 +3642,7 @@ snapshots:
       is-date-object: 1.0.5
       is-symbol: 1.0.4
 
-  esbuild-plugin-umd-wrapper@2.0.0: {}
+  esbuild-plugin-umd-wrapper@2.0.3: {}
 
   esbuild@0.21.5:
     optionalDependencies:
