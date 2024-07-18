@@ -43,8 +43,8 @@ importers:
         specifier: ^2.29.1
         version: 2.29.1(@typescript-eslint/parser@7.16.1(eslint@9.7.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.7.0)
       husky:
-        specifier: ^9.0.11
-        version: 9.0.11
+        specifier: ^9.1.0
+        version: 9.1.0
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.14.10)
@@ -1468,8 +1468,8 @@ packages:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==, tarball: https://registry.npmjs.org/human-signals/-/human-signals-2.1.0.tgz}
     engines: {node: '>=10.17.0'}
 
-  husky@9.0.11:
-    resolution: {integrity: sha512-AB6lFlbwwyIqMdHYhwPe+kjOC3Oc5P3nThEoW/AaO2BX3vJDjWPFxYLxokUZOo6RNX20He3AaT8sESs9NJcmEw==, tarball: https://registry.npmjs.org/husky/-/husky-9.0.11.tgz}
+  husky@9.1.0:
+    resolution: {integrity: sha512-8XCjbomYTGdNF2h50dio3T3zghmZ9f/ZNzr99YwSkvDdhEjJGs5qzy8tbFx+SG8yCx2wn9nMVfZxVrr/yT8gNQ==, tarball: https://registry.npmjs.org/husky/-/husky-9.1.0.tgz}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -4046,7 +4046,7 @@ snapshots:
 
   human-signals@2.1.0: {}
 
-  husky@9.0.11: {}
+  husky@9.1.0: {}
 
   ignore@5.3.1: {}
 
