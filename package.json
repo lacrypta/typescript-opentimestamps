@@ -36,9 +36,9 @@
   "jsdelivr": "./dist/umd/index.min.js",
   "exports": {
     "types": "./dist/types/index.d.ts",
-    "default": "./dist/esm/index.js",
+    "umd": "./dist/umd/index.js",
     "require": "./dist/cjs/index.cjs",
-    "umd": "./dist/umd/index.js"
+    "default": "./dist/esm/index.js"
   },
   "sideEffects": false,
   "type": "module",
