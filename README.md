@@ -7,12 +7,13 @@ It currently supports stamping, upgrading, and verifying timestamps.
 
 ## Table of Contents
 
-1. [Background](#background)
-2. [Install](#install)
-3. [Usage](#usage)
-4. [API](#api)
-5. [Contributing](#contributing)
-6. [License](#license)
+1. [Table of Contents](#table-of-contents)
+2. [Background](#background)
+3. [Install](#install)
+4. [Usage](#usage)
+5. [API](#api)
+6. [Contributing](#contributing)
+7. [License](#license)
 
 ## Background
 
@@ -137,4 +138,4 @@ Please follow contribution guidelines at [the GitHub repository](https://github.
 
 ## License
 
-GNU Affero General Public License v3.0 or later, see [LICENSE.md](./LICENSE.md).
+GNU Lesser General Public License v3 or later, see [LICENSE.md](./LICENSE.md).
